@@ -91,7 +91,7 @@ export async function deleteSet(id) {
   const rowIndex = rows.findIndex((r, i) => i > 0 && r[0] === id);
   if (rowIndex === -1) return;
 
-  await sheetsPost('/batchUpdate', {
+  await sheetsPost(':batchUpdate', {
     requests: [{
       deleteDimension: {
         range: {
