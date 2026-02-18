@@ -28,7 +28,9 @@ function getDateRange(period) {
   };
 }
 
-export default function StatsView({ sets, exercises }) {
+const USERS = ['Ethan', 'Ava'];
+
+export default function StatsView({ sets, exercises, activeUser, onUserChange }) {
   const [period, setPeriod] = useState('week');
   const [side, setSide] = useState('front');
 
@@ -40,6 +42,7 @@ export default function StatsView({ sets, exercises }) {
     const totals = {};
     for (const s of sets) {
       if (s.date < startStr || s.date > endStr) continue;
+      if (s.user !== activeUser) continue;
       const ex = exMap[s.exercise];
       if (!ex) continue;
       for (const [muscle, w] of Object.entries(ex.muscles)) {
@@ -47,7 +50,7 @@ export default function StatsView({ sets, exercises }) {
       }
     }
     return totals;
-  }, [sets, exercises, period]);
+  }, [sets, exercises, period, activeUser]);
 
   const rankedMuscles = Object.entries(effectiveSets)
     .filter(([, v]) => v > 0)
@@ -57,6 +60,17 @@ export default function StatsView({ sets, exercises }) {
 
   return (
     <div className="view">
+      <div className="user-toggle">
+        {USERS.map(u => (
+          <button
+            key={u}
+            className={`user-btn ${activeUser === u ? 'active' : ''}`}
+            onClick={() => onUserChange(u)}
+          >
+            {u}
+          </button>
+        ))}
+      </div>
       <div className="period-selector">
         {['week', 'month', 'year'].map(p => (
           <button

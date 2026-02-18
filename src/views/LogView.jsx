@@ -1,5 +1,6 @@
 import { addSet, deleteSet } from '../data/storage';
 import SwipeableRow from '../components/SwipeableRow';
+import { groupExercises } from '../data/grouping';
 
 const USERS = ['Ethan', 'Ava'];
 
@@ -61,8 +62,12 @@ export default function LogView({ exercises, sets, onSetsChange, activeUser, onU
           <label>Exercise</label>
           <select value={exercise} onChange={e => setLogDraft(d => ({ ...d, exercise: e.target.value }))} required>
             <option value="">— select —</option>
-            {exercises.map(ex => (
-              <option key={ex.name} value={ex.name}>{ex.name}</option>
+            {groupExercises(exercises).map(({ label, exercises: group }) => (
+              <optgroup key={label} label={label}>
+                {group.map(ex => (
+                  <option key={ex.name} value={ex.name}>{ex.name}</option>
+                ))}
+              </optgroup>
             ))}
           </select>
         </div>

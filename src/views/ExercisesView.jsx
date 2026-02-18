@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { addExercise, updateExercise } from '../data/storage';
 import ExerciseEditSheet from './ExerciseEditSheet';
+import { groupExercises } from '../data/grouping';
 
 const MUSCLE_LABELS = {
   chest: 'Chest', back: 'Back', shoulders: 'Shoulders', biceps: 'Biceps',
@@ -24,7 +25,8 @@ export default function ExercisesView({ exercises, onExercisesChange }) {
 
   function primaryMuscles(muscles) {
     return Object.entries(muscles)
-      .filter(([, v]) => v >= 1)
+      .filter(([, v]) => v > 0)
+      .sort(([, a], [, b]) => b - a)
       .map(([k]) => MUSCLE_LABELS[k])
       .join(', ');
   }
@@ -51,16 +53,21 @@ export default function ExercisesView({ exercises, onExercisesChange }) {
         </form>
       )}
 
-      <div className="exercise-list">
-        {exercises.map(ex => (
-          <div key={ex.name} className="exercise-item tappable" onClick={() => setEditingExercise(ex)}>
-            <span className="exercise-name">{ex.name}</span>
-            {Object.keys(ex.muscles).length > 0 && (
-              <span className="exercise-muscles">{primaryMuscles(ex.muscles)}</span>
-            )}
+      {groupExercises(exercises).map(({ label, exercises: group }) => (
+        <div key={label} className="exercise-group">
+          <div className="exercise-group-header">{label}</div>
+          <div className="exercise-list">
+            {group.map(ex => (
+              <div key={ex.name} className="exercise-item tappable" onClick={() => setEditingExercise(ex)}>
+                <span className="exercise-name">{ex.name}</span>
+                {Object.keys(ex.muscles).length > 0 && (
+                  <span className="exercise-muscles">{primaryMuscles(ex.muscles)}</span>
+                )}
+              </div>
+            ))}
           </div>
-        ))}
-      </div>
+        </div>
+      ))}
 
       {editingExercise && (
         <ExerciseEditSheet

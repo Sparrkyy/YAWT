@@ -369,6 +369,7 @@
 
 .exercise-name {
   font-size: 0.95rem;
+  flex: 1;
 }
 
 .exercise-muscles {
@@ -385,6 +386,21 @@
   color: var(--text-secondary);
   font-size: 1.2rem;
   margin-left: 8px;
+}
+
+/* Exercise groups */
+.exercise-group {
+  display: flex;
+  flex-direction: column;
+}
+
+.exercise-group-header {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  padding: 12px 4px 4px;
 }
 
 /* Sheet overlay */

@@ -66,7 +66,7 @@ export default function App() {
           <ExercisesView exercises={exercises} onExercisesChange={refreshExercises} />
         )}
         {tab === 'Stats' && (
-          <StatsView sets={sets} exercises={exercises} />
+          <StatsView sets={sets} exercises={exercises} activeUser={activeUser} onUserChange={setActiveUser} />
         )}
       </main>
 
