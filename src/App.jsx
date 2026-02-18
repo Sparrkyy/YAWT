@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
-import { getSets, getExercises } from './data/storage';
+import { initAuth, signIn, signOut } from './data/auth';
+import { getSets, getExercises } from './data/sheetsApi';
 import LogView from './views/LogView';
 import HistoryView from './views/HistoryView';
 import ExercisesView from './views/ExercisesView';
@@ -9,6 +10,8 @@ import './App.css';
 const TABS = ['Log', 'History', 'Exercises', 'Stats'];
 
 export default function App() {
+  const [signedIn, setSignedIn] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [tab, setTab] = useState('Log');
   const [sets, setSets] = useState([]);
   const [exercises, setExercises] = useState([]);
@@ -29,9 +32,28 @@ export default function App() {
   }
 
   useEffect(() => {
-    getSets().then(setSets);
-    getExercises().then(setExercises);
+    // GIS loads async; poll until it's ready then init
+    function tryInit() {
+      if (typeof google !== 'undefined' && google.accounts?.oauth2) {
+        initAuth(onSignIn);
+      } else {
+        setTimeout(tryInit, 100);
+      }
+    }
+    tryInit();
   }, []);
+
+  async function onSignIn() {
+    setSignedIn(true);
+    setLoading(true);
+    try {
+      const [fetchedSets, fetchedExercises] = await Promise.all([getSets(), getExercises()]);
+      setSets(fetchedSets);
+      setExercises(fetchedExercises);
+    } finally {
+      setLoading(false);
+    }
+  }
 
   async function refreshSets() {
     setSets(await getSets());
@@ -41,10 +63,43 @@ export default function App() {
     setExercises(await getExercises());
   }
 
+  function handleSignOut() {
+    signOut();
+    setSignedIn(false);
+    setSets([]);
+    setExercises([]);
+  }
+
+  if (!signedIn) {
+    return (
+      <div className="app sign-in-screen">
+        <div className="sign-in-card">
+          <h1 className="app-title">YAWT</h1>
+          <p className="sign-in-subtitle">Yet Another Workout Tracker</p>
+          <button className="btn-primary sign-in-btn" onClick={signIn}>
+            Sign in with Google
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  if (loading) {
+    return (
+      <div className="app sign-in-screen">
+        <div className="sign-in-card">
+          <span className="loading-spinner" />
+          <p>Loading…</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="app">
       <header className="app-header">
         <span className="app-title">YAWT</span>
+        <button className="sign-out-btn" onClick={handleSignOut}>Sign out</button>
       </header>
 
       <main className="app-main">

@@ -7,7 +7,9 @@
       "Bash(npm run build:*)",
       "Bash(file:*)",
       "Bash(npx vite:*)",
-      "Bash(pkill:*)"
+      "Bash(pkill:*)",
+      "Bash(ipconfig getifaddr:*)",
+      "Bash(ipconfig:*)"
     ]
   }
 }

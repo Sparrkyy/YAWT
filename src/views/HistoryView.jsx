@@ -1,4 +1,4 @@
-import { deleteSet } from '../data/storage';
+import { deleteSet } from '../data/sheetsApi';
 import SwipeableRow from '../components/SwipeableRow';
 
 export default function HistoryView({ sets, onSetsChange }) {

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { addExercise, updateExercise } from '../data/storage';
+import { addExercise, updateExercise } from '../data/sheetsApi';
 import ExerciseEditSheet from './ExerciseEditSheet';
 import { groupExercises } from '../data/grouping';
 

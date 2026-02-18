@@ -27,7 +27,11 @@ jobs:
           node-version: 20
           cache: npm
       - run: npm ci
-      - run: npm run build
+      - name: Build
+        run: npm run build
+        env:
+          VITE_GOOGLE_CLIENT_ID: ${{ secrets.VITE_GOOGLE_CLIENT_ID }}
+          VITE_SHEET_ID: ${{ secrets.VITE_SHEET_ID }}
       - uses: actions/upload-pages-artifact@v3
         with:
           path: dist

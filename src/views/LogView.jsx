@@ -1,10 +1,12 @@
-import { addSet, deleteSet } from '../data/storage';
+import { useState } from 'react';
+import { addSet, deleteSet } from '../data/sheetsApi';
 import SwipeableRow from '../components/SwipeableRow';
 import { groupExercises } from '../data/grouping';
 
 const USERS = ['Ethan', 'Ava'];
 
 export default function LogView({ exercises, sets, onSetsChange, activeUser, onUserChange, logDraft, setLogDraft }) {
+  const [saving, setSaving] = useState(false);
   const { exercise, reps, weight, notes } = logDraft;
 
   const today = new Date().toLocaleDateString('en-CA'); // YYYY-MM-DD
@@ -30,17 +32,22 @@ export default function LogView({ exercises, sets, onSetsChange, activeUser, onU
   async function handleSubmit(e) {
     e.preventDefault();
     if (!exercise || !weight) return;
-    await addSet({
-      date: today,
-      user: activeUser,
-      exercise,
-      reps: reps === '' ? null : Number(reps),
-      weight: Number(weight),
-      notes,
-      createdAt: new Date().toISOString(),
-    });
-    setLogDraft(d => ({ ...d, reps: '', weight: '', notes: '' }));
-    onSetsChange();
+    setSaving(true);
+    try {
+      await addSet({
+        date: today,
+        user: activeUser,
+        exercise,
+        reps: reps === '' ? null : Number(reps),
+        weight: Number(weight),
+        notes,
+        createdAt: new Date().toISOString(),
+      });
+      setLogDraft(d => ({ ...d, reps: '', weight: '', notes: '' }));
+      await onSetsChange();
+    } finally {
+      setSaving(false);
+    }
   }
 
   return (
@@ -127,7 +134,9 @@ export default function LogView({ exercises, sets, onSetsChange, activeUser, onU
           />
         </div>
 
-        <button type="submit" className="btn-primary">Add Set</button>
+        <button type="submit" className="btn-primary" disabled={saving}>
+          {saving ? 'Saving…' : 'Add Set'}
+        </button>
       </form>
 
       {todaysSets.length > 0 && (
