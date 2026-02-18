@@ -1,0 +1,510 @@
+/* Layout */
+.app {
+  display: flex;
+  flex-direction: column;
+  height: 100dvh;
+  max-width: 480px;
+  margin: 0 auto;
+}
+
+.app-header {
+  height: var(--header-height);
+  display: flex;
+  align-items: center;
+  padding: 0 16px;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+
+.app-title {
+  font-size: 1.1rem;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+}
+
+.app-main {
+  flex: 1;
+  overflow-y: auto;
+}
+
+/* Bottom nav */
+.app-nav {
+  height: var(--nav-height);
+  display: flex;
+  background: var(--surface);
+  border-top: 1px solid var(--border);
+  flex-shrink: 0;
+}
+
+.nav-btn {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  color: var(--text-secondary);
+  font-size: 0.7rem;
+  font-weight: 500;
+  transition: color 0.15s;
+}
+
+.nav-btn .nav-icon {
+  font-size: 1.3rem;
+  line-height: 1;
+}
+
+.nav-btn.active {
+  color: var(--accent);
+}
+
+/* View wrapper */
+.view {
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.empty-state {
+  color: var(--text-secondary);
+  text-align: center;
+  padding-top: 48px;
+}
+
+/* User toggle */
+.user-toggle {
+  display: flex;
+  gap: 8px;
+}
+
+.user-btn {
+  flex: 1;
+  padding: 10px;
+  border-radius: var(--radius);
+  background: var(--surface2);
+  color: var(--text-secondary);
+  font-size: 0.95rem;
+  font-weight: 600;
+  transition: background 0.15s, color 0.15s;
+}
+
+.user-btn.active {
+  background: var(--accent-dim);
+  color: var(--accent);
+}
+
+/* Form */
+.log-form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  background: var(--surface);
+  border-radius: var(--radius);
+  padding: 16px;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.field label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.field input,
+.field select {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 10px 12px;
+  color: var(--text);
+  width: 100%;
+  appearance: auto;
+}
+
+.field input:focus,
+.field select:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
+.exercise-stats {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  padding: 10px 12px;
+  background: var(--surface2);
+  border-radius: 8px;
+  border: 1px solid var(--border);
+}
+
+.stat-block {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.stat-label {
+  font-size: 0.7rem;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.stat-value {
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.field-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.btn-primary {
+  background: var(--accent);
+  color: #fff;
+  padding: 12px;
+  border-radius: var(--radius);
+  font-size: 1rem;
+  font-weight: 600;
+  text-align: center;
+  transition: opacity 0.15s;
+}
+
+.btn-primary:active {
+  opacity: 0.8;
+}
+
+/* Set rows */
+.todays-sets h3,
+.history-date {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  padding-bottom: 8px;
+}
+
+.set-row {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px;
+  background: var(--surface);
+  border-radius: 8px;
+  border-left: 3px solid var(--border);
+  margin-bottom: 6px;
+  position: relative;
+}
+
+.set-row.ethan {
+  border-left-color: var(--ethan);
+}
+
+.set-row.ava {
+  border-left-color: var(--ava);
+}
+
+.set-user {
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: var(--text-secondary);
+  min-width: 36px;
+}
+
+.set-row.ethan .set-user { color: var(--ethan); }
+.set-row.ava .set-user { color: var(--ava); }
+
+.set-exercise {
+  font-size: 0.9rem;
+  font-weight: 500;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.set-stats {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  white-space: nowrap;
+}
+
+.set-notes {
+  grid-column: 2 / -1;
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  font-style: italic;
+}
+
+/* History */
+.history-day {
+  margin-bottom: 8px;
+}
+
+.delete-btn {
+  color: var(--text-secondary);
+  font-size: 1.1rem;
+  line-height: 1;
+  padding: 0 4px;
+  transition: color 0.15s;
+}
+
+.delete-btn:active {
+  color: var(--danger);
+}
+
+/* Exercises */
+.exercises-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.exercises-header h3 {
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+.btn-small {
+  background: var(--accent-dim);
+  color: var(--accent);
+  padding: 6px 12px;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.add-exercise-form {
+  display: flex;
+  gap: 8px;
+}
+
+.add-exercise-form input {
+  flex: 1;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 10px 12px;
+  color: var(--text);
+}
+
+.add-exercise-form input:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
+.exercise-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.exercise-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 4px;
+  border-bottom: 1px solid var(--border);
+}
+
+.exercise-name {
+  font-size: 0.95rem;
+}
+
+.exercise-muscles {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+}
+
+.exercise-item.tappable {
+  cursor: pointer;
+}
+
+.exercise-item.tappable::after {
+  content: '›';
+  color: var(--text-secondary);
+  font-size: 1.2rem;
+  margin-left: 8px;
+}
+
+/* Sheet overlay */
+.sheet-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  z-index: 100;
+  display: flex;
+  align-items: flex-end;
+}
+
+.sheet {
+  width: 100%;
+  max-width: 480px;
+  margin: 0 auto;
+  background: var(--surface);
+  border-radius: var(--radius) var(--radius) 0 0;
+  max-height: 85dvh;
+  display: flex;
+  flex-direction: column;
+}
+
+.sheet-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+
+.sheet-title {
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+.sheet-close {
+  color: var(--text-secondary);
+  font-size: 1rem;
+  padding: 4px 8px;
+}
+
+.sheet-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 0 16px;
+}
+
+.sheet-footer {
+  padding: 16px;
+  border-top: 1px solid var(--border);
+  flex-shrink: 0;
+}
+
+.muscle-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.muscle-label {
+  font-size: 0.9rem;
+}
+
+.stepper {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.stepper-btn {
+  width: 32px;
+  height: 32px;
+  background: var(--surface2);
+  border-radius: 8px;
+  font-size: 1.2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.stepper-value {
+  font-size: 0.95rem;
+  font-weight: 600;
+  min-width: 28px;
+  text-align: center;
+}
+
+/* Stats */
+.period-selector {
+  display: flex;
+  gap: 8px;
+}
+
+.period-btn {
+  flex: 1;
+  background: var(--surface2);
+  color: var(--text-secondary);
+  padding: 8px 4px;
+  border-radius: 8px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  transition: background 0.15s, color 0.15s;
+}
+
+.period-btn.active {
+  background: var(--accent-dim);
+  color: var(--accent);
+}
+
+.body-diagram {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+.side-toggle {
+  display: flex;
+  gap: 8px;
+}
+
+.side-btn {
+  flex: 1;
+  background: var(--surface2);
+  color: var(--text-secondary);
+  padding: 8px 20px;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  transition: background 0.15s, color 0.15s;
+}
+
+.side-btn.active {
+  background: var(--accent-dim);
+  color: var(--accent);
+}
+
+.body-svg {
+  width: 100%;
+  max-width: 280px;
+}
+
+.muscle-totals {
+  background: var(--surface);
+  border-radius: var(--radius);
+  overflow: hidden;
+  border: 1px solid var(--border);
+}
+
+.muscle-total-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 14px;
+  border-bottom: 1px solid var(--border);
+  font-size: 0.9rem;
+}
+
+.muscle-total-row:last-child {
+  border-bottom: none;
+}
+
+.muscle-total-value {
+  color: var(--accent);
+  font-weight: 600;
+  font-size: 0.85rem;
+}
