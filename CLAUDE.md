@@ -21,6 +21,7 @@ Always start the dev server with `--host` so it's accessible on the LAN (Ava can
 npm run dev -- --host
 ```
 
+
 ## Status
 - [ ] UI scaffold
 - [ ] Local state / mock data
