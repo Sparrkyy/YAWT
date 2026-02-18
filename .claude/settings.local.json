@@ -9,7 +9,8 @@
       "Bash(npx vite:*)",
       "Bash(pkill:*)",
       "Bash(ipconfig getifaddr:*)",
-      "Bash(ipconfig:*)"
+      "Bash(ipconfig:*)",
+      "Bash(git add:*)"
     ]
   }
 }
