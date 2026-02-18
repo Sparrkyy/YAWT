@@ -1,4 +1,5 @@
 import { deleteSet } from '../data/storage';
+import SwipeableRow from '../components/SwipeableRow';
 
 export default function HistoryView({ sets, onSetsChange }) {
   if (sets.length === 0) {
@@ -28,15 +29,16 @@ export default function HistoryView({ sets, onSetsChange }) {
             })}
           </h3>
           {byDate[date].map(s => (
-            <div key={s.id} className={`set-row ${s.user?.toLowerCase()}`}>
-              <span className="set-user">{s.user}</span>
-              <span className="set-exercise">{s.exercise}</span>
-              <span className="set-stats">
-                {s.reps != null ? `${s.reps} reps` : '—'} @ {s.weight} lbs
-              </span>
-              {s.notes && <span className="set-notes">{s.notes}</span>}
-              <button className="delete-btn" onClick={() => handleDelete(s.id)} title="Delete">×</button>
-            </div>
+            <SwipeableRow key={s.id} onDelete={() => handleDelete(s.id)}>
+              <div className={`set-row ${s.user?.toLowerCase()}`}>
+                <span className="set-user">{s.user}</span>
+                <span className="set-exercise">{s.exercise}</span>
+                <span className="set-stats">
+                  {s.reps != null ? `${s.reps} reps` : '—'} @ {s.weight} lbs
+                </span>
+                {s.notes && <span className="set-notes">{s.notes}</span>}
+              </div>
+            </SwipeableRow>
           ))}
         </div>
       ))}

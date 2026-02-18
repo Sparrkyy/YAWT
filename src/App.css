@@ -8,10 +8,10 @@
 }
 
 .app-header {
-  height: var(--header-height);
+  height: calc(var(--header-height) + env(safe-area-inset-top));
   display: flex;
   align-items: center;
-  padding: 0 16px;
+  padding: env(safe-area-inset-top) 16px 0;
   background: var(--surface);
   border-bottom: 1px solid var(--border);
   flex-shrink: 0;
@@ -30,11 +30,12 @@
 
 /* Bottom nav */
 .app-nav {
-  height: var(--nav-height);
+  height: calc(var(--nav-height) + env(safe-area-inset-bottom));
   display: flex;
   background: var(--surface);
   border-top: 1px solid var(--border);
   flex-shrink: 0;
+  padding-bottom: env(safe-area-inset-bottom);
 }
 
 .nav-btn {
@@ -205,8 +206,9 @@
   background: var(--surface);
   border-radius: 8px;
   border-left: 3px solid var(--border);
-  margin-bottom: 6px;
+  margin-bottom: 0;
   position: relative;
+  width: 100%;
 }
 
 .set-row.ethan {
@@ -253,16 +255,62 @@
   margin-bottom: 8px;
 }
 
-.delete-btn {
-  color: var(--text-secondary);
-  font-size: 1.1rem;
-  line-height: 1;
-  padding: 0 4px;
-  transition: color 0.15s;
+/* Swipe-to-delete */
+.swipe-wrap {
+  position: relative;
+  overflow: hidden;
+  border-radius: var(--radius);
+  margin-bottom: 6px;
 }
 
-.delete-btn:active {
-  color: var(--danger);
+.swipe-delete-bg {
+  position: absolute;
+  inset: 0;
+  background: var(--danger);
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  padding-right: 20px;
+  color: #fff;
+  font-size: 0.9rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+.swipe-delete-bg button {
+  color: inherit;
+  font-size: inherit;
+  font-weight: inherit;
+  background: none;
+  padding: 0;
+}
+
+.swipe-inner {
+  position: relative;
+  display: flex;
+  align-items: stretch;
+}
+
+.swipe-hint-btn {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--text-secondary);
+  font-size: 1.1rem;
+  padding: 4px 6px;
+  opacity: 0;
+  transition: opacity 0.15s, color 0.15s;
+  z-index: 1;
+}
+
+@media (hover: hover) {
+  .swipe-inner:hover .swipe-hint-btn { opacity: 1; }
+  .swipe-hint-btn:hover { color: var(--danger); }
+}
+
+@media (hover: none) {
+  .swipe-hint-btn { display: none; }
 }
 
 /* Exercises */

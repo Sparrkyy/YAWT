@@ -15,6 +15,12 @@ Flat log structure (mirrors the Excel sheet):
 ## Users
 No auth for now. Users select their name (Ethan / Ava) when logging.
 
+## Dev Server
+Always start the dev server with `--host` so it's accessible on the LAN (Ava can open it on her phone):
+```
+npm run dev -- --host
+```
+
 ## Status
 - [ ] UI scaffold
 - [ ] Local state / mock data

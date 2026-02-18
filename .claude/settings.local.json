@@ -6,7 +6,8 @@
       "Bash(npm run dev:*)",
       "Bash(npm run build:*)",
       "Bash(file:*)",
-      "Bash(npx vite:*)"
+      "Bash(npx vite:*)",
+      "Bash(pkill:*)"
     ]
   }
 }

@@ -13,7 +13,20 @@ export default function App() {
   const [sets, setSets] = useState([]);
   const [exercises, setExercises] = useState([]);
   const [activeUser, setActiveUser] = useState('Ethan');
-  const [logDraft, setLogDraft] = useState({ exercise: '', reps: '', weight: '', notes: '' });
+  const [sharedExercise, setSharedExercise] = useState('');
+  const [userDrafts, setUserDrafts] = useState({
+    Ethan: { reps: '', weight: '', notes: '' },
+    Ava:   { reps: '', weight: '', notes: '' },
+  });
+
+  const logDraft = { exercise: sharedExercise, ...userDrafts[activeUser] };
+
+  function setLogDraft(updater) {
+    const next = typeof updater === 'function' ? updater(logDraft) : updater;
+    const { exercise: ex, ...userFields } = next;
+    if (ex !== sharedExercise) setSharedExercise(ex);
+    setUserDrafts(prev => ({ ...prev, [activeUser]: userFields }));
+  }
 
   useEffect(() => {
     getSets().then(setSets);
@@ -31,7 +44,7 @@ export default function App() {
   return (
     <div className="app">
       <header className="app-header">
-        <span className="app-title">Workout</span>
+        <span className="app-title">YAWT</span>
       </header>
 
       <main className="app-main">

@@ -1,4 +1,5 @@
-import { addSet } from '../data/storage';
+import { addSet, deleteSet } from '../data/storage';
+import SwipeableRow from '../components/SwipeableRow';
 
 const USERS = ['Ethan', 'Ava'];
 
@@ -19,6 +20,11 @@ export default function LogView({ exercises, sets, onSetsChange, activeUser, onU
   const bestSet = exerciseSets
     .filter(s => s.reps != null && s.reps >= 5)
     .sort((a, b) => b.weight - a.weight)[0] ?? null;
+
+  async function handleDelete(id) {
+    await deleteSet(id);
+    onSetsChange();
+  }
 
   async function handleSubmit(e) {
     e.preventDefault();
@@ -123,14 +129,16 @@ export default function LogView({ exercises, sets, onSetsChange, activeUser, onU
         <div className="todays-sets">
           <h3>Today</h3>
           {todaysSets.map(s => (
-            <div key={s.id} className={`set-row ${s.user.toLowerCase()}`}>
-              <span className="set-user">{s.user}</span>
-              <span className="set-exercise">{s.exercise}</span>
-              <span className="set-stats">
-                {s.reps != null ? `${s.reps} reps` : '—'} @ {s.weight} lbs
-              </span>
-              {s.notes && <span className="set-notes">{s.notes}</span>}
-            </div>
+            <SwipeableRow key={s.id} onDelete={() => handleDelete(s.id)}>
+              <div className={`set-row ${s.user.toLowerCase()}`}>
+                <span className="set-user">{s.user}</span>
+                <span className="set-exercise">{s.exercise}</span>
+                <span className="set-stats">
+                  {s.reps != null ? `${s.reps} reps` : '—'} @ {s.weight} lbs
+                </span>
+                {s.notes && <span className="set-notes">{s.notes}</span>}
+              </div>
+            </SwipeableRow>
           ))}
         </div>
       )}
