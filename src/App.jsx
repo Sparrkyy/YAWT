@@ -10,6 +10,7 @@ import './App.css';
 const TABS = ['Log', 'History', 'Exercises', 'Stats'];
 
 export default function App() {
+  const [authReady, setAuthReady] = useState(false);
   const [signedIn, setSignedIn] = useState(false);
   const [loading, setLoading] = useState(false);
   const [tab, setTab] = useState('Log');
@@ -36,6 +37,7 @@ export default function App() {
     function tryInit() {
       if (typeof google !== 'undefined' && google.accounts?.oauth2) {
         initAuth(onSignIn);
+        setAuthReady(true);
       } else {
         setTimeout(tryInit, 100);
       }
@@ -76,8 +78,8 @@ export default function App() {
         <div className="sign-in-card">
           <h1 className="app-title">YAWT</h1>
           <p className="sign-in-subtitle">Yet Another Workout Tracker</p>
-          <button className="btn-primary sign-in-btn" onClick={signIn}>
-            Sign in with Google
+          <button className="btn-primary sign-in-btn" onClick={signIn} disabled={!authReady}>
+            {authReady ? 'Sign in with Google' : 'Loading…'}
           </button>
         </div>
       </div>
