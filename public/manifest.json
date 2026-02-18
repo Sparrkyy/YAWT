@@ -1,7 +1,8 @@
 {
   "name": "YAWT — Yet Another Workout Tracker",
   "short_name": "YAWT",
-  "start_url": "/",
+  "start_url": "/YAWT/",
+  "scope": "/YAWT/",
   "display": "standalone",
   "background_color": "#111111",
   "theme_color": "#111111",
