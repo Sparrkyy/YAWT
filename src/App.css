@@ -28,6 +28,14 @@
   flex: 1;
 }
 
+.app-logo-icon {
+  width: 28px;
+  height: 28px;
+  border-radius: 7px;
+  flex-shrink: 0;
+  margin-right: auto;
+}
+
 .sign-out-btn {
   font-size: 0.8rem;
   color: var(--text-secondary);
@@ -113,8 +121,8 @@
 }
 
 .nav-btn .nav-icon {
-  font-size: 1.3rem;
   line-height: 1;
+  display: flex;
 }
 
 .nav-btn.active {

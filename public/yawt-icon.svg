@@ -1,5 +1,5 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-  <rect width="512" height="512" rx="114" fill="#111111"/>
+  <rect width="512" height="512" rx="114" fill="#5E5CE6"/>
   <text x="256" y="310" font-family="-apple-system, system-ui, sans-serif"
-        font-size="168" font-weight="700" text-anchor="middle" fill="#0a84ff">YAWT</text>
+        font-size="168" font-weight="700" text-anchor="middle" fill="#FFFFFF">YAWT</text>
 </svg>

@@ -100,7 +100,7 @@ export default function App() {
   return (
     <div className={`app${tab === 'Log' ? ` user-${activeUser.toLowerCase()}` : ''}`}>
       <header className="app-header">
-        <span className="app-title">YAWT</span>
+        <img src="yawt-icon.svg" className="app-logo-icon" alt="YAWT" />
         <button className="sign-out-btn" onClick={handleSignOut}>Sign out</button>
       </header>
 
@@ -135,10 +135,32 @@ export default function App() {
             onClick={() => setTab(t)}
           >
             <span className="nav-icon">
-              {t === 'Log' && '✏️'}
-              {t === 'History' && '📋'}
-              {t === 'Exercises' && '💪'}
-              {t === 'Stats' && '📊'}
+              {t === 'Log' && (
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/>
+                  <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+                </svg>
+              )}
+              {t === 'History' && (
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
+                  <circle cx="12" cy="12" r="10"/>
+                  <polyline points="12 6 12 12 16 14"/>
+                </svg>
+              )}
+              {t === 'Exercises' && (
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M6 4v16M18 4v16M6 9h12M6 15h12"/>
+                  <path d="M2 9v6M22 9v6"/>
+                </svg>
+              )}
+              {t === 'Stats' && (
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
+                  <line x1="18" y1="20" x2="18" y2="10"/>
+                  <line x1="12" y1="20" x2="12" y2="4"/>
+                  <line x1="6" y1="20" x2="6" y2="14"/>
+                  <line x1="2" y1="20" x2="22" y2="20"/>
+                </svg>
+              )}
             </span>
             <span>{t}</span>
           </button>

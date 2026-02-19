@@ -10,7 +10,8 @@
       "Bash(pkill:*)",
       "Bash(ipconfig getifaddr:*)",
       "Bash(ipconfig:*)",
-      "Bash(git add:*)"
+      "Bash(git add:*)",
+      "Bash(convert:*)"
     ]
   }
 }
