@@ -5,7 +5,11 @@
   height: 100dvh;
   max-width: 480px;
   margin: 0 auto;
+  transition: background 0.25s;
 }
+
+.app.user-ethan { background: #4a7c5a; }
+.app.user-ava   { background: #fad7e1; }
 
 .app-header {
   height: calc(var(--header-height) + env(safe-area-inset-top));

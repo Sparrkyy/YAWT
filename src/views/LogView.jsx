@@ -13,7 +13,7 @@ export default function LogView({ exercises, sets, onSetsChange, activeUser, onU
 
   const todaysSets = sets
     .filter(s => s.date === today)
-    .sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt));
+    .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
 
   const exerciseSets = sets.filter(s => s.exercise === exercise && s.user === activeUser);
 

@@ -98,7 +98,7 @@ export default function App() {
   }
 
   return (
-    <div className="app">
+    <div className={`app${tab === 'Log' ? ` user-${activeUser.toLowerCase()}` : ''}`}>
       <header className="app-header">
         <span className="app-title">YAWT</span>
         <button className="sign-out-btn" onClick={handleSignOut}>Sign out</button>
