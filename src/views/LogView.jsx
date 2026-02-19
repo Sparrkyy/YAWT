@@ -1,12 +1,14 @@
 import { useState } from 'react';
 import { addSet, deleteSet } from '../data/sheetsApi';
 import SwipeableRow from '../components/SwipeableRow';
+import ConfirmDialog from '../components/ConfirmDialog';
 import { groupExercises } from '../data/grouping';
 
 const USERS = ['Ethan', 'Ava'];
 
 export default function LogView({ exercises, sets, onSetsChange, activeUser, onUserChange, logDraft, setLogDraft }) {
   const [saving, setSaving] = useState(false);
+  const [pendingDelete, setPendingDelete] = useState(null);
   const { exercise, reps, weight, notes } = logDraft;
 
   const today = new Date().toLocaleDateString('en-CA'); // YYYY-MM-DD
@@ -24,9 +26,20 @@ export default function LogView({ exercises, sets, onSetsChange, activeUser, onU
     .filter(s => s.reps != null && s.reps >= 5)
     .sort((a, b) => b.weight - a.weight)[0] ?? null;
 
-  async function handleDelete(id) {
+  function handleRequestDelete(id, snapBack) {
+    setPendingDelete({ id, snapBack });
+  }
+
+  async function handleConfirmDelete() {
+    const { id } = pendingDelete;
+    setPendingDelete(null);
     await deleteSet(id);
     onSetsChange();
+  }
+
+  function handleCancelDelete() {
+    pendingDelete?.snapBack?.();
+    setPendingDelete(null);
   }
 
   async function handleSubmit(e) {
@@ -144,7 +157,7 @@ export default function LogView({ exercises, sets, onSetsChange, activeUser, onU
         <div className="todays-sets">
           <h3>Today</h3>
           {todaysSets.map(s => (
-            <SwipeableRow key={s.id} onDelete={() => handleDelete(s.id)}>
+            <SwipeableRow key={s.id} onDelete={({ snapBack }) => handleRequestDelete(s.id, snapBack)}>
               <div className={`set-row ${s.user.toLowerCase()}`}>
                 <span className="set-user">{s.user}</span>
                 <span className="set-exercise">{s.exercise}</span>
@@ -156,6 +169,9 @@ export default function LogView({ exercises, sets, onSetsChange, activeUser, onU
             </SwipeableRow>
           ))}
         </div>
+      )}
+      {pendingDelete && (
+        <ConfirmDialog onConfirm={handleConfirmDelete} onCancel={handleCancelDelete} />
       )}
     </div>
   );

@@ -67,7 +67,9 @@ export default function SwipeableRow({ children, onDelete }) {
         applyOffset(-80);
       } else {
         applyOffset(-rowWidth);
-        setTimeout(() => onDeleteRef.current(), 250);
+        setTimeout(() => onDeleteRef.current({
+          snapBack: () => { setIsSnapping(true); applyOffset(0); }
+        }), 250);
       }
     }
 
@@ -86,7 +88,9 @@ export default function SwipeableRow({ children, onDelete }) {
     const rowWidth = wrapRef.current?.offsetWidth ?? 300;
     setIsSnapping(true);
     applyOffset(-rowWidth);
-    setTimeout(() => onDeleteRef.current(), 250);
+    setTimeout(() => onDeleteRef.current({
+      snapBack: () => { setIsSnapping(true); applyOffset(0); }
+    }), 250);
   }
 
   return (

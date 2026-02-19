@@ -1,7 +1,11 @@
+import { useState } from 'react';
 import { deleteSet } from '../data/sheetsApi';
 import SwipeableRow from '../components/SwipeableRow';
+import ConfirmDialog from '../components/ConfirmDialog';
 
 export default function HistoryView({ sets, onSetsChange }) {
+  const [pendingDelete, setPendingDelete] = useState(null);
+
   if (sets.length === 0) {
     return <div className="view empty-state">No sets logged yet.</div>;
   }
@@ -14,9 +18,20 @@ export default function HistoryView({ sets, onSetsChange }) {
 
   const sortedDates = Object.keys(byDate).sort((a, b) => b.localeCompare(a));
 
-  async function handleDelete(id) {
+  function handleRequestDelete(id, snapBack) {
+    setPendingDelete({ id, snapBack });
+  }
+
+  async function handleConfirmDelete() {
+    const { id } = pendingDelete;
+    setPendingDelete(null);
     await deleteSet(id);
     onSetsChange();
+  }
+
+  function handleCancelDelete() {
+    pendingDelete?.snapBack?.();
+    setPendingDelete(null);
   }
 
   return (
@@ -29,7 +44,7 @@ export default function HistoryView({ sets, onSetsChange }) {
             })}
           </h3>
           {byDate[date].map(s => (
-            <SwipeableRow key={s.id} onDelete={() => handleDelete(s.id)}>
+            <SwipeableRow key={s.id} onDelete={({ snapBack }) => handleRequestDelete(s.id, snapBack)}>
               <div className={`set-row ${s.user?.toLowerCase()}`}>
                 <span className="set-user">{s.user}</span>
                 <span className="set-exercise">{s.exercise}</span>
@@ -42,6 +57,9 @@ export default function HistoryView({ sets, onSetsChange }) {
           ))}
         </div>
       ))}
+      {pendingDelete && (
+        <ConfirmDialog onConfirm={handleConfirmDelete} onCancel={handleCancelDelete} />
+      )}
     </div>
   );
 }
