@@ -3,6 +3,7 @@ import { addSet, deleteSet } from '../data/sheetsApi';
 import SwipeableRow from '../components/SwipeableRow';
 import ConfirmDialog from '../components/ConfirmDialog';
 import { groupExercises } from '../data/grouping';
+import { getBestSet, getLastSet } from '../data/logUtils';
 
 const USERS = ['Ethan', 'Ava'];
 
@@ -17,14 +18,8 @@ export default function LogView({ exercises, sets, onSetsChange, activeUser, onU
     .filter(s => s.date === today)
     .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
 
-  const exerciseSets = sets.filter(s => s.exercise === exercise && s.user === activeUser);
-
-  const lastSet = [...exerciseSets]
-    .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))[0] ?? null;
-
-  const bestSet = exerciseSets
-    .filter(s => s.reps != null && s.reps >= 5)
-    .sort((a, b) => b.weight - a.weight)[0] ?? null;
+  const bestSet = getBestSet(sets, exercise, activeUser);
+  const lastSet = getLastSet(sets, exercise, activeUser);
 
   function handleRequestDelete(id, snapBack) {
     setPendingDelete({ id, snapBack });

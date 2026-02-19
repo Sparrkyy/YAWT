@@ -39,7 +39,7 @@ async function sheetsPut(path, body) {
 
 // ─── Sets ────────────────────────────────────────────────────────────────────
 
-function rowToSet(row) {
+export function rowToSet(row) {
   return {
     id: row[0] ?? '',
     date: row[1] ?? '',
@@ -52,7 +52,7 @@ function rowToSet(row) {
   };
 }
 
-function setToRow(set) {
+export function setToRow(set) {
   return [
     set.id,
     set.date,
@@ -107,13 +107,13 @@ export async function deleteSet(id) {
 
 // ─── Exercises ───────────────────────────────────────────────────────────────
 
-function rowToExercise(row) {
+export function rowToExercise(row) {
   let muscles = {};
   try { muscles = JSON.parse(row[1] ?? '{}'); } catch { /* ignore */ }
   return { name: row[0] ?? '', muscles };
 }
 
-function exerciseToRow(ex) {
+export function exerciseToRow(ex) {
   return [ex.name, JSON.stringify(ex.muscles ?? {})];
 }
 

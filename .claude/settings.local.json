@@ -14,7 +14,8 @@
       "Bash(convert:*)",
       "Bash(node:*)",
       "Bash(npx husky init:*)",
-      "Bash(chmod:*)"
+      "Bash(chmod:*)",
+      "Bash(npm test:*)"
     ]
   }
 }
