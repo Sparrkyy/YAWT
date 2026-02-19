@@ -4,7 +4,7 @@ import { MUSCLE_GROUPS } from '../data/exercises';
 const MUSCLE_LABELS = {
   chest: 'Chest', back: 'Back', shoulders: 'Shoulders', biceps: 'Biceps',
   triceps: 'Triceps', quads: 'Quads', hamstrings: 'Hamstrings', glutes: 'Glutes',
-  calves: 'Calves', abs: 'Abs', rearDelts: 'Rear Delts', lowBack: 'Low Back',
+  calves: 'Calves', tibialis: 'Tibialis', abs: 'Abs', rearDelts: 'Rear Delts', lowBack: 'Low Back',
 };
 
 function fmt(v) {
