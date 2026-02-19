@@ -90,7 +90,7 @@ export default function StatsView({ sets, exercises, activeUser, onUserChange })
           {rankedMuscles.map(([muscle, value]) => (
             <div key={muscle} className="muscle-total-row">
               <span>{MUSCLE_LABELS[muscle] ?? muscle}</span>
-              <span className="muscle-total-value">{value.toFixed(1)} sets</span>
+              <span className="muscle-total-value">{parseFloat(value.toFixed(2))} sets</span>
             </div>
           ))}
         </div>

@@ -4,3 +4,4 @@ A mobile-first PWA for logging gym sets, built with React + Vite and hosted on G
 
 TODO:
 - Fix the body diagram section padding 
+- Add a test suite
