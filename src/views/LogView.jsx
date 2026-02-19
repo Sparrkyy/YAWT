@@ -43,7 +43,7 @@ export default function LogView({ exercises, sets, onSetsChange, activeUser, onU
         notes,
         createdAt: new Date().toISOString(),
       });
-      setLogDraft(d => ({ ...d, reps: '', weight: '', notes: '' }));
+      setLogDraft(d => ({ ...d, reps: '', notes: '' }));
       await onSetsChange();
     } finally {
       setSaving(false);
@@ -67,7 +67,7 @@ export default function LogView({ exercises, sets, onSetsChange, activeUser, onU
       <form className="log-form" onSubmit={handleSubmit}>
         <div className="field">
           <label>Exercise</label>
-          <select value={exercise} onChange={e => setLogDraft(d => ({ ...d, exercise: e.target.value }))} required>
+          <select value={exercise} onChange={e => setLogDraft(d => ({ ...d, exercise: e.target.value, weight: '' }))} required>
             <option value="">— select —</option>
             {groupExercises(exercises).map(({ label, exercises: group }) => (
               <optgroup key={label} label={label}>
@@ -100,17 +100,6 @@ export default function LogView({ exercises, sets, onSetsChange, activeUser, onU
 
         <div className="field-row">
           <div className="field">
-            <label>Reps</label>
-            <input
-              type="number"
-              inputMode="numeric"
-              placeholder="—"
-              value={reps}
-              onChange={e => setLogDraft(d => ({ ...d, reps: e.target.value }))}
-              min="0"
-            />
-          </div>
-          <div className="field">
             <label>Weight (lbs)</label>
             <input
               type="number"
@@ -119,7 +108,19 @@ export default function LogView({ exercises, sets, onSetsChange, activeUser, onU
               value={weight}
               onChange={e => setLogDraft(d => ({ ...d, weight: e.target.value }))}
               min="0"
+              step="0.5"
               required
+            />
+          </div>
+          <div className="field">
+            <label>Reps</label>
+            <input
+              type="number"
+              inputMode="numeric"
+              placeholder="—"
+              value={reps}
+              onChange={e => setLogDraft(d => ({ ...d, reps: e.target.value }))}
+              min="0"
             />
           </div>
         </div>
