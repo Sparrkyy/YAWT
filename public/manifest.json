@@ -4,8 +4,8 @@
   "start_url": "/YAWT/",
   "scope": "/YAWT/",
   "display": "standalone",
-  "background_color": "#111111",
-  "theme_color": "#111111",
+  "background_color": "#F2F2F7",
+  "theme_color": "#F2F2F7",
   "icons": [
     { "src": "/yawt-icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }
   ]

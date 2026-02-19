@@ -8,8 +8,8 @@
   transition: background 0.25s;
 }
 
-.app.user-ethan { background: #4a7c5a; }
-.app.user-ava   { background: #fad7e1; }
+.app.user-ethan { background: #EFEFFF; }
+.app.user-ava   { background: #FFF0F5; }
 
 .app-header {
   height: calc(var(--header-height) + env(safe-area-inset-top));
@@ -144,7 +144,7 @@
 .user-btn {
   flex: 1;
   padding: 10px;
-  border-radius: var(--radius);
+  border-radius: 999px;
   background: var(--surface2);
   color: var(--text-secondary);
   font-size: 0.95rem;
@@ -233,7 +233,7 @@
 }
 
 .btn-primary {
-  background: var(--accent);
+  background: #1C1C1E;
   color: #fff;
   padding: 12px;
   border-radius: var(--radius);
@@ -395,7 +395,7 @@
   background: var(--accent-dim);
   color: var(--accent);
   padding: 6px 12px;
-  border-radius: 8px;
+  border-radius: 999px;
   font-size: 0.85rem;
   font-weight: 600;
 }
@@ -599,7 +599,7 @@
   background: var(--surface2);
   color: var(--text-secondary);
   padding: 8px 4px;
-  border-radius: 8px;
+  border-radius: 999px;
   font-size: 0.8rem;
   font-weight: 600;
   transition: background 0.15s, color 0.15s;
@@ -627,7 +627,7 @@
   background: var(--surface2);
   color: var(--text-secondary);
   padding: 8px 20px;
-  border-radius: 8px;
+  border-radius: 999px;
   font-size: 0.85rem;
   font-weight: 600;
   transition: background 0.15s, color 0.15s;
