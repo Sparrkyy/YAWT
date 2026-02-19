@@ -1,32 +1,12 @@
 import { useState, useMemo } from 'react';
 import BodyDiagram from './BodyDiagram';
+import { getDateRange } from '../data/statsUtils';
 
 const MUSCLE_LABELS = {
   chest: 'Chest', back: 'Back', shoulders: 'Shoulders', biceps: 'Biceps',
   triceps: 'Triceps', quads: 'Quads', hamstrings: 'Hamstrings', glutes: 'Glutes',
   calves: 'Calves', abs: 'Abs', rearDelts: 'Rear Delts', lowBack: 'Low Back',
 };
-
-function getDateRange(period) {
-  const today = new Date();
-  today.setHours(0, 0, 0, 0);
-  if (period === 'week') {
-    const dayOfWeek = (today.getDay() + 6) % 7; // Mon=0
-    const start = new Date(today);
-    start.setDate(today.getDate() - dayOfWeek);
-    const end = new Date(start);
-    end.setDate(start.getDate() + 6);
-    return { start, end };
-  }
-  if (period === 'month') return {
-    start: new Date(today.getFullYear(), today.getMonth(), 1),
-    end:   new Date(today.getFullYear(), today.getMonth() + 1, 0),
-  };
-  return {
-    start: new Date(today.getFullYear(), 0, 1),
-    end:   new Date(today.getFullYear(), 11, 31),
-  };
-}
 
 const USERS = ['Ethan', 'Ava'];
 

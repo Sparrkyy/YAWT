@@ -11,7 +11,10 @@
       "Bash(ipconfig getifaddr:*)",
       "Bash(ipconfig:*)",
       "Bash(git add:*)",
-      "Bash(convert:*)"
+      "Bash(convert:*)",
+      "Bash(node:*)",
+      "Bash(npx husky init:*)",
+      "Bash(chmod:*)"
     ]
   }
 }

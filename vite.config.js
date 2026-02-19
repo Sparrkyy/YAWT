@@ -15,4 +15,9 @@ export default defineConfig({
     }),
   ],
   base: '/YAWT/',
+  test: {
+    environment: 'jsdom',
+    globals: true,
+    setupFiles: ['./src/test/setup.js'],
+  },
 })
