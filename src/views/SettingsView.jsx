@@ -1,11 +1,13 @@
 import { useState } from 'react';
 import { createNewSheet, validateSheet } from '../data/sheetsApi';
+import ConfirmDialog from '../components/ConfirmDialog';
 
 export default function SettingsView({ currentSheetId, users, onSheetChange, onUsersChange, onSignOut }) {
   const [sheetInput, setSheetInput] = useState('');
   const [sheetLoading, setSheetLoading] = useState(false);
   const [sheetError, setSheetError] = useState('');
   const [newUser, setNewUser] = useState('');
+  const [confirmCreate, setConfirmCreate] = useState(false);
 
   async function handleLinkSheet() {
     const id = sheetInput.trim();
@@ -81,11 +83,20 @@ export default function SettingsView({ currentSheetId, users, onSheetChange, onU
         </div>
         <button
           className="settings-text-btn"
-          onClick={handleCreateSheet}
+          onClick={() => setConfirmCreate(true)}
           disabled={sheetLoading}
         >
-          {sheetLoading ? 'Creating…' : 'Create a new sheet'}
+          Create a new sheet
         </button>
+        {confirmCreate && (
+          <ConfirmDialog
+            title="Create a new sheet?"
+            confirmLabel="Create"
+            confirmStyle="btn-primary"
+            onConfirm={() => { setConfirmCreate(false); handleCreateSheet(); }}
+            onCancel={() => setConfirmCreate(false)}
+          />
+        )}
       </section>
 
       <section className="settings-section">

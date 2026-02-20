@@ -107,14 +107,22 @@ npm run test:watch # re-runs on file save during development
 | `sheetsApi.serialization.test.js` | 5 | `rowToSet`/`setToRow`/`rowToExercise`/`exerciseToRow` roundtrips |
 | `StatsView.test.jsx` | 3 | Renders empty state, muscle rows, period switching |
 | `HistoryView.test.jsx` | 3 | Renders empty state, date grouping, newest-first order |
+| `ConfirmDialog.test.jsx` | 9 | Default/custom props, confirm/cancel/close/backdrop interactions |
+| `SettingsView.test.jsx` | 7 | Dialog open/close, createNewSheet success/failure, loading state, ID truncation |
+| `SetupView.test.jsx` | 13 | Sheet/users phase rendering, create/link success and failure paths, user list management |
+| `App.test.jsx` | 5 | Sign-in screen, onboarding phase transitions driven by localStorage state |
 
-**Total: 34 tests.** All tests use `vi.setSystemTime('2026-02-19')` as the anchor date. No test ever hits the real Sheets API — serialization helpers are pure functions, and network-dependent code is not tested.
+**Total: 68 tests.** All tests use `vi.setSystemTime('2026-02-19')` as the anchor date. No test ever hits the real Sheets API — serialization helpers are pure functions, and network-dependent code is not tested.
 
 ### What is intentionally not tested
 - `sheetsApi.js` network calls — require real credentials
 - Auth flow (`auth.js`) — out of scope
 - `BodyDiagram` SVG rendering — mocked in component tests
 - `SwipeableRow` touch physics — jsdom has no touch geometry
+
+### Test policy for new features
+Any new component or view feature must ship with at least basic test coverage.
+When in doubt: add a test file alongside the implementation before marking the work done.
 
 ## Deployment (GitHub Actions)
 On push to `main`: install → **test** → build (with Sheets secrets injected) → deploy to GitHub Pages. Push is blocked if tests fail (both locally via Husky pre-push and in CI).
