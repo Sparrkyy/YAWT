@@ -676,3 +676,101 @@
   font-weight: 600;
   font-size: 0.85rem;
 }
+
+/* Settings */
+.settings-view {
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.settings-section {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.settings-heading {
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.settings-sheet-id {
+  font-size: 0.9rem;
+  color: var(--text-secondary);
+}
+
+.settings-sheet-id code {
+  background: var(--surface2);
+  border-radius: 4px;
+  padding: 1px 4px;
+  font-family: monospace;
+  color: var(--text);
+}
+
+.settings-error {
+  color: var(--danger);
+  font-size: 0.875rem;
+}
+
+.settings-row {
+  display: flex;
+  gap: 8px;
+}
+
+.settings-row .setup-input {
+  flex: 1;
+}
+
+.setup-input {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 10px 12px;
+  color: var(--text);
+  font-size: 1rem;
+  width: 100%;
+}
+
+.setup-input:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
+.settings-text-btn {
+  font-size: 0.9rem;
+  color: var(--accent);
+  text-align: left;
+  padding: 2px 0;
+}
+
+.settings-text-btn:disabled {
+  opacity: 0.5;
+}
+
+.settings-user-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.settings-user-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 4px;
+  border-bottom: 1px solid var(--border);
+  font-size: 0.95rem;
+}
+
+.settings-remove-btn {
+  color: var(--text-secondary);
+  font-size: 1.2rem;
+  padding: 0 4px;
+  line-height: 1;
+}

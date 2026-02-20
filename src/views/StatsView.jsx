@@ -8,9 +8,7 @@ const MUSCLE_LABELS = {
   calves: 'Calves', abs: 'Abs', rearDelts: 'Rear Delts', lowBack: 'Low Back',
 };
 
-const USERS = ['Ethan', 'Ava'];
-
-export default function StatsView({ sets, exercises, activeUser, onUserChange }) {
+export default function StatsView({ sets, exercises, activeUser, onUserChange, users = [] }) {
   const [period, setPeriod] = useState('week');
   const [side, setSide] = useState('front');
 
@@ -41,7 +39,7 @@ export default function StatsView({ sets, exercises, activeUser, onUserChange })
   return (
     <div className="view">
       <div className="user-toggle">
-        {USERS.map(u => (
+        {users.map(u => (
           <button
             key={u}
             className={`user-btn ${activeUser === u ? 'active' : ''}`}

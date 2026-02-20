@@ -1,7 +1,9 @@
 import { getToken } from './auth';
 
-const SHEET_ID = import.meta.env.VITE_SHEET_ID;
-const BASE = `https://sheets.googleapis.com/v4/spreadsheets/${SHEET_ID}`;
+let sheetId = null;
+export function setSheetId(id) { sheetId = id; }
+
+function getBase() { return `https://sheets.googleapis.com/v4/spreadsheets/${sheetId}`; }
 
 // Numeric GID for each tab — found in the sheet URL fragment (#gid=...)
 // Sets tab is typically gid=0, Exercises is gid=1 (update if yours differ)
@@ -12,13 +14,13 @@ function authHeaders() {
 }
 
 async function sheetsGet(path) {
-  const res = await fetch(`${BASE}${path}`, { headers: authHeaders() });
+  const res = await fetch(`${getBase()}${path}`, { headers: authHeaders() });
   if (!res.ok) throw Object.assign(new Error('Sheets GET failed'), { status: res.status });
   return res.json();
 }
 
 async function sheetsPost(path, body) {
-  const res = await fetch(`${BASE}${path}`, {
+  const res = await fetch(`${getBase()}${path}`, {
     method: 'POST',
     headers: { ...authHeaders(), 'Content-Type': 'application/json' },
     body: JSON.stringify(body),
@@ -28,7 +30,7 @@ async function sheetsPost(path, body) {
 }
 
 async function sheetsPut(path, body) {
-  const res = await fetch(`${BASE}${path}`, {
+  const res = await fetch(`${getBase()}${path}`, {
     method: 'PUT',
     headers: { ...authHeaders(), 'Content-Type': 'application/json' },
     body: JSON.stringify(body),
@@ -143,6 +145,61 @@ export async function updateExercise(name, updatedExercise) {
     `/values/Exercises!A${sheetRow}:B${sheetRow}?valueInputOption=RAW`,
     { values: [exerciseToRow(merged)] }
   );
+}
+
+// ─── Sheet management ────────────────────────────────────────────────────────
+
+export async function createNewSheet() {
+  const BASE_SHEETS = 'https://sheets.googleapis.com/v4/spreadsheets';
+
+  // 1. Create the spreadsheet
+  const createRes = await fetch(BASE_SHEETS, {
+    method: 'POST',
+    headers: { ...authHeaders(), 'Content-Type': 'application/json' },
+    body: JSON.stringify({ properties: { title: 'YAWT Workout Tracker' } }),
+  });
+  if (!createRes.ok) throw Object.assign(new Error('Failed to create sheet'), { status: createRes.status });
+  const created = await createRes.json();
+  const id = created.spreadsheetId;
+  const defaultSheetId = created.sheets[0].properties.sheetId;
+
+  // 2. Rename "Sheet1" → "Sets" and add "Exercises" tab
+  await fetch(`${BASE_SHEETS}/${id}:batchUpdate`, {
+    method: 'POST',
+    headers: { ...authHeaders(), 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      requests: [
+        { updateSheetProperties: { properties: { sheetId: defaultSheetId, title: 'Sets' }, fields: 'title' } },
+        { addSheet: { properties: { title: 'Exercises' } } },
+      ],
+    }),
+  });
+
+  // 3. Write headers
+  await fetch(`${BASE_SHEETS}/${id}/values/Sets!A1:H1?valueInputOption=RAW`, {
+    method: 'PUT',
+    headers: { ...authHeaders(), 'Content-Type': 'application/json' },
+    body: JSON.stringify({ values: [['id', 'date', 'user', 'exercise', 'reps', 'weight', 'notes', 'createdAt']] }),
+  });
+  await fetch(`${BASE_SHEETS}/${id}/values/Exercises!A1:B1?valueInputOption=RAW`, {
+    method: 'PUT',
+    headers: { ...authHeaders(), 'Content-Type': 'application/json' },
+    body: JSON.stringify({ values: [['name', 'muscles']] }),
+  });
+
+  return id;
+}
+
+export async function validateSheet(id) {
+  try {
+    const res = await fetch(
+      `https://sheets.googleapis.com/v4/spreadsheets/${id}/values/Sets!A1`,
+      { headers: authHeaders() }
+    );
+    return res.ok;
+  } catch {
+    return false;
+  }
 }
 
 // ─── Batch migration (Phase 5) ───────────────────────────────────────────────

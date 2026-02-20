@@ -5,9 +5,7 @@ import ConfirmDialog from '../components/ConfirmDialog';
 import { groupExercises } from '../data/grouping';
 import { getBestSet, getLastSet } from '../data/logUtils';
 
-const USERS = ['Ethan', 'Ava'];
-
-export default function LogView({ exercises, sets, onSetsChange, activeUser, onUserChange, logDraft, setLogDraft }) {
+export default function LogView({ exercises, sets, onSetsChange, activeUser, onUserChange, logDraft, setLogDraft, users = [] }) {
   const [saving, setSaving] = useState(false);
   const [pendingDelete, setPendingDelete] = useState(null);
   const { exercise, reps, weight, notes } = logDraft;
@@ -61,7 +59,7 @@ export default function LogView({ exercises, sets, onSetsChange, activeUser, onU
   return (
     <div className="view">
       <div className="user-toggle">
-        {USERS.map(u => (
+        {users.map(u => (
           <button
             key={u}
             className={`user-btn ${activeUser === u ? 'active' : ''}`}

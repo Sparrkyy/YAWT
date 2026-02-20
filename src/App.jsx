@@ -1,13 +1,19 @@
-import { useState, useEffect } from 'react';
-import { initAuth, signIn, signOut } from './data/auth';
-import { getSets, getExercises } from './data/sheetsApi';
+import { useState, useEffect, useRef } from 'react';
+import { initAuth, signIn, signOut, getUserSub } from './data/auth';
+import { getSets, getExercises, setSheetId } from './data/sheetsApi';
 import LogView from './views/LogView';
 import HistoryView from './views/HistoryView';
 import ExercisesView from './views/ExercisesView';
 import StatsView from './views/StatsView';
+import SetupView from './views/SetupView';
+import SettingsView from './views/SettingsView';
 import './App.css';
 
-const TABS = ['Log', 'History', 'Exercises', 'Stats'];
+const TABS = ['Log', 'History', 'Exercises', 'Stats', 'Settings'];
+
+function storageKey(suffix) {
+  return `yawt_${suffix}_${getUserSub() ?? 'default'}`;
+}
 
 export default function App() {
   const [authReady, setAuthReady] = useState(false);
@@ -16,14 +22,23 @@ export default function App() {
   const [tab, setTab] = useState('Log');
   const [sets, setSets] = useState([]);
   const [exercises, setExercises] = useState([]);
-  const [activeUser, setActiveUser] = useState('Ethan');
+  const [activeUser, setActiveUser] = useState('');
   const [sharedExercise, setSharedExercise] = useState('');
-  const [userDrafts, setUserDrafts] = useState({
-    Ethan: { reps: '', weight: '', notes: '' },
-    Ava:   { reps: '', weight: '', notes: '' },
-  });
+  const [userDrafts, setUserDrafts] = useState({});
+  const [users, setUsers] = useState([]);
+  const [setupPhase, setSetupPhase] = useState(null); // 'sheet' | 'users' | null
+  const [currentSheetId, setCurrentSheetId] = useState(null);
+  const pendingSheetIdRef = useRef(null); // carries sheet ID from step 1 → step 2 of setup
 
-  const logDraft = { exercise: sharedExercise, ...userDrafts[activeUser] };
+  // Re-initialize drafts whenever the user list changes
+  useEffect(() => {
+    setUserDrafts(Object.fromEntries(users.map(u => [u, { reps: '', weight: '', notes: '' }])));
+    if (users.length > 0 && !users.includes(activeUser)) {
+      setActiveUser(users[0]);
+    }
+  }, [users]);
+
+  const logDraft = { exercise: sharedExercise, ...(userDrafts[activeUser] ?? { reps: '', weight: '', notes: '' }) };
 
   function setLogDraft(updater) {
     const next = typeof updater === 'function' ? updater(logDraft) : updater;
@@ -47,6 +62,30 @@ export default function App() {
 
   async function onSignIn() {
     setSignedIn(true);
+
+    const storedSheetId = localStorage.getItem(storageKey('sheet'));
+
+    if (!storedSheetId) {
+      setSetupPhase('sheet');
+      return;
+    }
+
+    const storedUsers = localStorage.getItem(storageKey('users'));
+    if (!storedUsers) {
+      setSheetId(storedSheetId);
+      setSetupPhase('users');
+      return;
+    }
+
+    await loadApp(storedSheetId, JSON.parse(storedUsers));
+  }
+
+  async function loadApp(id, userList) {
+    setSetupPhase(null);
+    setSheetId(id);
+    setCurrentSheetId(id);
+    setUsers(userList);
+    setActiveUser(userList[0]);
     setLoading(true);
     try {
       const [fetchedSets, fetchedExercises] = await Promise.all([getSets(), getExercises()]);
@@ -57,6 +96,20 @@ export default function App() {
     }
   }
 
+  function handleSheetReady(id) {
+    pendingSheetIdRef.current = id;
+    localStorage.setItem(storageKey('sheet'), id);
+    setSheetId(id);
+    setSetupPhase('users');
+  }
+
+  async function handleUsersReady(userList) {
+    // Prefer the ref (set during step 1 of this session), fall back to localStorage
+    const id = pendingSheetIdRef.current ?? localStorage.getItem(storageKey('sheet'));
+    localStorage.setItem(storageKey('users'), JSON.stringify(userList));
+    await loadApp(id, userList);
+  }
+
   async function refreshSets() {
     setSets(await getSets());
   }
@@ -65,11 +118,25 @@ export default function App() {
     setExercises(await getExercises());
   }
 
+  async function handleSheetChange(id) {
+    setCurrentSheetId(id);
+    setSheetId(id);
+    localStorage.setItem(storageKey('sheet'), id);
+    await Promise.all([refreshSets(), refreshExercises()]);
+  }
+
+  function handleUsersChange(newUsers) {
+    setUsers(newUsers);
+    localStorage.setItem(storageKey('users'), JSON.stringify(newUsers));
+  }
+
   function handleSignOut() {
     signOut();
     setSignedIn(false);
     setSets([]);
     setExercises([]);
+    setUsers([]);
+    setSetupPhase(null);
   }
 
   if (!signedIn) {
@@ -83,6 +150,16 @@ export default function App() {
           </button>
         </div>
       </div>
+    );
+  }
+
+  if (setupPhase !== null) {
+    return (
+      <SetupView
+        setupPhase={setupPhase}
+        onSheetReady={handleSheetReady}
+        onUsersReady={handleUsersReady}
+      />
     );
   }
 
@@ -101,7 +178,6 @@ export default function App() {
     <div className={`app${tab === 'Log' ? ` user-${activeUser.toLowerCase()}` : ''}`}>
       <header className="app-header">
         <img src="yawt-icon.svg" className="app-logo-icon" alt="YAWT" />
-        <button className="sign-out-btn" onClick={handleSignOut}>Sign out</button>
       </header>
 
       <main className="app-main">
@@ -114,6 +190,7 @@ export default function App() {
             onUserChange={setActiveUser}
             logDraft={logDraft}
             setLogDraft={setLogDraft}
+            users={users}
           />
         )}
         {tab === 'History' && (
@@ -123,7 +200,16 @@ export default function App() {
           <ExercisesView exercises={exercises} onExercisesChange={refreshExercises} />
         )}
         {tab === 'Stats' && (
-          <StatsView sets={sets} exercises={exercises} activeUser={activeUser} onUserChange={setActiveUser} />
+          <StatsView sets={sets} exercises={exercises} activeUser={activeUser} onUserChange={setActiveUser} users={users} />
+        )}
+        {tab === 'Settings' && (
+          <SettingsView
+            currentSheetId={currentSheetId}
+            users={users}
+            onSheetChange={handleSheetChange}
+            onUsersChange={handleUsersChange}
+            onSignOut={handleSignOut}
+          />
         )}
       </main>
 
@@ -159,6 +245,12 @@ export default function App() {
                   <line x1="12" y1="20" x2="12" y2="4"/>
                   <line x1="6" y1="20" x2="6" y2="14"/>
                   <line x1="2" y1="20" x2="22" y2="20"/>
+                </svg>
+              )}
+              {t === 'Settings' && (
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
+                  <circle cx="12" cy="12" r="3"/>
+                  <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
                 </svg>
               )}
             </span>
