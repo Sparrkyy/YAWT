@@ -20,3 +20,10 @@ export function getBestRepsAtWeight(sets, exercise, user, weight) {
   if (!filtered.length) return null;
   return filtered.reduce((best, s) => (s.reps > best.reps ? s : best));
 }
+
+export function isNewPR(sets, exercise, user, weight, reps) {
+  if (reps == null) return false;
+  const previous = getBestRepsAtWeight(sets, exercise, user, weight);
+  if (previous === null) return false;   // first time at this weight → not a PR
+  return reps > previous.reps;
+}

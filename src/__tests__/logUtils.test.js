@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { getBestSet, getLastSet, getBestRepsAtWeight } from '../data/logUtils';
+import { getBestSet, getLastSet, getBestRepsAtWeight, isNewPR } from '../data/logUtils';
 
 function makeSet(overrides = {}) {
   return {
@@ -126,5 +126,26 @@ describe('getLastSet', () => {
 
   it('returns null when no sets exist for that exercise and user', () => {
     expect(getLastSet([], 'Bench Press', 'Ethan')).toBeNull();
+  });
+});
+
+describe('isNewPR', () => {
+  it('returns false when reps is null', () => {
+    expect(isNewPR([makeSet({ weight: 135, reps: 10 })], 'Bench Press', 'Ethan', 135, null)).toBe(false);
+  });
+  it('returns false when no previous entry at that weight', () => {
+    expect(isNewPR([makeSet({ weight: 135, reps: 10 })], 'Bench Press', 'Ethan', 185, 8)).toBe(false);
+  });
+  it('returns false when new reps ties the previous best', () => {
+    expect(isNewPR([makeSet({ weight: 135, reps: 10 })], 'Bench Press', 'Ethan', 135, 10)).toBe(false);
+  });
+  it('returns false when new reps is less than previous best', () => {
+    expect(isNewPR([makeSet({ weight: 135, reps: 10 })], 'Bench Press', 'Ethan', 135, 8)).toBe(false);
+  });
+  it('returns true when new reps strictly beats the previous best', () => {
+    expect(isNewPR([makeSet({ weight: 135, reps: 10 })], 'Bench Press', 'Ethan', 135, 11)).toBe(true);
+  });
+  it('returns false when sets is empty', () => {
+    expect(isNewPR([], 'Bench Press', 'Ethan', 135, 12)).toBe(false);
   });
 });
