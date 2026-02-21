@@ -19,6 +19,25 @@ export function getDateRange(period) {
   };
 }
 
+export function getExerciseProgress(sets, exercise, user) {
+  const byDate = {};
+  for (const s of sets) {
+    if (s.exercise !== exercise || s.user !== user) continue;
+    const e1rm = (!s.reps || s.reps === 0) ? s.weight : s.weight * (1 + s.reps / 30);
+    if (!byDate[s.date] || e1rm > byDate[s.date].e1rm) {
+      byDate[s.date] = { e1rm, reps: s.reps, weight: s.weight };
+    }
+  }
+  return Object.entries(byDate)
+    .sort(([a], [b]) => a.localeCompare(b))
+    .map(([date, { e1rm, reps, weight }]) => ({
+      date,
+      e1rm: parseFloat(e1rm.toFixed(1)),
+      reps,
+      weight,
+    }));
+}
+
 export function computeStats(sets, exercises, period, user) {
   const { start, end } = getDateRange(period);
   const startStr = start.toLocaleDateString('en-CA');

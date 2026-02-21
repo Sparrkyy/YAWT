@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
-import { computeStats } from '../data/statsUtils';
+import { computeStats, getExerciseProgress } from '../data/statsUtils';
 
 // Today is 2026-02-19 (Thursday)
 const TODAY = '2026-02-19';
@@ -90,5 +90,50 @@ describe('computeStats', () => {
     const sets = [makeSet({ exercise: 'Unknown Exercise' })];
     const totals = computeStats(sets, exercises, 'week', 'Ethan');
     expect(totals).toEqual({});
+  });
+});
+
+describe('getExerciseProgress', () => {
+  function makeProgressSet(overrides = {}) {
+    return {
+      date: TODAY,
+      user: 'Ethan',
+      exercise: 'Bench Press',
+      reps: 8,
+      weight: 135,
+      ...overrides,
+    };
+  }
+
+  it('returns empty array when no matching sets', () => {
+    const result = getExerciseProgress([], 'Bench Press', 'Ethan');
+    expect(result).toEqual([]);
+  });
+
+  it('groups sets on same date and keeps best e1RM', () => {
+    const sets = [
+      makeProgressSet({ reps: 5, weight: 135 }),   // 135 * (1 + 5/30) = 157.5
+      makeProgressSet({ reps: 10, weight: 135 }),  // 135 * (1 + 10/30) = 180
+    ];
+    const result = getExerciseProgress(sets, 'Bench Press', 'Ethan');
+    expect(result).toHaveLength(1);
+    expect(result[0].e1rm).toBe(180);
+    expect(result[0].reps).toBe(10);
+    expect(result[0].weight).toBe(135);
+  });
+
+  it('filters by user and excludes other users', () => {
+    const sets = [makeProgressSet({ user: 'Ava' })];
+    const result = getExerciseProgress(sets, 'Bench Press', 'Ethan');
+    expect(result).toEqual([]);
+  });
+
+  it('handles null reps by using weight directly as e1RM', () => {
+    const sets = [makeProgressSet({ reps: null, weight: 100 })];
+    const result = getExerciseProgress(sets, 'Bench Press', 'Ethan');
+    expect(result).toHaveLength(1);
+    expect(result[0].e1rm).toBe(100);
+    expect(result[0].reps).toBeNull();
+    expect(result[0].weight).toBe(100);
   });
 });
