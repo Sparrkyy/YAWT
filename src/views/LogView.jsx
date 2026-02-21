@@ -3,7 +3,7 @@ import { addSet, deleteSet } from '../data/sheetsApi';
 import SwipeableRow from '../components/SwipeableRow';
 import ConfirmDialog from '../components/ConfirmDialog';
 import { groupExercises } from '../data/grouping';
-import { getBestSet, getLastSet } from '../data/logUtils';
+import { getBestSet, getLastSet, getBestRepsAtWeight } from '../data/logUtils';
 
 export default function LogView({ exercises, sets, onSetsChange, activeUser, onUserChange, logDraft, setLogDraft, users = [] }) {
   const [saving, setSaving] = useState(false);
@@ -18,6 +18,9 @@ export default function LogView({ exercises, sets, onSetsChange, activeUser, onU
 
   const bestSet = getBestSet(sets, exercise, activeUser);
   const lastSet = getLastSet(sets, exercise, activeUser);
+  const bestAtWeight = exercise
+    ? getBestRepsAtWeight(sets, exercise, activeUser, Number(weight))
+    : null;
 
   function handleRequestDelete(id, snapBack) {
     setPendingDelete({ id, snapBack });
@@ -99,6 +102,12 @@ export default function LogView({ exercises, sets, onSetsChange, activeUser, onU
                 {lastSet
                   ? `${lastSet.weight} lbs${lastSet.reps != null ? ` × ${lastSet.reps}` : ''}`
                   : '—'}
+              </span>
+            </div>
+            <div className="stat-block">
+              <span className="stat-label">Best at {weight || '0'} lbs</span>
+              <span className="stat-value">
+                {bestAtWeight ? `${bestAtWeight.reps} reps` : '—'}
               </span>
             </div>
           </div>

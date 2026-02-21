@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { getBestSet, getLastSet } from '../data/logUtils';
+import { getBestSet, getLastSet, getBestRepsAtWeight } from '../data/logUtils';
 
 function makeSet(overrides = {}) {
   return {
@@ -49,6 +49,61 @@ describe('getBestSet', () => {
   it('ignores sets for a different exercise', () => {
     const sets = [makeSet({ weight: 200, reps: 8, exercise: 'Squat' })];
     expect(getBestSet(sets, 'Bench Press', 'Ethan')).toBeNull();
+  });
+
+  it('returns the set with more reps when two sets share the highest weight', () => {
+    const sets = [
+      makeSet({ weight: 185, reps: 6 }),
+      makeSet({ weight: 185, reps: 10 }),
+    ];
+    expect(getBestSet(sets, 'Bench Press', 'Ethan').reps).toBe(10);
+  });
+});
+
+describe('getBestRepsAtWeight', () => {
+  it('returns the set with the most reps at the exact weight', () => {
+    const sets = [
+      makeSet({ weight: 185, reps: 6 }),
+      makeSet({ weight: 185, reps: 8 }),
+      makeSet({ weight: 185, reps: 5 }),
+    ];
+    expect(getBestRepsAtWeight(sets, 'Bench Press', 'Ethan', 185).reps).toBe(8);
+  });
+
+  it('ignores sets at a different weight', () => {
+    const sets = [
+      makeSet({ weight: 135, reps: 12 }),
+      makeSet({ weight: 185, reps: 6 }),
+    ];
+    expect(getBestRepsAtWeight(sets, 'Bench Press', 'Ethan', 185).reps).toBe(6);
+  });
+
+  it('ignores sets for a different user', () => {
+    const sets = [
+      makeSet({ weight: 185, reps: 10, user: 'Ava' }),
+    ];
+    expect(getBestRepsAtWeight(sets, 'Bench Press', 'Ethan', 185)).toBeNull();
+  });
+
+  it('ignores sets for a different exercise', () => {
+    const sets = [
+      makeSet({ weight: 185, reps: 10, exercise: 'Squat' }),
+    ];
+    expect(getBestRepsAtWeight(sets, 'Bench Press', 'Ethan', 185)).toBeNull();
+  });
+
+  it('returns null when no sets exist at that weight', () => {
+    const sets = [
+      makeSet({ weight: 135, reps: 8 }),
+    ];
+    expect(getBestRepsAtWeight(sets, 'Bench Press', 'Ethan', 185)).toBeNull();
+  });
+
+  it('ignores sets where reps is null', () => {
+    const sets = [
+      makeSet({ weight: 185, reps: null }),
+    ];
+    expect(getBestRepsAtWeight(sets, 'Bench Press', 'Ethan', 185)).toBeNull();
   });
 });
 
