@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { initAuth, signIn, signOut, getUserSub } from './data/auth';
+import { initAuth, signIn, signOut, getUserSub, tryRestoreSession, hasStoredSession, trySilentSignIn } from './data/auth';
 import { getSets, getExercises, setSheetId } from './data/sheetsApi';
 import LogView from './views/LogView';
 import HistoryView from './views/HistoryView';
@@ -53,6 +53,16 @@ export default function App() {
       if (typeof google !== 'undefined' && google.accounts?.oauth2) {
         initAuth(onSignIn);
         setAuthReady(true);
+        if (tryRestoreSession()) {
+          // Valid token in localStorage — skip sign-in screen entirely
+          onSignIn();
+        } else if (hasStoredSession()) {
+          // Stored token exists but expired — attempt silent GIS re-auth (no popup)
+          // If successful, the initAuth callback will call onSignIn()
+          // If it fails, resp.error is set and callback returns early → sign-in screen stays
+          trySilentSignIn();
+        }
+        // else: no stored session — show sign-in screen normally
       } else {
         setTimeout(tryInit, 100);
       }

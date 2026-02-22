@@ -7,6 +7,9 @@ vi.mock('../data/auth', () => ({
   signIn: vi.fn(),
   signOut: vi.fn(),
   getUserSub: vi.fn(() => 'test-user'),
+  tryRestoreSession: vi.fn(() => false),
+  hasStoredSession: vi.fn(() => false),
+  trySilentSignIn: vi.fn(),
 }));
 
 vi.mock('../data/sheetsApi', () => ({
