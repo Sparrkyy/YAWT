@@ -18,7 +18,9 @@
       "Bash(npm test:*)",
       "WebSearch",
       "Bash(ls:*)",
-      "WebFetch(domain:developers.google.com)"
+      "WebFetch(domain:developers.google.com)",
+      "Bash(echo SHELL env var: $SHELL:*)",
+      "Bash(code:*)"
     ]
   }
 }
