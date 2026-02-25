@@ -4,12 +4,12 @@ import SwipeableRow from '../components/SwipeableRow';
 import ConfirmDialog from '../components/ConfirmDialog';
 import Fireworks from '../components/Fireworks';
 import { groupExercises } from '../data/grouping';
-import { getBestSet, getLastSet, getBestRepsAtWeight, isNewPR } from '../data/logUtils';
+import { getBestSet, getLastSet, getBestRepsAtWeight, isNewPR, isNewBestSetEver } from '../data/logUtils';
 
 export default function LogView({ exercises, sets, onSetsChange, activeUser, onUserChange, logDraft, setLogDraft, users = [] }) {
   const [saving, setSaving] = useState(false);
   const [pendingDelete, setPendingDelete] = useState(null);
-  const [showFireworks, setShowFireworks] = useState(false);
+  const [fireworksLabel, setFireworksLabel] = useState(null);
   const { exercise, reps, weight, notes } = logDraft;
 
   const today = new Date().toLocaleDateString('en-CA'); // YYYY-MM-DD
@@ -44,21 +44,28 @@ export default function LogView({ exercises, sets, onSetsChange, activeUser, onU
     e.preventDefault();
     if (!exercise || !weight) return;
     setSaving(true);
-    // Evaluate PR status against current sets BEFORE the save
-    const pr = isNewPR(sets, exercise, activeUser, Number(weight), reps === '' ? null : Number(reps));
+    // Evaluate celebration status against current sets BEFORE the save
+    const numReps = reps === '' ? null : Number(reps);
+    const numWeight = Number(weight);
+    let label = null;
+    if (isNewBestSetEver(sets, exercise, activeUser, numWeight, numReps)) {
+      label = 'New Best!';
+    } else if (isNewPR(sets, exercise, activeUser, numWeight, numReps)) {
+      label = 'New PR!';
+    }
     try {
       await addSet({
         date: today,
         user: activeUser,
         exercise,
-        reps: reps === '' ? null : Number(reps),
-        weight: Number(weight),
+        reps: numReps,
+        weight: numWeight,
         notes,
         createdAt: new Date().toISOString(),
       });
       setLogDraft(d => ({ ...d, reps: '', notes: '' }));
       await onSetsChange();
-      if (pr) setShowFireworks(true);
+      if (label) setFireworksLabel(label);
     } finally {
       setSaving(false);
     }
@@ -180,8 +187,8 @@ export default function LogView({ exercises, sets, onSetsChange, activeUser, onU
       {pendingDelete && (
         <ConfirmDialog onConfirm={handleConfirmDelete} onCancel={handleCancelDelete} />
       )}
-      {showFireworks && (
-        <Fireworks onDismiss={() => setShowFireworks(false)} />
+      {fireworksLabel && (
+        <Fireworks label={fireworksLabel} onDismiss={() => setFireworksLabel(null)} />
       )}
     </div>
   );

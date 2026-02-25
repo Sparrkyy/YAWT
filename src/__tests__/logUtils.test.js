@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { getBestSet, getLastSet, getBestRepsAtWeight, isNewPR } from '../data/logUtils';
+import { getBestSet, getLastSet, getBestRepsAtWeight, isNewPR, isNewBestSetEver } from '../data/logUtils';
 
 function makeSet(overrides = {}) {
   return {
@@ -126,6 +126,43 @@ describe('getLastSet', () => {
 
   it('returns null when no sets exist for that exercise and user', () => {
     expect(getLastSet([], 'Bench Press', 'Ethan')).toBeNull();
+  });
+});
+
+describe('isNewBestSetEver', () => {
+  const prevBest = [makeSet({ weight: 135, reps: 8 })];
+
+  it('returns false when reps is null', () => {
+    expect(isNewBestSetEver(prevBest, 'Bench Press', 'Ethan', 145, null)).toBe(false);
+  });
+
+  it('returns false when reps < 5', () => {
+    expect(isNewBestSetEver(prevBest, 'Bench Press', 'Ethan', 145, 4)).toBe(false);
+  });
+
+  it('returns false when no prior 5+ rep sets exist', () => {
+    const sets = [makeSet({ weight: 225, reps: 2 })];
+    expect(isNewBestSetEver(sets, 'Bench Press', 'Ethan', 145, 6)).toBe(false);
+  });
+
+  it('returns true when new weight exceeds current best weight (with 5+ reps)', () => {
+    expect(isNewBestSetEver(prevBest, 'Bench Press', 'Ethan', 145, 6)).toBe(true);
+  });
+
+  it('returns false when new weight is less than current best weight', () => {
+    expect(isNewBestSetEver(prevBest, 'Bench Press', 'Ethan', 125, 8)).toBe(false);
+  });
+
+  it('returns true when same weight but more reps than current best', () => {
+    expect(isNewBestSetEver(prevBest, 'Bench Press', 'Ethan', 135, 9)).toBe(true);
+  });
+
+  it('returns false when same weight and equal reps', () => {
+    expect(isNewBestSetEver(prevBest, 'Bench Press', 'Ethan', 135, 8)).toBe(false);
+  });
+
+  it('returns false when same weight and fewer reps', () => {
+    expect(isNewBestSetEver(prevBest, 'Bench Press', 'Ethan', 135, 6)).toBe(false);
   });
 });
 

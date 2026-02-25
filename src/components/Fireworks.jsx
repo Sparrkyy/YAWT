@@ -15,7 +15,7 @@ const PARTICLES = [
   { x:'65%', y:'72%', color:'#64D2FF', delay:'0.65s', rise:'-210px', bx:'-60px',  by:'100px',  dur:'0.52s', bdur:'0.92s' },
 ];
 
-export default function Fireworks({ onDismiss }) {
+export default function Fireworks({ onDismiss, label = 'New PR!' }) {
   useEffect(() => {
 const id = setTimeout(onDismiss, 2500);
     return () => clearTimeout(id);
@@ -27,7 +27,7 @@ const id = setTimeout(onDismiss, 2500);
       onClick={onDismiss}
       role="dialog"
       aria-modal="true"
-      aria-label="New PR celebration"
+      aria-label={`${label} celebration`}
     >
       <div className="fireworks-canvas" aria-hidden="true">
         {PARTICLES.map((p, i) => (
@@ -42,7 +42,7 @@ const id = setTimeout(onDismiss, 2500);
           />
         ))}
       </div>
-      <p className="fireworks-label">New PR!</p>
+      <p className="fireworks-label">{label}</p>
       <p className="fireworks-sub">Tap to dismiss</p>
     </div>
   );

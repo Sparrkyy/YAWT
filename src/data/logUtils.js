@@ -27,3 +27,10 @@ export function isNewPR(sets, exercise, user, weight, reps) {
   if (previous === null) return false;   // first time at this weight → not a PR
   return reps > previous.reps;
 }
+
+export function isNewBestSetEver(sets, exercise, user, weight, reps) {
+  if (reps == null || reps < 5) return false;
+  const best = getBestSet(sets, exercise, user);
+  if (best === null) return false;  // no previous 5+ rep set → not a new best
+  return weight > best.weight || (weight === best.weight && reps > best.reps);
+}

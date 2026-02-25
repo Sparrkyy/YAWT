@@ -13,8 +13,8 @@ vi.mock('../components/SwipeableRow', () => ({
 }));
 
 vi.mock('../components/Fireworks', () => ({
-  default: ({ onDismiss }) => (
-    <div data-testid="fireworks" onClick={onDismiss}>Fireworks</div>
+  default: ({ onDismiss, label }) => (
+    <div data-testid="fireworks" onClick={onDismiss}>{label}</div>
   ),
 }));
 
@@ -73,6 +73,7 @@ describe('LogView', () => {
 
   it('does not show fireworks after a non-PR save', async () => {
     vi.spyOn(logUtils, 'isNewPR').mockReturnValue(false);
+    vi.spyOn(logUtils, 'isNewBestSetEver').mockReturnValue(false);
     render(<LogView {...defaultProps} />);
 
     fireEvent.submit(screen.getByRole('button', { name: 'Add Set' }).closest('form'));
@@ -82,5 +83,33 @@ describe('LogView', () => {
     });
 
     expect(screen.queryByTestId('fireworks')).not.toBeInTheDocument();
+  });
+
+  it('shows "New Best!" fireworks when isNewBestSetEver returns true', async () => {
+    vi.spyOn(logUtils, 'isNewBestSetEver').mockReturnValue(true);
+    vi.spyOn(logUtils, 'isNewPR').mockReturnValue(false);
+    render(<LogView {...defaultProps} />);
+
+    fireEvent.submit(screen.getByRole('button', { name: 'Add Set' }).closest('form'));
+
+    await waitFor(() => {
+      expect(screen.getByTestId('fireworks')).toBeInTheDocument();
+    });
+
+    expect(screen.getByTestId('fireworks')).toHaveTextContent('New Best!');
+  });
+
+  it('shows "New PR!" fireworks when only isNewPR returns true', async () => {
+    vi.spyOn(logUtils, 'isNewBestSetEver').mockReturnValue(false);
+    vi.spyOn(logUtils, 'isNewPR').mockReturnValue(true);
+    render(<LogView {...defaultProps} />);
+
+    fireEvent.submit(screen.getByRole('button', { name: 'Add Set' }).closest('form'));
+
+    await waitFor(() => {
+      expect(screen.getByTestId('fireworks')).toBeInTheDocument();
+    });
+
+    expect(screen.getByTestId('fireworks')).toHaveTextContent('New PR!');
   });
 });
