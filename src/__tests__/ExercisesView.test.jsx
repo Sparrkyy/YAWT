@@ -8,6 +8,7 @@ const updateExerciseMock = vi.fn();
 vi.mock('../data/sheetsApi', () => ({
   addExercise: (...args) => addExerciseMock(...args),
   updateExercise: (...args) => updateExerciseMock(...args),
+  renameExercise: vi.fn(),
 }));
 
 vi.mock('../components/SwipeableRow', () => ({
@@ -31,6 +32,7 @@ vi.mock('../views/ExerciseEditSheet', () => ({
 
 function makeExercise(overrides = {}) {
   return {
+    id: 'ex-001',
     name: 'Bench Press',
     muscles: { chest: 1, triceps: 0.5 },
     archived: false,
@@ -40,7 +42,7 @@ function makeExercise(overrides = {}) {
 
 describe('ExercisesView', () => {
   beforeEach(() => {
-    addExerciseMock.mockResolvedValue(undefined);
+    addExerciseMock.mockImplementation(exercise => Promise.resolve({ id: 'new-ex-id', ...exercise }));
     updateExerciseMock.mockResolvedValue(undefined);
   });
 
@@ -105,7 +107,7 @@ describe('ExercisesView', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Archive' }));
 
     await waitFor(() => {
-      expect(updateExerciseMock).toHaveBeenCalledWith('Bench Press', { archived: true });
+      expect(updateExerciseMock).toHaveBeenCalledWith('ex-001', { archived: true });
     });
     expect(onExercisesChange).toHaveBeenCalled();
   });

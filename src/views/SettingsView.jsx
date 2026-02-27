@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { createNewSheet, validateSheet } from '../data/sheetsApi';
+import { createNewSheet, validateSheet, migrateToGuids } from '../data/sheetsApi';
 import ConfirmDialog from '../components/ConfirmDialog';
 
 export default function SettingsView({ currentSheetId, users, onSheetChange, onUsersChange, onSignOut }) {
@@ -8,6 +8,8 @@ export default function SettingsView({ currentSheetId, users, onSheetChange, onU
   const [sheetError, setSheetError] = useState('');
   const [newUser, setNewUser] = useState('');
   const [confirmCreate, setConfirmCreate] = useState(false);
+  const [migrateLoading, setMigrateLoading] = useState(false);
+  const [migrateStatus, setMigrateStatus] = useState('');
 
   async function handleLinkSheet() {
     const id = sheetInput.trim();
@@ -52,6 +54,19 @@ export default function SettingsView({ currentSheetId, users, onSheetChange, onU
   function handleRemoveUser(name) {
     if (users.length <= 1) return;
     onUsersChange(users.filter(u => u !== name));
+  }
+
+  async function handleMigrate() {
+    setMigrateLoading(true);
+    setMigrateStatus('');
+    try {
+      await migrateToGuids();
+      setMigrateStatus('Migration complete.');
+    } catch {
+      setMigrateStatus('Migration failed. Please try again.');
+    } finally {
+      setMigrateLoading(false);
+    }
   }
 
   return (
@@ -136,6 +151,18 @@ export default function SettingsView({ currentSheetId, users, onSheetChange, onU
             </button>
           </div>
         )}
+      </section>
+
+      <section className="settings-section">
+        <h2 className="settings-heading">Data</h2>
+        {migrateStatus && <p className="settings-migrate-status">{migrateStatus}</p>}
+        <button
+          className="settings-text-btn"
+          onClick={handleMigrate}
+          disabled={migrateLoading}
+        >
+          {migrateLoading ? 'Migrating…' : 'Migrate data to new schema'}
+        </button>
       </section>
 
       <section className="settings-section">

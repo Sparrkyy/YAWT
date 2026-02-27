@@ -21,11 +21,11 @@ export default function ExercisesView({ exercises, onExercisesChange }) {
     e.preventDefault();
     if (!name.trim()) return;
     const trimmedName = name.trim();
-    await addExercise({ name: trimmedName, muscles: {}, archived: false });
+    const newExercise = await addExercise({ name: trimmedName, muscles: {}, archived: false });
     setName('');
     setAdding(false);
     await onExercisesChange();
-    setEditingExercise({ name: trimmedName, muscles: {}, archived: false });
+    setEditingExercise(newExercise);
   }
 
   function handleArchiveRequest(exercise, snapBack) {
@@ -35,7 +35,7 @@ export default function ExercisesView({ exercises, onExercisesChange }) {
   async function handleConfirmArchive() {
     const { exercise } = pendingArchive;
     setPendingArchive(null);
-    await updateExercise(exercise.name, { archived: true });
+    await updateExercise(exercise.id, { archived: true });
     onExercisesChange();
   }
 
@@ -97,8 +97,9 @@ export default function ExercisesView({ exercises, onExercisesChange }) {
       {editingExercise && (
         <ExerciseEditSheet
           exercise={editingExercise}
+          exercises={exercises}
           onSave={async (muscles) => {
-            await updateExercise(editingExercise.name, { muscles });
+            await updateExercise(editingExercise.id, { muscles });
             onExercisesChange();
           }}
           onClose={() => setEditingExercise(null)}

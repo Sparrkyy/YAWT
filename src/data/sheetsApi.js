@@ -41,25 +41,30 @@ async function sheetsPut(path, body) {
 
 // ─── Sets ────────────────────────────────────────────────────────────────────
 
+// New column layout: A=id, B=date, C=user, D=exercise(formula), E=exercise_id, F=reps, G=weight, H=notes, I=createdAt
 export function rowToSet(row) {
   return {
     id: row[0] ?? '',
     date: row[1] ?? '',
     user: row[2] ?? '',
     exercise: row[3] ?? '',
-    reps: row[4] !== '' && row[4] != null ? Number(row[4]) : null,
-    weight: Number(row[5] ?? 0),
-    notes: row[6] ?? '',
-    createdAt: row[7] ?? '',
+    exerciseId: row[4] ?? '',
+    reps: row[5] !== '' && row[5] != null ? Number(row[5]) : null,
+    weight: Number(row[6] ?? 0),
+    notes: row[7] ?? '',
+    createdAt: row[8] ?? '',
   };
 }
 
 export function setToRow(set) {
+  // exerciseId falls back to exercise name for backward-compat with old data
+  const exerciseId = set.exerciseId ?? set.exercise ?? '';
   return [
     set.id,
     set.date,
     set.user,
-    set.exercise,
+    `=IFERROR(XLOOKUP(INDIRECT("E"&ROW()), Exercises!A:A, Exercises!B:B), INDIRECT("E"&ROW()))`,
+    exerciseId,
     set.reps != null ? set.reps : '',
     set.weight,
     set.notes ?? '',
@@ -68,7 +73,7 @@ export function setToRow(set) {
 }
 
 export async function getSets() {
-  const data = await sheetsGet('/values/Sets!A:H');
+  const data = await sheetsGet('/values/Sets!A:I');
   const rows = data.values ?? [];
   // skip header row (index 0)
   return rows.slice(1).map(rowToSet).filter(s => s.id);
@@ -80,14 +85,14 @@ export async function addSet(set) {
     : `${Date.now()}-${Math.random().toString(36).slice(2)}`;
   const newSet = { ...set, id };
   await sheetsPost(
-    '/values/Sets!A:H:append?valueInputOption=RAW&insertDataOption=INSERT_ROWS',
+    '/values/Sets!A:I:append?valueInputOption=USER_ENTERED&insertDataOption=INSERT_ROWS',
     { values: [setToRow(newSet)] }
   );
   return newSet;
 }
 
 export async function deleteSet(id) {
-  const data = await sheetsGet('/values/Sets!A:H');
+  const data = await sheetsGet('/values/Sets!A:I');
   const rows = data.values ?? [];
   // rows[0] is header; find the data row (1-based in the sheet)
   const rowIndex = rows.findIndex((r, i) => i > 0 && r[0] === id);
@@ -109,42 +114,52 @@ export async function deleteSet(id) {
 
 // ─── Exercises ───────────────────────────────────────────────────────────────
 
+// New column layout: A=id, B=name, C=muscles, D=archived
 export function rowToExercise(row) {
   let muscles = {};
-  try { muscles = JSON.parse(row[1] ?? '{}'); } catch { /* ignore */ }
-  return { name: row[0] ?? '', muscles, archived: row[2] === 'true' };
+  try { muscles = JSON.parse(row[2] ?? '{}'); } catch { /* ignore */ }
+  return { id: row[0] ?? '', name: row[1] ?? '', muscles, archived: row[3] === 'true' };
 }
 
 export function exerciseToRow(ex) {
-  return [ex.name, JSON.stringify(ex.muscles ?? {}), ex.archived ? 'true' : ''];
+  return [ex.id, ex.name, JSON.stringify(ex.muscles ?? {}), ex.archived ? 'true' : ''];
 }
 
 export async function getExercises() {
-  const data = await sheetsGet('/values/Exercises!A:C');
+  const data = await sheetsGet('/values/Exercises!A:D');
   const rows = data.values ?? [];
   return rows.slice(1).map(rowToExercise).filter(e => e.name);
 }
 
 export async function addExercise(exercise) {
+  const id = crypto.randomUUID
+    ? crypto.randomUUID()
+    : `${Date.now()}-${Math.random().toString(36).slice(2)}`;
+  const newExercise = { ...exercise, id };
   await sheetsPost(
-    '/values/Exercises!A:C:append?valueInputOption=RAW&insertDataOption=INSERT_ROWS',
-    { values: [exerciseToRow(exercise)] }
+    '/values/Exercises!A:D:append?valueInputOption=USER_ENTERED&insertDataOption=INSERT_ROWS',
+    { values: [exerciseToRow(newExercise)] }
   );
+  return newExercise;
 }
 
-export async function updateExercise(name, updatedExercise) {
-  const data = await sheetsGet('/values/Exercises!A:C');
+export async function updateExercise(exerciseId, updatedExercise) {
+  const data = await sheetsGet('/values/Exercises!A:D');
   const rows = data.values ?? [];
-  const rowIndex = rows.findIndex((r, i) => i > 0 && r[0] === name);
+  const rowIndex = rows.findIndex((r, i) => i > 0 && r[0] === exerciseId);
   if (rowIndex === -1) return;
 
   const merged = { ...rowToExercise(rows[rowIndex]), ...updatedExercise };
   // rowIndex is 0-based in array; sheet rows are 1-based, so sheet row = rowIndex + 1
   const sheetRow = rowIndex + 1;
   await sheetsPut(
-    `/values/Exercises!A${sheetRow}:C${sheetRow}?valueInputOption=RAW`,
+    `/values/Exercises!A${sheetRow}:D${sheetRow}?valueInputOption=RAW`,
     { values: [exerciseToRow(merged)] }
   );
+}
+
+export function renameExercise(exerciseId, newName) {
+  return updateExercise(exerciseId, { name: newName });
 }
 
 // ─── Sheet management ────────────────────────────────────────────────────────
@@ -176,15 +191,15 @@ export async function createNewSheet() {
   });
 
   // 3. Write headers
-  await fetch(`${BASE_SHEETS}/${id}/values/Sets!A1:H1?valueInputOption=RAW`, {
+  await fetch(`${BASE_SHEETS}/${id}/values/Sets!A1:I1?valueInputOption=RAW`, {
     method: 'PUT',
     headers: { ...authHeaders(), 'Content-Type': 'application/json' },
-    body: JSON.stringify({ values: [['id', 'date', 'user', 'exercise', 'reps', 'weight', 'notes', 'createdAt']] }),
+    body: JSON.stringify({ values: [['id', 'date', 'user', 'exercise', 'exercise_id', 'reps', 'weight', 'notes', 'createdAt']] }),
   });
-  await fetch(`${BASE_SHEETS}/${id}/values/Exercises!A1:C1?valueInputOption=RAW`, {
+  await fetch(`${BASE_SHEETS}/${id}/values/Exercises!A1:D1?valueInputOption=RAW`, {
     method: 'PUT',
     headers: { ...authHeaders(), 'Content-Type': 'application/json' },
-    body: JSON.stringify({ values: [['name', 'muscles', 'archived']] }),
+    body: JSON.stringify({ values: [['id', 'name', 'muscles', 'archived']] }),
   });
 
   return id;
@@ -212,7 +227,7 @@ export async function migrateSetsFromLocalStorage() {
 
   const rows = sets.map(setToRow);
   await sheetsPost(
-    '/values/Sets!A:H:append?valueInputOption=RAW&insertDataOption=INSERT_ROWS',
+    '/values/Sets!A:I:append?valueInputOption=USER_ENTERED&insertDataOption=INSERT_ROWS',
     { values: rows }
   );
 
@@ -220,4 +235,78 @@ export async function migrateSetsFromLocalStorage() {
   localStorage.removeItem('workout_sets');
   localStorage.removeItem('csv_v1_imported');
   return sets.length;
+}
+
+// ─── Schema migration (name → GUID) ──────────────────────────────────────────
+
+function newUuid() {
+  return crypto.randomUUID
+    ? crypto.randomUUID()
+    : `${Date.now()}-${Math.random().toString(36).slice(2)}`;
+}
+
+async function sheetsClear(range) {
+  const res = await fetch(`${getBase()}/values/${encodeURIComponent(range)}:clear`, {
+    method: 'POST',
+    headers: { ...authHeaders(), 'Content-Type': 'application/json' },
+  });
+  if (!res.ok) throw Object.assign(new Error('Sheets CLEAR failed'), { status: res.status });
+  return res.json();
+}
+
+export async function migrateToGuids() {
+  // Check if already migrated (new schema has "id" in Exercises!A1)
+  const headerData = await sheetsGet('/values/Exercises!A1');
+  const a1 = (headerData.values?.[0]?.[0] ?? '').toLowerCase();
+  if (a1 === 'id') return; // already migrated
+
+  // Fetch all exercises (old format: name, muscles, archived)
+  const exData = await sheetsGet('/values/Exercises!A:C');
+  const exRows = (exData.values ?? []).slice(1);
+  const oldExercises = exRows
+    .filter(r => r[0])
+    .map(r => {
+      let muscles = {};
+      try { muscles = JSON.parse(r[1] ?? '{}'); } catch { /* ignore */ }
+      return { id: newUuid(), name: r[0], muscles, archived: r[2] === 'true' };
+    });
+
+  // Fetch all sets (old format: id, date, user, exercise_name, reps, weight, notes, createdAt)
+  const setsData = await sheetsGet('/values/Sets!A:H');
+  const oldSetRows = (setsData.values ?? []).slice(1).filter(r => r[0]);
+
+  // Build name → uuid map
+  const nameToId = Object.fromEntries(oldExercises.map(e => [e.name, e.id]));
+
+  const XLOOKUP_FORMULA = `=IFERROR(XLOOKUP(INDIRECT("E"&ROW()), Exercises!A:A, Exercises!B:B), INDIRECT("E"&ROW()))`;
+
+  // Build new sets rows (columns: id, date, user, formula, exercise_id, reps, weight, notes, createdAt)
+  const newSetRows = oldSetRows.map(r => [
+    r[0] ?? '',               // id
+    r[1] ?? '',               // date
+    r[2] ?? '',               // user
+    XLOOKUP_FORMULA,          // exercise (formula resolves to name)
+    nameToId[r[3]] ?? r[3],   // exercise_id (UUID or original name as fallback)
+    r[4] ?? '',               // reps
+    r[5] ?? '',               // weight
+    r[6] ?? '',               // notes
+    r[7] ?? '',               // createdAt
+  ]);
+
+  // Rewrite Exercises tab
+  await sheetsClear('Exercises!A:D');
+  const exerciseHeader = [['id', 'name', 'muscles', 'archived']];
+  const exerciseData = oldExercises.map(e => [e.id, e.name, JSON.stringify(e.muscles), e.archived ? 'true' : '']);
+  await sheetsPut(
+    `/values/Exercises!A1:D${1 + oldExercises.length}?valueInputOption=RAW`,
+    { values: [...exerciseHeader, ...exerciseData] }
+  );
+
+  // Rewrite Sets tab
+  await sheetsClear('Sets!A:I');
+  const setHeader = [['id', 'date', 'user', 'exercise', 'exercise_id', 'reps', 'weight', 'notes', 'createdAt']];
+  await sheetsPut(
+    `/values/Sets!A1:I${1 + newSetRows.length}?valueInputOption=USER_ENTERED`,
+    { values: [...setHeader, ...newSetRows] }
+  );
 }

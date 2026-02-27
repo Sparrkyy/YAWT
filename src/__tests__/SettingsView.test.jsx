@@ -6,6 +6,7 @@ import * as sheetsApi from '../data/sheetsApi';
 vi.mock('../data/sheetsApi', () => ({
   createNewSheet: vi.fn(),
   validateSheet: vi.fn(),
+  migrateToGuids: vi.fn(),
 }));
 
 function renderSettings(overrides = {}) {
@@ -78,5 +79,36 @@ describe('SettingsView', () => {
   it('displays the first 8 characters of the current sheet ID followed by an ellipsis', () => {
     renderSettings({ currentSheetId: 'abcdefghijklmnop' });
     expect(screen.getByText(/abcdefgh/)).toBeInTheDocument();
+  });
+
+  it('renders the Migrate data button', () => {
+    renderSettings();
+    expect(screen.getByRole('button', { name: 'Migrate data to new schema' })).toBeInTheDocument();
+  });
+
+  it('calls migrateToGuids and shows success message on successful migration', async () => {
+    sheetsApi.migrateToGuids.mockResolvedValue(undefined);
+    renderSettings();
+    fireEvent.click(screen.getByRole('button', { name: 'Migrate data to new schema' }));
+    await waitFor(() => {
+      expect(sheetsApi.migrateToGuids).toHaveBeenCalled();
+      expect(screen.getByText('Migration complete.')).toBeInTheDocument();
+    });
+  });
+
+  it('shows error message when migrateToGuids fails', async () => {
+    sheetsApi.migrateToGuids.mockRejectedValue(new Error('network error'));
+    renderSettings();
+    fireEvent.click(screen.getByRole('button', { name: 'Migrate data to new schema' }));
+    await waitFor(() => {
+      expect(screen.getByText('Migration failed. Please try again.')).toBeInTheDocument();
+    });
+  });
+
+  it('disables migrate button while migration is in progress', async () => {
+    sheetsApi.migrateToGuids.mockReturnValue(new Promise(() => {})); // never resolves
+    renderSettings();
+    fireEvent.click(screen.getByRole('button', { name: 'Migrate data to new schema' }));
+    expect(screen.getByRole('button', { name: 'Migrating…' })).toBeDisabled();
   });
 });

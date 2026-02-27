@@ -54,10 +54,12 @@ export default function LogView({ exercises, sets, onSetsChange, activeUser, onU
       label = 'New PR!';
     }
     try {
+      const selectedExercise = exercises.find(ex => ex.name === exercise);
       await addSet({
         date: today,
         user: activeUser,
         exercise,
+        exerciseId: selectedExercise?.id ?? '',
         reps: numReps,
         weight: numWeight,
         notes,
