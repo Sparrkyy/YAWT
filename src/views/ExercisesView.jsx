@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import { addExercise, updateExercise } from '../data/sheetsApi';
 import ExerciseEditSheet from './ExerciseEditSheet';
+import SwipeableRow from '../components/SwipeableRow';
+import ConfirmDialog from '../components/ConfirmDialog';
 import { groupExercises } from '../data/grouping';
 
 const MUSCLE_LABELS = {
@@ -13,14 +15,33 @@ export default function ExercisesView({ exercises, onExercisesChange }) {
   const [adding, setAdding] = useState(false);
   const [name, setName] = useState('');
   const [editingExercise, setEditingExercise] = useState(null);
+  const [pendingArchive, setPendingArchive] = useState(null);
 
   async function handleAdd(e) {
     e.preventDefault();
     if (!name.trim()) return;
-    await addExercise({ name: name.trim(), muscles: {} });
+    const trimmedName = name.trim();
+    await addExercise({ name: trimmedName, muscles: {}, archived: false });
     setName('');
     setAdding(false);
+    await onExercisesChange();
+    setEditingExercise({ name: trimmedName, muscles: {}, archived: false });
+  }
+
+  function handleArchiveRequest(exercise, snapBack) {
+    setPendingArchive({ exercise, snapBack });
+  }
+
+  async function handleConfirmArchive() {
+    const { exercise } = pendingArchive;
+    setPendingArchive(null);
+    await updateExercise(exercise.name, { archived: true });
     onExercisesChange();
+  }
+
+  function handleCancelArchive() {
+    pendingArchive?.snapBack?.();
+    setPendingArchive(null);
   }
 
   function primaryMuscles(muscles) {
@@ -30,6 +51,8 @@ export default function ExercisesView({ exercises, onExercisesChange }) {
       .map(([k]) => MUSCLE_LABELS[k])
       .join(', ');
   }
+
+  const visibleExercises = exercises.filter(ex => !ex.archived);
 
   return (
     <div className="view">
@@ -53,17 +76,19 @@ export default function ExercisesView({ exercises, onExercisesChange }) {
         </form>
       )}
 
-      {groupExercises(exercises).map(({ label, exercises: group }) => (
+      {groupExercises(visibleExercises).map(({ label, exercises: group }) => (
         <div key={label} className="exercise-group">
           <div className="exercise-group-header">{label}</div>
           <div className="exercise-list">
             {group.map(ex => (
-              <div key={ex.name} className="exercise-item tappable" onClick={() => setEditingExercise(ex)}>
-                <span className="exercise-name">{ex.name}</span>
-                {Object.keys(ex.muscles).length > 0 && (
-                  <span className="exercise-muscles">{primaryMuscles(ex.muscles)}</span>
-                )}
-              </div>
+              <SwipeableRow key={ex.name} onDelete={({ snapBack }) => handleArchiveRequest(ex, snapBack)}>
+                <div className="exercise-item tappable" onClick={() => setEditingExercise(ex)}>
+                  <span className="exercise-name">{ex.name}</span>
+                  {Object.keys(ex.muscles).length > 0 && (
+                    <span className="exercise-muscles">{primaryMuscles(ex.muscles)}</span>
+                  )}
+                </div>
+              </SwipeableRow>
             ))}
           </div>
         </div>
@@ -77,6 +102,16 @@ export default function ExercisesView({ exercises, onExercisesChange }) {
             onExercisesChange();
           }}
           onClose={() => setEditingExercise(null)}
+        />
+      )}
+
+      {pendingArchive && (
+        <ConfirmDialog
+          title={`Archive "${pendingArchive.exercise.name}"?`}
+          confirmLabel="Archive"
+          confirmStyle="btn-danger"
+          onConfirm={handleConfirmArchive}
+          onCancel={handleCancelArchive}
         />
       )}
     </div>

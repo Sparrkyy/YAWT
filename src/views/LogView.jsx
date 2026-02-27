@@ -90,7 +90,7 @@ export default function LogView({ exercises, sets, onSetsChange, activeUser, onU
           <label>Exercise</label>
           <select value={exercise} onChange={e => setLogDraft(d => ({ ...d, exercise: e.target.value, weight: '' }))} required>
             <option value="">— select —</option>
-            {groupExercises(exercises).map(({ label, exercises: group }) => (
+            {groupExercises(exercises.filter(ex => !ex.archived)).map(({ label, exercises: group }) => (
               <optgroup key={label} label={label}>
                 {group.map(ex => (
                   <option key={ex.name} value={ex.name}>{ex.name}</option>

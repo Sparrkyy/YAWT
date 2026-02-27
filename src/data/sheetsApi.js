@@ -112,28 +112,28 @@ export async function deleteSet(id) {
 export function rowToExercise(row) {
   let muscles = {};
   try { muscles = JSON.parse(row[1] ?? '{}'); } catch { /* ignore */ }
-  return { name: row[0] ?? '', muscles };
+  return { name: row[0] ?? '', muscles, archived: row[2] === 'true' };
 }
 
 export function exerciseToRow(ex) {
-  return [ex.name, JSON.stringify(ex.muscles ?? {})];
+  return [ex.name, JSON.stringify(ex.muscles ?? {}), ex.archived ? 'true' : ''];
 }
 
 export async function getExercises() {
-  const data = await sheetsGet('/values/Exercises!A:B');
+  const data = await sheetsGet('/values/Exercises!A:C');
   const rows = data.values ?? [];
   return rows.slice(1).map(rowToExercise).filter(e => e.name);
 }
 
 export async function addExercise(exercise) {
   await sheetsPost(
-    '/values/Exercises!A:B:append?valueInputOption=RAW&insertDataOption=INSERT_ROWS',
+    '/values/Exercises!A:C:append?valueInputOption=RAW&insertDataOption=INSERT_ROWS',
     { values: [exerciseToRow(exercise)] }
   );
 }
 
 export async function updateExercise(name, updatedExercise) {
-  const data = await sheetsGet('/values/Exercises!A:B');
+  const data = await sheetsGet('/values/Exercises!A:C');
   const rows = data.values ?? [];
   const rowIndex = rows.findIndex((r, i) => i > 0 && r[0] === name);
   if (rowIndex === -1) return;
@@ -142,7 +142,7 @@ export async function updateExercise(name, updatedExercise) {
   // rowIndex is 0-based in array; sheet rows are 1-based, so sheet row = rowIndex + 1
   const sheetRow = rowIndex + 1;
   await sheetsPut(
-    `/values/Exercises!A${sheetRow}:B${sheetRow}?valueInputOption=RAW`,
+    `/values/Exercises!A${sheetRow}:C${sheetRow}?valueInputOption=RAW`,
     { values: [exerciseToRow(merged)] }
   );
 }
@@ -181,10 +181,10 @@ export async function createNewSheet() {
     headers: { ...authHeaders(), 'Content-Type': 'application/json' },
     body: JSON.stringify({ values: [['id', 'date', 'user', 'exercise', 'reps', 'weight', 'notes', 'createdAt']] }),
   });
-  await fetch(`${BASE_SHEETS}/${id}/values/Exercises!A1:B1?valueInputOption=RAW`, {
+  await fetch(`${BASE_SHEETS}/${id}/values/Exercises!A1:C1?valueInputOption=RAW`, {
     method: 'PUT',
     headers: { ...authHeaders(), 'Content-Type': 'application/json' },
-    body: JSON.stringify({ values: [['name', 'muscles']] }),
+    body: JSON.stringify({ values: [['name', 'muscles', 'archived']] }),
   });
 
   return id;

@@ -37,8 +37,28 @@ describe('exercise row serialization', () => {
     const original = {
       name: 'Bench Press',
       muscles: { chest: 1, triceps: 0.5, shoulders: 0.25 },
+      archived: false,
     };
     expect(rowToExercise(exerciseToRow(original))).toEqual(original);
+  });
+
+  it('roundtrips an archived exercise preserving the archived flag', () => {
+    const original = {
+      name: 'Old Lift',
+      muscles: { back: 1 },
+      archived: true,
+    };
+    expect(rowToExercise(exerciseToRow(original))).toEqual(original);
+  });
+
+  it('defaults archived to false when column C is missing (legacy row)', () => {
+    const result = rowToExercise(['Bench Press', '{"chest":1}']);
+    expect(result.archived).toBe(false);
+  });
+
+  it('defaults archived to false when column C is an empty string', () => {
+    const result = rowToExercise(['Bench Press', '{"chest":1}', '']);
+    expect(result.archived).toBe(false);
   });
 
   it('returns {} for muscles when the JSON cell is malformed (no crash)', () => {
