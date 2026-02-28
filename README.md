@@ -1,9 +1,18 @@
 # YAWT — Yet Another Workout Tracker
 
-A mobile-first PWA for logging gym sets, built with React + Vite and hosted on GitHub Pages.
+A mobile-first PWA to log gym sets, track muscle volume over time, and manage their exercise library. Built with React + Vite, backed by Google Sheets, and hosted on GitHub Pages.
 
-TODO:
-- Make it have a graph that is more helpful for showing progressions
-- You should not be able to enter a set it with 0 reps, it should reject the same way it does with 0 weight
-- WHen making the exercise on the phone, the weights dont save propery for muscle groups
-- Weight should be nulled out for all users when a new exercise is selected 
+Allows you to define each exercise's target muscles, allowing you to count partially towards a muscle group, matching science based research on muscle growth. Further, allows you to define exercises very specifically, so that you are sure to be tracking progress over time under the same exact conditions. 
+
+## Screenshots
+
+| Log | Exercises | Stats |
+|-----|-----------|-------|
+| <img src="docs/screenshots/log.png" height="400"> | <img src="docs/screenshots/exercises.png" height="400"> | <img src="docs/screenshots/stats.png" height="400"> |
+
+## TODO
+
+- [ ] Make a graph that shows progressions more clearly
+- [ ] Reject sets with 0 reps the same way 0 weight is rejected
+- [ ] Fix muscle group weights not saving properly when creating an exercise on mobile
+- [ ] Clear weight field for all users when a new exercise is selected
