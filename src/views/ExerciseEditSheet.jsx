@@ -50,16 +50,18 @@ export default function ExerciseEditSheet({ exercise, exercises = [], onSave, on
         </div>
 
         <div className="sheet-body">
-          <div className="name-field">
+          <div className="field" style={{ padding: '16px 0', borderBottom: '1px solid var(--border)', marginBottom: 0 }}>
+            <label>Exercise Name</label>
             <input
               type="text"
-              className="exercise-name-input"
               value={draftName}
               onChange={e => { setDraftName(e.target.value); setNameError(''); }}
               placeholder="Exercise name"
             />
-            {nameError && <span className="name-error">{nameError}</span>}
-            <span className="name-hint">Renaming updates all historical sets automatically</span>
+            {nameError
+              ? <span className="settings-error">{nameError}</span>
+              : <span style={{ fontSize: '0.75rem', color: 'var(--text-secondary)' }}>Renaming updates all historical sets automatically</span>
+            }
           </div>
 
           {MUSCLE_GROUPS.map(muscle => (
