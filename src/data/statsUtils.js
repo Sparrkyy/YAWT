@@ -13,6 +13,10 @@ export function getDateRange(period) {
     start: new Date(today.getFullYear(), today.getMonth(), 1),
     end:   new Date(today.getFullYear(), today.getMonth() + 1, 0),
   };
+  if (period === 'lastMonth') return {
+    start: new Date(today.getFullYear(), today.getMonth() - 1, 1),
+    end:   new Date(today.getFullYear(), today.getMonth(), 0),
+  };
   return {
     start: new Date(today.getFullYear(), 0, 1),
     end:   new Date(today.getFullYear(), 11, 31),
@@ -36,6 +40,21 @@ export function getExerciseProgress(sets, exercise, user) {
       reps,
       weight,
     }));
+}
+
+export function getLastMuscleHitDates(sets, exercises, user) {
+  const exMap = Object.fromEntries(exercises.map(ex => [ex.name, ex]));
+  const result = {};
+  for (const s of sets) {
+    if (s.user !== user) continue;
+    const ex = exMap[s.exercise];
+    if (!ex) continue;
+    for (const [muscle, w] of Object.entries(ex.muscles)) {
+      if (!w) continue;
+      if (!result[muscle] || s.date > result[muscle]) result[muscle] = s.date;
+    }
+  }
+  return result;
 }
 
 export function computeStats(sets, exercises, period, user) {

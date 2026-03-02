@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
-import { computeStats, getExerciseProgress } from '../data/statsUtils';
+import { computeStats, getExerciseProgress, getLastMuscleHitDates } from '../data/statsUtils';
 
 // Today is 2026-02-19 (Thursday)
 const TODAY = '2026-02-19';
@@ -90,6 +90,56 @@ describe('computeStats', () => {
     const sets = [makeSet({ exercise: 'Unknown Exercise' })];
     const totals = computeStats(sets, exercises, 'week', 'Ethan');
     expect(totals).toEqual({});
+  });
+
+  it('includes a set from last month when period is lastMonth', () => {
+    // TODAY = 2026-02-19, so last month = January 2026
+    const sets = [makeSet({ date: '2026-01-15' })];
+    const totals = computeStats(sets, exercises, 'lastMonth', 'Ethan');
+    expect(totals.chest).toBe(1);
+  });
+
+  it('excludes a set from this month when period is lastMonth', () => {
+    const sets = [makeSet({ date: TODAY })]; // Feb 19 → this month, not last
+    const totals = computeStats(sets, exercises, 'lastMonth', 'Ethan');
+    expect(totals).toEqual({});
+  });
+});
+
+describe('getLastMuscleHitDates', () => {
+  it('returns empty object when no sets', () => {
+    const result = getLastMuscleHitDates([], exercises, 'Ethan');
+    expect(result).toEqual({});
+  });
+
+  it('returns the correct last date per muscle', () => {
+    const sets = [
+      makeSet({ date: '2026-02-10', exercise: 'Bench Press' }),
+      makeSet({ date: '2026-02-19', exercise: 'Bench Press' }),
+    ];
+    const result = getLastMuscleHitDates(sets, exercises, 'Ethan');
+    expect(result.chest).toBe('2026-02-19');
+    expect(result.triceps).toBe('2026-02-19');
+  });
+
+  it('respects user filter and ignores other users sets', () => {
+    const sets = [
+      makeSet({ date: '2026-02-19', exercise: 'Bench Press', user: 'Ava' }),
+    ];
+    const result = getLastMuscleHitDates(sets, exercises, 'Ethan');
+    expect(result).toEqual({});
+  });
+
+  it('skips muscles with weight 0', () => {
+    const zeroMuscleExercise = {
+      name: 'Plank',
+      muscles: { abs: 1, chest: 0, triceps: 0 },
+    };
+    const sets = [makeSet({ exercise: 'Plank' })];
+    const result = getLastMuscleHitDates(sets, [zeroMuscleExercise], 'Ethan');
+    expect(result.abs).toBe(TODAY);
+    expect(result.chest).toBeUndefined();
+    expect(result.triceps).toBeUndefined();
   });
 });
 

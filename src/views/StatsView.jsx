@@ -1,8 +1,9 @@
 import { useState, useMemo, useEffect } from 'react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import BodyDiagram from './BodyDiagram';
-import { getDateRange, getExerciseProgress } from '../data/statsUtils';
+import { getDateRange, getExerciseProgress, getLastMuscleHitDates } from '../data/statsUtils';
 import { groupExercises } from '../data/grouping';
+import ExerciseSelector from '../components/ExerciseSelector';
 
 const MUSCLE_LABELS = {
   chest: 'Chest', back: 'Back', shoulders: 'Shoulders', biceps: 'Biceps',
@@ -13,6 +14,12 @@ const MUSCLE_LABELS = {
 const formatDate = (dateStr) => {
   const [, month, day] = dateStr.split('-');
   return `${month}/${day}`;
+};
+
+const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+const formatShortDate = (dateStr) => {
+  const [, m, d] = dateStr.split('-').map(Number);
+  return `${MONTHS[m - 1]} ${d}`;
 };
 
 function CustomTooltip({ active, payload, label }) {
@@ -71,11 +78,25 @@ export default function StatsView({ sets, exercises, activeUser, onUserChange, u
     [sets, selectedExercise, activeUser]
   );
 
+  const weeksInPeriod = useMemo(() => {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const { start, end } = getDateRange(period);
+    const effectiveEnd = period === 'lastMonth' ? end : today;
+    const elapsedDays = Math.round((effectiveEnd - start) / 86400000) + 1;
+    return Math.ceil(elapsedDays / 7);
+  }, [period]);
+
+  const lastMuscleHit = useMemo(
+    () => getLastMuscleHitDates(sets, exercises, activeUser),
+    [sets, exercises, activeUser]
+  );
+
   const rankedMuscles = Object.entries(effectiveSets)
     .filter(([, v]) => v > 0)
     .sort(([, a], [, b]) => b - a);
 
-  const periodLabels = { week: 'This Week', month: 'This Month', year: 'This Year' };
+  const periodLabels = { week: 'This Week', month: 'This Month', lastMonth: 'Last Month', year: 'This Year' };
 
   return (
     <div className="view">
@@ -91,7 +112,7 @@ export default function StatsView({ sets, exercises, activeUser, onUserChange, u
         ))}
       </div>
       <div className="period-selector">
-        {['week', 'month', 'year'].map(p => (
+        {['week', 'month', 'lastMonth', 'year'].map(p => (
           <button
             key={p}
             className={`period-btn ${period === p ? 'active' : ''}`}
@@ -108,8 +129,16 @@ export default function StatsView({ sets, exercises, activeUser, onUserChange, u
         <div className="muscle-totals">
           {rankedMuscles.map(([muscle, value]) => (
             <div key={muscle} className="muscle-total-row">
-              <span>{MUSCLE_LABELS[muscle] ?? muscle}</span>
-              <span className="muscle-total-value">{parseFloat(value.toFixed(2))} sets</span>
+              <span className="muscle-name">{MUSCLE_LABELS[muscle] ?? muscle}</span>
+              <div className="muscle-right">
+                <span className="muscle-total-value">{parseFloat(value.toFixed(2))} sets</span>
+                {period !== 'week' && (
+                  <span className="muscle-avg">~{(value / weeksInPeriod).toFixed(2)}/wk</span>
+                )}
+                {lastMuscleHit[muscle] && (
+                  <span className="muscle-last">last performed {formatShortDate(lastMuscleHit[muscle])}</span>
+                )}
+              </div>
             </div>
           ))}
         </div>
@@ -119,19 +148,13 @@ export default function StatsView({ sets, exercises, activeUser, onUserChange, u
 
       <div className="exercise-progress">
         <h3>Exercise Progress</h3>
-        <select
+        <ExerciseSelector
+          exercises={exercises}
           value={selectedExercise}
           onChange={e => setSelectedExercise(e.target.value)}
+          includeArchived
           aria-label="Select exercise"
-        >
-          {groupedExercises.map(({ label, exercises: group }) => (
-            <optgroup key={label} label={label}>
-              {group.map(ex => (
-                <option key={ex.name} value={ex.name}>{ex.name}</option>
-              ))}
-            </optgroup>
-          ))}
-        </select>
+        />
         {progressData.length > 0 ? (
           <ResponsiveContainer width="100%" height={250}>
             <LineChart data={progressData} margin={{ top: 5, right: 20, left: 10, bottom: 5 }}>

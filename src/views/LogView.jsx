@@ -3,8 +3,8 @@ import { addSet, deleteSet } from '../data/sheetsApi';
 import SwipeableRow from '../components/SwipeableRow';
 import ConfirmDialog from '../components/ConfirmDialog';
 import Fireworks from '../components/Fireworks';
-import { groupExercises } from '../data/grouping';
 import { getBestSet, getLastSet, getBestRepsAtWeight, isNewPR, isNewBestSetEver } from '../data/logUtils';
+import ExerciseSelector from '../components/ExerciseSelector';
 
 export default function LogView({ exercises, sets, onSetsChange, activeUser, onUserChange, logDraft, setLogDraft, users = [] }) {
   const [saving, setSaving] = useState(false);
@@ -90,16 +90,12 @@ export default function LogView({ exercises, sets, onSetsChange, activeUser, onU
       <form className="log-form" onSubmit={handleSubmit}>
         <div className="field">
           <label>Exercise</label>
-          <select value={exercise} onChange={e => setLogDraft(d => ({ ...d, exercise: e.target.value, weight: '' }))} required>
-            <option value="">— select —</option>
-            {groupExercises(exercises.filter(ex => !ex.archived)).map(({ label, exercises: group }) => (
-              <optgroup key={label} label={label}>
-                {group.map(ex => (
-                  <option key={ex.name} value={ex.name}>{ex.name}</option>
-                ))}
-              </optgroup>
-            ))}
-          </select>
+          <ExerciseSelector
+            exercises={exercises}
+            value={exercise}
+            onChange={e => setLogDraft(d => ({ ...d, exercise: e.target.value, weight: '' }))}
+            required
+          />
         </div>
 
         {exercise && (

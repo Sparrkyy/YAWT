@@ -20,7 +20,8 @@
       "Bash(ls:*)",
       "WebFetch(domain:developers.google.com)",
       "Bash(echo SHELL env var: $SHELL:*)",
-      "Bash(code:*)"
+      "Bash(code:*)",
+      "Bash(grep:*)"
     ]
   }
 }

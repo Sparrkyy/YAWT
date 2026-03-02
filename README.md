@@ -16,3 +16,6 @@ Allows you to define each exercise's target muscles, allowing you to count parti
 - [ ] Reject sets with 0 reps the same way 0 weight is rejected
 - [ ] Fix muscle group weights not saving properly when creating an exercise on mobile
 - [ ] Clear weight field for all users when a new exercise is selected
+- [ ] Make a better login page with a actuall description of the app
+- [ ] change the logo to look a little less like shop pay
+

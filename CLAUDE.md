@@ -15,6 +15,7 @@ Always start with `--host` so Ava can open it on her phone over LAN:
 ```
 npm run dev -- --host
 ```
+After making any code change, ensure the dev server is running so the result can be verified in the browser. If it's not already running, start it in the background.
 
 ## Environment Variables
 Required in `.env.local` (never committed):
