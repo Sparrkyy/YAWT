@@ -384,7 +384,7 @@
 }
 
 @media (hover: none) {
-  .swipe-hint-btn { display: none; }
+  .swipe-hint-btn { opacity: 0.4; }
 }
 
 /* Exercises */
@@ -912,4 +912,25 @@
     transform: translateY(var(--rise, -180px)) translate(var(--bx, 60px), var(--by, 60px)) scale(0);
     opacity: 0;
   }
+}
+
+/* Toast */
+.toast {
+  position: fixed;
+  bottom: calc(70px + env(safe-area-inset-bottom));
+  left: 50%;
+  transform: translateX(-50%);
+  background: #333;
+  color: #fff;
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-size: 0.875rem;
+  z-index: 1000;
+  animation: toast-in 0.25s ease;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+}
+
+@keyframes toast-in {
+  from { opacity: 0; transform: translateX(-50%) translateY(10px); }
+  to   { opacity: 1; transform: translateX(-50%) translateY(0); }
 }

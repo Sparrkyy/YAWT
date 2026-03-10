@@ -216,7 +216,7 @@ export default function App() {
           />
         )}
         {tab === 'History' && (
-          <HistoryView sets={sets} onSetsChange={refreshSets} />
+          <HistoryView sets={sets} onSetsChange={refreshSets} activeUser={activeUser} onUserChange={setActiveUser} users={users} />
         )}
         {tab === 'Exercises' && (
           <ExercisesView exercises={exercises} onExercisesChange={refreshExercises} />

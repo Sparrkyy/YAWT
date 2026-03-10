@@ -2,15 +2,25 @@ import { useState } from 'react';
 import { deleteSet } from '../data/sheetsApi';
 import SwipeableRow from '../components/SwipeableRow';
 import ConfirmDialog from '../components/ConfirmDialog';
+import Toast from '../components/Toast';
 
-export default function HistoryView({ sets, onSetsChange }) {
+function formatStats(s) {
+  const reps = s.reps != null ? `${s.reps} reps` : '—';
+  if (!s.weight || s.weight === 0) return reps;
+  return `${reps} @ ${s.weight} lbs`;
+}
+
+export default function HistoryView({ sets, onSetsChange, activeUser, onUserChange, users = [] }) {
   const [pendingDelete, setPendingDelete] = useState(null);
+  const [error, setError] = useState(null);
 
   if (sets.length === 0) {
     return <div className="view empty-state">No sets logged yet.</div>;
   }
 
-  const byDate = sets.reduce((acc, s) => {
+  const filtered = activeUser ? sets.filter(s => s.user === activeUser) : sets;
+
+  const byDate = filtered.reduce((acc, s) => {
     if (!acc[s.date]) acc[s.date] = [];
     acc[s.date].push(s);
     return acc;
@@ -25,8 +35,12 @@ export default function HistoryView({ sets, onSetsChange }) {
   async function handleConfirmDelete() {
     const { id } = pendingDelete;
     setPendingDelete(null);
-    await deleteSet(id);
-    onSetsChange();
+    try {
+      await deleteSet(id);
+      onSetsChange();
+    } catch {
+      setError('Failed to delete set. Check your connection.');
+    }
   }
 
   function handleCancelDelete() {
@@ -36,30 +50,48 @@ export default function HistoryView({ sets, onSetsChange }) {
 
   return (
     <div className="view">
-      {sortedDates.map(date => (
-        <div key={date} className="history-day">
-          <h3 className="history-date">
-            {new Date(date + 'T12:00:00').toLocaleDateString('en-US', {
-              weekday: 'short', month: 'short', day: 'numeric'
-            })}
-          </h3>
-          {byDate[date].map(s => (
-            <SwipeableRow key={s.id} onDelete={({ snapBack }) => handleRequestDelete(s.id, snapBack)}>
-              <div className={`set-row ${s.user?.toLowerCase()}`}>
-                <span className="set-user">{s.user}</span>
-                <span className="set-exercise">{s.exercise}</span>
-                <span className="set-stats">
-                  {s.reps != null ? `${s.reps} reps` : '—'} @ {s.weight} lbs
-                </span>
-                {s.notes && <span className="set-notes">{s.notes}</span>}
-              </div>
-            </SwipeableRow>
+      {users.length > 0 && (
+        <div className="user-toggle">
+          {users.map(u => (
+            <button
+              key={u}
+              className={`user-btn ${activeUser === u ? 'active' : ''}`}
+              onClick={() => onUserChange(u)}
+            >
+              {u}
+            </button>
           ))}
         </div>
-      ))}
+      )}
+
+      {sortedDates.length === 0 ? (
+        <div className="empty-state">No sets for {activeUser}.</div>
+      ) : (
+        sortedDates.map(date => (
+          <div key={date} className="history-day">
+            <h3 className="history-date">
+              {new Date(date + 'T12:00:00').toLocaleDateString('en-US', {
+                weekday: 'short', month: 'short', day: 'numeric'
+              })}
+            </h3>
+            {byDate[date].map(s => (
+              <SwipeableRow key={s.id} onDelete={({ snapBack }) => handleRequestDelete(s.id, snapBack)}>
+                <div className={`set-row ${s.user?.toLowerCase()}`}>
+                  <span className="set-user">{s.user}</span>
+                  <span className="set-exercise">{s.exercise}</span>
+                  <span className="set-stats">{formatStats(s)}</span>
+                  {s.notes && <span className="set-notes">{s.notes}</span>}
+                </div>
+              </SwipeableRow>
+            ))}
+          </div>
+        ))
+      )}
+
       {pendingDelete && (
         <ConfirmDialog onConfirm={handleConfirmDelete} onCancel={handleCancelDelete} />
       )}
+      {error && <Toast message={error} onDismiss={() => setError(null)} />}
     </div>
   );
 }

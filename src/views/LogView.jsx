@@ -3,6 +3,7 @@ import { addSet, deleteSet } from '../data/sheetsApi';
 import SwipeableRow from '../components/SwipeableRow';
 import ConfirmDialog from '../components/ConfirmDialog';
 import Fireworks from '../components/Fireworks';
+import Toast from '../components/Toast';
 import { getBestSet, getLastSet, getBestRepsAtWeight, isNewPR, isNewBestSetEver } from '../data/logUtils';
 import ExerciseSelector from '../components/ExerciseSelector';
 
@@ -10,6 +11,7 @@ export default function LogView({ exercises, sets, onSetsChange, activeUser, onU
   const [saving, setSaving] = useState(false);
   const [pendingDelete, setPendingDelete] = useState(null);
   const [fireworksLabel, setFireworksLabel] = useState(null);
+  const [error, setError] = useState(null);
   const { exercise, reps, weight, notes } = logDraft;
 
   const today = new Date().toLocaleDateString('en-CA'); // YYYY-MM-DD
@@ -31,8 +33,12 @@ export default function LogView({ exercises, sets, onSetsChange, activeUser, onU
   async function handleConfirmDelete() {
     const { id } = pendingDelete;
     setPendingDelete(null);
-    await deleteSet(id);
-    onSetsChange();
+    try {
+      await deleteSet(id);
+      onSetsChange();
+    } catch {
+      setError('Failed to delete set. Check your connection.');
+    }
   }
 
   function handleCancelDelete() {
@@ -68,6 +74,8 @@ export default function LogView({ exercises, sets, onSetsChange, activeUser, onU
       setLogDraft(d => ({ ...d, reps: '', notes: '' }));
       await onSetsChange();
       if (label) setFireworksLabel(label);
+    } catch {
+      setError('Failed to save set. Check your connection.');
     } finally {
       setSaving(false);
     }
@@ -164,7 +172,7 @@ export default function LogView({ exercises, sets, onSetsChange, activeUser, onU
           />
         </div>
 
-        <button type="submit" className="btn-primary" disabled={saving}>
+        <button type="submit" className="btn-primary" disabled={saving || !exercise}>
           {saving ? 'Saving…' : 'Add Set'}
         </button>
       </form>
@@ -178,7 +186,7 @@ export default function LogView({ exercises, sets, onSetsChange, activeUser, onU
                 <span className="set-user">{s.user}</span>
                 <span className="set-exercise">{s.exercise}</span>
                 <span className="set-stats">
-                  {s.reps != null ? `${s.reps} reps` : '—'} @ {s.weight} lbs
+                  {s.reps != null ? `${s.reps} reps` : '—'}{s.weight ? ` @ ${s.weight} lbs` : ''}
                 </span>
                 {s.notes && <span className="set-notes">{s.notes}</span>}
               </div>
@@ -192,6 +200,7 @@ export default function LogView({ exercises, sets, onSetsChange, activeUser, onU
       {fireworksLabel && (
         <Fireworks label={fireworksLabel} onDismiss={() => setFireworksLabel(null)} />
       )}
+      {error && <Toast message={error} onDismiss={() => setError(null)} />}
     </div>
   );
 }
