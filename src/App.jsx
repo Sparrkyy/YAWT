@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { initAuth, signIn, signOut, getUserSub, tryRestoreSession, hasStoredSession, trySilentSignIn } from './data/auth';
 import { getSets, getExercises, setSheetId } from './data/sheetsApi';
+import { getLastSet } from './data/logUtils';
 import LogView from './views/LogView';
 import HistoryView from './views/HistoryView';
 import ExercisesView from './views/ExercisesView';
@@ -39,6 +40,17 @@ export default function App() {
   }, [users]);
 
   const logDraft = { exercise: sharedExercise, ...(userDrafts[activeUser] ?? { reps: '', weight: '', notes: '' }) };
+
+  function handleUserChange(u) {
+    setActiveUser(u);
+    if (sharedExercise) {
+      const last = getLastSet(sets, sharedExercise, u);
+      setUserDrafts(prev => ({
+        ...prev,
+        [u]: { ...(prev[u] ?? { reps: '', notes: '' }), weight: last ? String(last.weight) : '' },
+      }));
+    }
+  }
 
   function setLogDraft(updater) {
     const next = typeof updater === 'function' ? updater(logDraft) : updater;
@@ -197,7 +209,7 @@ export default function App() {
             sets={sets}
             onSetsChange={refreshSets}
             activeUser={activeUser}
-            onUserChange={setActiveUser}
+            onUserChange={handleUserChange}
             logDraft={logDraft}
             setLogDraft={setLogDraft}
             users={users}

@@ -112,4 +112,38 @@ describe('LogView', () => {
 
     expect(screen.getByTestId('fireworks')).toHaveTextContent('New PR!');
   });
+
+  it('pre-fills weight from last set when exercise is selected', () => {
+    const sets = [
+      { id: '1', date: '2026-02-01', user: 'Ethan', exercise: 'Bench Press', reps: 5, weight: 135, notes: '', createdAt: '2026-02-01T10:00:00.000Z' },
+    ];
+    const setLogDraft = vi.fn();
+    render(<LogView {...defaultProps} sets={sets} logDraft={{ exercise: '', reps: '', weight: '', notes: '' }} setLogDraft={setLogDraft} />);
+
+    fireEvent.change(screen.getByRole('combobox'), { target: { value: 'Bench Press' } });
+
+    expect(setLogDraft).toHaveBeenCalled();
+    const updater = setLogDraft.mock.calls[0][0];
+    expect(updater({ exercise: '', reps: '', weight: '', notes: '' })).toMatchObject({ weight: '135' });
+  });
+
+  it('leaves weight empty when no prior sets exist for the exercise', () => {
+    const setLogDraft = vi.fn();
+    render(<LogView {...defaultProps} sets={[]} logDraft={{ exercise: '', reps: '', weight: '', notes: '' }} setLogDraft={setLogDraft} />);
+
+    fireEvent.change(screen.getByRole('combobox'), { target: { value: 'Bench Press' } });
+
+    expect(setLogDraft).toHaveBeenCalled();
+    const updater = setLogDraft.mock.calls[0][0];
+    expect(updater({ exercise: '', reps: '', weight: '', notes: '' })).toMatchObject({ weight: '' });
+  });
+
+  it('calls onUserChange with the new user when user toggle is clicked', () => {
+    const onUserChange = vi.fn();
+    render(<LogView {...defaultProps} onUserChange={onUserChange} />);
+
+    fireEvent.click(screen.getByRole('button', { name: 'Ava' }));
+
+    expect(onUserChange).toHaveBeenCalledWith('Ava');
+  });
 });

@@ -93,7 +93,11 @@ export default function LogView({ exercises, sets, onSetsChange, activeUser, onU
           <ExerciseSelector
             exercises={exercises}
             value={exercise}
-            onChange={e => setLogDraft(d => ({ ...d, exercise: e.target.value, weight: '' }))}
+            onChange={e => {
+              const newExercise = e.target.value;
+              const last = getLastSet(sets, newExercise, activeUser);
+              setLogDraft(d => ({ ...d, exercise: newExercise, weight: last ? String(last.weight) : '' }));
+            }}
             required
           />
         </div>
