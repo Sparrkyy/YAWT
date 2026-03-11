@@ -22,7 +22,14 @@
       "Bash(echo SHELL env var: $SHELL:*)",
       "Bash(code:*)",
       "Bash(grep:*)",
-      "Bash(npm info:*)"
+      "Bash(npm info:*)",
+      "Bash(npx playwright:*)",
+      "Bash(npm run:*)",
+      "Bash(npx vitest:*)",
+      "Bash(npm ls:*)",
+      "Bash(command -v nvm)",
+      "Read(//Users/ethan/.nvm/versions/**)",
+      "Bash(brew list:*)"
     ]
   }
 }
