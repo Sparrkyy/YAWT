@@ -17,7 +17,7 @@ const PARTICLES = [
 
 export default function Fireworks({ onDismiss, label = 'New PR!' }) {
   useEffect(() => {
-const id = setTimeout(onDismiss, 2500);
+    const id = setTimeout(onDismiss, 2500);
     return () => clearTimeout(id);
   }, [onDismiss]);
 

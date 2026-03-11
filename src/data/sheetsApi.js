@@ -176,9 +176,13 @@ export function planToRow(plan) {
 }
 
 export async function getPlans() {
-  const data = await sheetsGet('/values/Plans!A:C');
-  const rows = data.values ?? [];
-  return rows.slice(1).map(rowToPlan).filter(p => p.id);
+  try {
+    const data = await sheetsGet('/values/Plans!A:C');
+    const rows = data.values ?? [];
+    return rows.slice(1).map(rowToPlan).filter(p => p.id);
+  } catch {
+    return [];
+  }
 }
 
 export async function addPlan(plan) {
