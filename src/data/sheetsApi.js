@@ -162,6 +162,75 @@ export function renameExercise(exerciseId, newName) {
   return updateExercise(exerciseId, { name: newName });
 }
 
+// ─── Plans ───────────────────────────────────────────────────────────────────
+
+// Column layout: A=id, B=name, C=exerciseIds (JSON array)
+export function rowToPlan(row) {
+  let exerciseIds = [];
+  try { exerciseIds = JSON.parse(row[2] ?? '[]'); } catch { /* ignore */ }
+  return { id: row[0] ?? '', name: row[1] ?? '', exerciseIds };
+}
+
+export function planToRow(plan) {
+  return [plan.id, plan.name, JSON.stringify(plan.exerciseIds ?? [])];
+}
+
+export async function getPlans() {
+  const data = await sheetsGet('/values/Plans!A:C');
+  const rows = data.values ?? [];
+  return rows.slice(1).map(rowToPlan).filter(p => p.id);
+}
+
+export async function addPlan(plan) {
+  const id = crypto.randomUUID
+    ? crypto.randomUUID()
+    : `${Date.now()}-${Math.random().toString(36).slice(2)}`;
+  const newPlan = { ...plan, id };
+  await sheetsPost(
+    '/values/Plans!A:C:append?valueInputOption=USER_ENTERED&insertDataOption=INSERT_ROWS',
+    { values: [planToRow(newPlan)] }
+  );
+  return newPlan;
+}
+
+export async function updatePlan(planId, updatedPlan) {
+  const data = await sheetsGet('/values/Plans!A:C');
+  const rows = data.values ?? [];
+  const rowIndex = rows.findIndex((r, i) => i > 0 && r[0] === planId);
+  if (rowIndex === -1) return;
+
+  const merged = { ...rowToPlan(rows[rowIndex]), ...updatedPlan };
+  const sheetRow = rowIndex + 1;
+  await sheetsPut(
+    `/values/Plans!A${sheetRow}:C${sheetRow}?valueInputOption=RAW`,
+    { values: [planToRow(merged)] }
+  );
+}
+
+async function getSheetGid(tabTitle) {
+  const data = await sheetsGet('');
+  const sheet = (data.sheets ?? []).find(s => s.properties.title === tabTitle);
+  return sheet?.properties?.sheetId ?? null;
+}
+
+export async function deletePlan(id) {
+  const data = await sheetsGet('/values/Plans!A:C');
+  const rows = data.values ?? [];
+  const rowIndex = rows.findIndex((r, i) => i > 0 && r[0] === id);
+  if (rowIndex === -1) return;
+
+  const gid = await getSheetGid('Plans');
+  if (gid === null) return;
+
+  await sheetsPost(':batchUpdate', {
+    requests: [{
+      deleteDimension: {
+        range: { sheetId: gid, dimension: 'ROWS', startIndex: rowIndex, endIndex: rowIndex + 1 },
+      },
+    }],
+  });
+}
+
 // ─── Sheet management ────────────────────────────────────────────────────────
 
 export async function createNewSheet() {
@@ -178,7 +247,7 @@ export async function createNewSheet() {
   const id = created.spreadsheetId;
   const defaultSheetId = created.sheets[0].properties.sheetId;
 
-  // 2. Rename "Sheet1" → "Sets" and add "Exercises" tab
+  // 2. Rename "Sheet1" → "Sets" and add "Exercises" and "Plans" tabs
   await fetch(`${BASE_SHEETS}/${id}:batchUpdate`, {
     method: 'POST',
     headers: { ...authHeaders(), 'Content-Type': 'application/json' },
@@ -186,6 +255,7 @@ export async function createNewSheet() {
       requests: [
         { updateSheetProperties: { properties: { sheetId: defaultSheetId, title: 'Sets' }, fields: 'title' } },
         { addSheet: { properties: { title: 'Exercises' } } },
+        { addSheet: { properties: { title: 'Plans' } } },
       ],
     }),
   });
@@ -200,6 +270,11 @@ export async function createNewSheet() {
     method: 'PUT',
     headers: { ...authHeaders(), 'Content-Type': 'application/json' },
     body: JSON.stringify({ values: [['id', 'name', 'muscles', 'archived']] }),
+  });
+  await fetch(`${BASE_SHEETS}/${id}/values/Plans!A1:C1?valueInputOption=RAW`, {
+    method: 'PUT',
+    headers: { ...authHeaders(), 'Content-Type': 'application/json' },
+    body: JSON.stringify({ values: [['id', 'name', 'exerciseIds']] }),
   });
 
   return id;

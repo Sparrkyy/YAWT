@@ -1,16 +1,17 @@
 import { useState, useEffect, useRef } from 'react';
 import { initAuth, signIn, signOut, getUserSub, tryRestoreSession, hasStoredSession, trySilentSignIn } from './data/auth';
-import { getSets, getExercises, setSheetId } from './data/sheetsApi';
+import { getSets, getExercises, getPlans, setSheetId } from './data/sheetsApi';
 import { getLastSet } from './data/logUtils';
 import LogView from './views/LogView';
 import HistoryView from './views/HistoryView';
 import ExercisesView from './views/ExercisesView';
+import PlansView from './views/PlansView';
 import StatsView from './views/StatsView';
 import SetupView from './views/SetupView';
 import SettingsView from './views/SettingsView';
 import './App.css';
 
-const TABS = ['Log', 'History', 'Exercises', 'Stats', 'Settings'];
+const TABS = ['Log', 'History', 'Exercises', 'Plans', 'Stats', 'Settings'];
 
 function storageKey(suffix) {
   return `yawt_${suffix}_${getUserSub() ?? 'default'}`;
@@ -23,6 +24,7 @@ export default function App() {
   const [tab, setTab] = useState('Log');
   const [sets, setSets] = useState([]);
   const [exercises, setExercises] = useState([]);
+  const [plans, setPlans] = useState([]);
   const [activeUser, setActiveUser] = useState('');
   const [sharedExercise, setSharedExercise] = useState('');
   const [userDrafts, setUserDrafts] = useState({});
@@ -110,9 +112,10 @@ export default function App() {
     setActiveUser(userList[0]);
     setLoading(true);
     try {
-      const [fetchedSets, fetchedExercises] = await Promise.all([getSets(), getExercises()]);
+      const [fetchedSets, fetchedExercises, fetchedPlans] = await Promise.all([getSets(), getExercises(), getPlans()]);
       setSets(fetchedSets);
       setExercises(fetchedExercises);
+      setPlans(fetchedPlans);
     } finally {
       setLoading(false);
     }
@@ -140,11 +143,15 @@ export default function App() {
     setExercises(await getExercises());
   }
 
+  async function refreshPlans() {
+    setPlans(await getPlans());
+  }
+
   async function handleSheetChange(id) {
     setCurrentSheetId(id);
     setSheetId(id);
     localStorage.setItem(storageKey('sheet'), id);
-    await Promise.all([refreshSets(), refreshExercises()]);
+    await Promise.all([refreshSets(), refreshExercises(), refreshPlans()]);
   }
 
   function handleUsersChange(newUsers) {
@@ -157,6 +164,7 @@ export default function App() {
     setSignedIn(false);
     setSets([]);
     setExercises([]);
+    setPlans([]);
     setUsers([]);
     setSetupPhase(null);
   }
@@ -206,6 +214,7 @@ export default function App() {
         {tab === 'Log' && (
           <LogView
             exercises={exercises}
+            plans={plans}
             sets={sets}
             onSetsChange={refreshSets}
             activeUser={activeUser}
@@ -220,6 +229,9 @@ export default function App() {
         )}
         {tab === 'Exercises' && (
           <ExercisesView exercises={exercises} onExercisesChange={refreshExercises} />
+        )}
+        {tab === 'Plans' && (
+          <PlansView exercises={exercises} plans={plans} onPlansChange={refreshPlans} />
         )}
         {tab === 'Stats' && (
           <StatsView sets={sets} exercises={exercises} activeUser={activeUser} onUserChange={setActiveUser} users={users} />
@@ -259,6 +271,15 @@ export default function App() {
                 <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
                   <path d="M6 4v16M18 4v16M6 9h12M6 15h12"/>
                   <path d="M2 9v6M22 9v6"/>
+                </svg>
+              )}
+              {t === 'Plans' && (
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
+                  <rect x="3" y="3" width="18" height="18" rx="2"/>
+                  <line x1="9" y1="9" x2="15" y2="9"/>
+                  <line x1="9" y1="12" x2="15" y2="12"/>
+                  <line x1="9" y1="15" x2="13" y2="15"/>
+                  <polyline points="6 9 7 10 6 11"/>
                 </svg>
               )}
               {t === 'Stats' && (

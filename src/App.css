@@ -914,6 +914,107 @@
   }
 }
 
+/* Plan chips (LogView filter bar) */
+.plan-chips {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+  padding-bottom: 2px;
+}
+
+.plan-chips::-webkit-scrollbar {
+  display: none;
+}
+
+.plan-chip {
+  flex-shrink: 0;
+  padding: 6px 14px;
+  border-radius: 999px;
+  background: var(--surface2);
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+  font-weight: 600;
+  white-space: nowrap;
+  transition: background 0.15s, color 0.15s;
+}
+
+.plan-chip.active {
+  background: var(--accent-dim);
+  color: var(--accent);
+}
+
+/* Plans view */
+.plan-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.plan-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 14px 4px;
+  border-bottom: 1px solid var(--border);
+  background: var(--surface);
+  width: 100%;
+  text-align: left;
+  cursor: pointer;
+}
+
+.plan-name {
+  font-size: 0.95rem;
+  font-weight: 500;
+  flex: 1;
+}
+
+.plan-exercise-count {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+}
+
+.plan-chevron {
+  color: var(--text-secondary);
+  font-size: 1.2rem;
+  margin-left: 4px;
+}
+
+/* Plan edit sheet — name input */
+.plan-name-input {
+  flex: 1;
+  font-size: 1rem;
+  font-weight: 700;
+  background: transparent;
+  border: none;
+  color: var(--text);
+  padding: 0;
+  min-width: 0;
+}
+
+.plan-name-input:focus {
+  outline: none;
+  border-bottom: 1px solid var(--accent);
+}
+
+/* Plan exercise checkbox rows */
+.plan-exercise-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 11px 4px;
+  border-bottom: 1px solid var(--border);
+  cursor: pointer;
+}
+
+.plan-exercise-row input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  accent-color: var(--accent);
+  flex-shrink: 0;
+}
+
 /* Toast */
 .toast {
   position: fixed;

@@ -7,12 +7,30 @@ import Toast from '../components/Toast';
 import { getBestSet, getLastSet, getBestRepsAtWeight, isNewPR, isNewBestSetEver } from '../data/logUtils';
 import ExerciseSelector from '../components/ExerciseSelector';
 
-export default function LogView({ exercises, sets, onSetsChange, activeUser, onUserChange, logDraft, setLogDraft, users = [] }) {
+export default function LogView({ exercises, plans = [], sets, onSetsChange, activeUser, onUserChange, logDraft, setLogDraft, users = [] }) {
   const [saving, setSaving] = useState(false);
   const [pendingDelete, setPendingDelete] = useState(null);
   const [fireworksLabel, setFireworksLabel] = useState(null);
   const [error, setError] = useState(null);
+  const [activePlanId, setActivePlanId] = useState(null);
   const { exercise, reps, weight, notes } = logDraft;
+
+  const activePlan = plans.find(p => p.id === activePlanId) ?? null;
+  const visibleExercises = activePlan
+    ? exercises.filter(ex => activePlan.exerciseIds.includes(ex.id))
+    : exercises;
+
+  function handlePlanSelect(planId) {
+    setActivePlanId(planId);
+    // Clear exercise if it's not in the newly selected plan
+    if (planId !== null) {
+      const plan = plans.find(p => p.id === planId);
+      const currentEx = exercises.find(ex => ex.name === exercise);
+      if (currentEx && plan && !plan.exerciseIds.includes(currentEx.id)) {
+        setLogDraft(d => ({ ...d, exercise: '', weight: '' }));
+      }
+    }
+  }
 
   const today = new Date().toLocaleDateString('en-CA'); // YYYY-MM-DD
 
@@ -95,11 +113,33 @@ export default function LogView({ exercises, sets, onSetsChange, activeUser, onU
         ))}
       </div>
 
+      {plans.length > 0 && (
+        <div className="plan-chips">
+          <button
+            type="button"
+            className={`plan-chip ${activePlanId === null ? 'active' : ''}`}
+            onClick={() => handlePlanSelect(null)}
+          >
+            All
+          </button>
+          {plans.map(p => (
+            <button
+              key={p.id}
+              type="button"
+              className={`plan-chip ${activePlanId === p.id ? 'active' : ''}`}
+              onClick={() => handlePlanSelect(p.id)}
+            >
+              {p.name}
+            </button>
+          ))}
+        </div>
+      )}
+
       <form className="log-form" onSubmit={handleSubmit}>
         <div className="field">
           <label>Exercise</label>
           <ExerciseSelector
-            exercises={exercises}
+            exercises={visibleExercises}
             value={exercise}
             onChange={e => {
               const newExercise = e.target.value;

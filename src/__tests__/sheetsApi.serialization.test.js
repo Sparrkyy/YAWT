@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { rowToSet, setToRow, rowToExercise, exerciseToRow } from '../data/sheetsApi';
+import { rowToSet, setToRow, rowToExercise, exerciseToRow, rowToPlan, planToRow } from '../data/sheetsApi';
 
 describe('set row serialization', () => {
   it('setToRow writes XLOOKUP formula in col D and exerciseId in col E', () => {
@@ -94,5 +94,27 @@ describe('exercise row serialization', () => {
     expect(result.reps).toBeNull();
     expect(result.notes).toBe('');
     expect(result.exerciseId).toBe('');
+  });
+});
+
+describe('plan row serialization', () => {
+  it('roundtrips a plan with id, name, exerciseIds without data loss', () => {
+    const original = { id: 'plan-uuid-1', name: 'Push Day', exerciseIds: ['ex-1', 'ex-2'] };
+    expect(rowToPlan(planToRow(original))).toEqual(original);
+  });
+
+  it('roundtrips a plan with an empty exerciseIds array', () => {
+    const original = { id: 'plan-uuid-2', name: 'Empty Plan', exerciseIds: [] };
+    expect(rowToPlan(planToRow(original))).toEqual(original);
+  });
+
+  it('defaults exerciseIds to [] when JSON cell is malformed', () => {
+    const result = rowToPlan(['plan-id', 'Push Day', 'not valid json']);
+    expect(result.exerciseIds).toEqual([]);
+  });
+
+  it('defaults exerciseIds to [] when column C is missing', () => {
+    const result = rowToPlan(['plan-id', 'Push Day']);
+    expect(result.exerciseIds).toEqual([]);
   });
 });
