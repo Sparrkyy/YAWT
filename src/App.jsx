@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { initAuth, signIn, signOut, getUserSub, tryRestoreSession, hasStoredSession, trySilentSignIn } from './data/auth';
-import { getSets, getExercises, getPlans, setSheetId } from './data/sheetsApi';
+import { getSets, getExercises, getPlans, setSheetId, setApiErrorHandler } from './data/sheetsApi';
 import { getLastSet } from './data/logUtils';
 import LogView from './views/LogView';
 import HistoryView from './views/HistoryView';
@@ -9,6 +9,7 @@ import PlansView from './views/PlansView';
 import StatsView from './views/StatsView';
 import SetupView from './views/SetupView';
 import SettingsView from './views/SettingsView';
+import ErrorDialog from './components/ErrorDialog';
 import './App.css';
 
 const TABS = ['Log', 'History', 'Exercises', 'Plans', 'Stats', 'Settings'];
@@ -31,6 +32,7 @@ export default function App() {
   const [users, setUsers] = useState([]);
   const [setupPhase, setSetupPhase] = useState(null); // 'sheet' | 'users' | null
   const [currentSheetId, setCurrentSheetId] = useState(null);
+  const [apiError, setApiError] = useState(null);
   const pendingSheetIdRef = useRef(null); // carries sheet ID from step 1 → step 2 of setup
 
   // Re-initialize drafts whenever the user list changes
@@ -63,6 +65,7 @@ export default function App() {
 
   useEffect(() => {
     // GIS loads async; poll until it's ready then init
+    setApiErrorHandler(setApiError);
     function tryInit() {
       if (typeof google !== 'undefined' && google.accounts?.oauth2) {
         initAuth(onSignIn);
@@ -116,7 +119,7 @@ export default function App() {
       setSets(fetchedSets);
       setExercises(fetchedExercises);
       setPlans(fetchedPlans);
-    } finally {
+    } catch { /* error dialog shown by transport layer */ } finally {
       setLoading(false);
     }
   }
@@ -136,15 +139,15 @@ export default function App() {
   }
 
   async function refreshSets() {
-    setSets(await getSets());
+    try { setSets(await getSets()); } catch { /* error dialog shown by transport layer */ }
   }
 
   async function refreshExercises() {
-    setExercises(await getExercises());
+    try { setExercises(await getExercises()); } catch { /* error dialog shown by transport layer */ }
   }
 
   async function refreshPlans() {
-    setPlans(await getPlans());
+    try { setPlans(await getPlans()); } catch { /* error dialog shown by transport layer */ }
   }
 
   async function handleSheetChange(id) {
@@ -179,17 +182,21 @@ export default function App() {
             {authReady ? 'Sign in with Google' : 'Loading…'}
           </button>
         </div>
+        <ErrorDialog error={apiError} onDismiss={() => setApiError(null)} />
       </div>
     );
   }
 
   if (setupPhase !== null) {
     return (
-      <SetupView
-        setupPhase={setupPhase}
-        onSheetReady={handleSheetReady}
-        onUsersReady={handleUsersReady}
-      />
+      <>
+        <SetupView
+          setupPhase={setupPhase}
+          onSheetReady={handleSheetReady}
+          onUsersReady={handleUsersReady}
+        />
+        <ErrorDialog error={apiError} onDismiss={() => setApiError(null)} />
+      </>
     );
   }
 
@@ -200,6 +207,7 @@ export default function App() {
           <span className="loading-spinner" />
           <p>Loading…</p>
         </div>
+        <ErrorDialog error={apiError} onDismiss={() => setApiError(null)} />
       </div>
     );
   }
@@ -301,6 +309,7 @@ export default function App() {
           </button>
         ))}
       </nav>
+      <ErrorDialog error={apiError} onDismiss={() => setApiError(null)} />
     </div>
   );
 }

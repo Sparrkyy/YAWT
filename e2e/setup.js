@@ -1,9 +1,7 @@
 import '@testing-library/jest-dom/vitest';
-import { setupWorker } from 'msw/browser';
-import { handlers, resetMockData } from './mocks/handlers';
+import { resetMockData } from './mocks/handlers';
 import { mockGoogleGIS, seedLocalStorage, clearLocalStorage } from './helpers';
-
-const worker = setupWorker(...handlers);
+import { worker } from './worker';
 
 beforeAll(async () => {
   await worker.start({
@@ -13,6 +11,7 @@ beforeAll(async () => {
 });
 
 beforeEach(() => {
+  worker.resetHandlers();
   resetMockData();
   clearLocalStorage();
   mockGoogleGIS();
@@ -22,3 +21,5 @@ beforeEach(() => {
 afterAll(() => {
   worker.stop();
 });
+
+export { worker };

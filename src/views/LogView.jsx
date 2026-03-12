@@ -3,7 +3,6 @@ import { addSet, deleteSet } from '../data/sheetsApi';
 import SwipeableRow from '../components/SwipeableRow';
 import ConfirmDialog from '../components/ConfirmDialog';
 import Fireworks from '../components/Fireworks';
-import Toast from '../components/Toast';
 import { getBestSet, getLastSet, getBestRepsAtWeight, isNewPR, isNewBestSetEver } from '../data/logUtils';
 import ExerciseSelector from '../components/ExerciseSelector';
 
@@ -11,7 +10,6 @@ export default function LogView({ exercises, plans = [], sets, onSetsChange, act
   const [saving, setSaving] = useState(false);
   const [pendingDelete, setPendingDelete] = useState(null);
   const [fireworksLabel, setFireworksLabel] = useState(null);
-  const [error, setError] = useState(null);
   const [activePlanId, setActivePlanId] = useState(null);
   const { exercise, reps, weight, notes } = logDraft;
 
@@ -54,9 +52,7 @@ export default function LogView({ exercises, plans = [], sets, onSetsChange, act
     try {
       await deleteSet(id);
       onSetsChange();
-    } catch {
-      setError('Failed to delete set. Check your connection.');
-    }
+    } catch { /* error dialog shown by transport layer */ }
   }
 
   function handleCancelDelete() {
@@ -92,9 +88,7 @@ export default function LogView({ exercises, plans = [], sets, onSetsChange, act
       setLogDraft(d => ({ ...d, reps: '', notes: '' }));
       await onSetsChange();
       if (label) setFireworksLabel(label);
-    } catch {
-      setError('Failed to save set. Check your connection.');
-    } finally {
+    } catch { /* error dialog shown by transport layer */ } finally {
       setSaving(false);
     }
   }
@@ -240,7 +234,6 @@ export default function LogView({ exercises, plans = [], sets, onSetsChange, act
       {fireworksLabel && (
         <Fireworks label={fireworksLabel} onDismiss={() => setFireworksLabel(null)} />
       )}
-      {error && <Toast message={error} onDismiss={() => setError(null)} />}
     </div>
   );
 }

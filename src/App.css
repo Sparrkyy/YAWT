@@ -1016,6 +1016,13 @@
   flex-shrink: 0;
 }
 
+/* Error dialog */
+.error-sheet { max-height: 300px; }
+.error-sheet .sheet-body { padding: 16px; }
+.error-detail { font-size: 0.9rem; color: var(--text-secondary); margin: 0 0 8px; }
+.error-status { font-size: 0.8rem; }
+.error-hint { font-size: 0.85rem; color: var(--accent); margin: 8px 0 0; }
+
 /* Toast */
 .toast {
   position: fixed;

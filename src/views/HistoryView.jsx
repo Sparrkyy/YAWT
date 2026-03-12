@@ -2,7 +2,6 @@ import { useState } from 'react';
 import { deleteSet } from '../data/sheetsApi';
 import SwipeableRow from '../components/SwipeableRow';
 import ConfirmDialog from '../components/ConfirmDialog';
-import Toast from '../components/Toast';
 
 function formatStats(s) {
   const reps = s.reps != null ? `${s.reps} reps` : '—';
@@ -12,7 +11,6 @@ function formatStats(s) {
 
 export default function HistoryView({ sets, onSetsChange, activeUser, onUserChange, users = [] }) {
   const [pendingDelete, setPendingDelete] = useState(null);
-  const [error, setError] = useState(null);
 
   if (sets.length === 0) {
     return <div className="view empty-state">No sets logged yet.</div>;
@@ -38,9 +36,7 @@ export default function HistoryView({ sets, onSetsChange, activeUser, onUserChan
     try {
       await deleteSet(id);
       onSetsChange();
-    } catch {
-      setError('Failed to delete set. Check your connection.');
-    }
+    } catch { /* error dialog shown by transport layer */ }
   }
 
   function handleCancelDelete() {
@@ -91,7 +87,6 @@ export default function HistoryView({ sets, onSetsChange, activeUser, onUserChan
       {pendingDelete && (
         <ConfirmDialog onConfirm={handleConfirmDelete} onCancel={handleCancelDelete} />
       )}
-      {error && <Toast message={error} onDismiss={() => setError(null)} />}
     </div>
   );
 }

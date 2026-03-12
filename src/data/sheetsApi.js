@@ -3,6 +3,9 @@ import { getToken } from './auth';
 let sheetId = null;
 export function setSheetId(id) { sheetId = id; }
 
+let errorCallback = null;
+export function setApiErrorHandler(handler) { errorCallback = handler; }
+
 function getBase() { return `https://sheets.googleapis.com/v4/spreadsheets/${sheetId}`; }
 
 // Numeric GID for each tab — found in the sheet URL fragment (#gid=...)
@@ -13,29 +16,41 @@ function authHeaders() {
   return { Authorization: `Bearer ${getToken()}` };
 }
 
-async function sheetsGet(path) {
+async function sheetsGet(path, operation) {
   const res = await fetch(`${getBase()}${path}`, { headers: authHeaders() });
-  if (!res.ok) throw Object.assign(new Error('Sheets GET failed'), { status: res.status });
+  if (!res.ok) {
+    const err = Object.assign(new Error('Sheets GET failed'), { status: res.status });
+    errorCallback?.({ message: err.message, status: res.status, operation });
+    throw err;
+  }
   return res.json();
 }
 
-async function sheetsPost(path, body) {
+async function sheetsPost(path, body, operation) {
   const res = await fetch(`${getBase()}${path}`, {
     method: 'POST',
     headers: { ...authHeaders(), 'Content-Type': 'application/json' },
     body: JSON.stringify(body),
   });
-  if (!res.ok) throw Object.assign(new Error('Sheets POST failed'), { status: res.status });
+  if (!res.ok) {
+    const err = Object.assign(new Error('Sheets POST failed'), { status: res.status });
+    errorCallback?.({ message: err.message, status: res.status, operation });
+    throw err;
+  }
   return res.json();
 }
 
-async function sheetsPut(path, body) {
+async function sheetsPut(path, body, operation) {
   const res = await fetch(`${getBase()}${path}`, {
     method: 'PUT',
     headers: { ...authHeaders(), 'Content-Type': 'application/json' },
     body: JSON.stringify(body),
   });
-  if (!res.ok) throw Object.assign(new Error('Sheets PUT failed'), { status: res.status });
+  if (!res.ok) {
+    const err = Object.assign(new Error('Sheets PUT failed'), { status: res.status });
+    errorCallback?.({ message: err.message, status: res.status, operation });
+    throw err;
+  }
   return res.json();
 }
 
@@ -73,7 +88,7 @@ export function setToRow(set) {
 }
 
 export async function getSets() {
-  const data = await sheetsGet('/values/Sets!A:I');
+  const data = await sheetsGet('/values/Sets!A:I', 'loading sets');
   const rows = data.values ?? [];
   // skip header row (index 0)
   return rows.slice(1).map(rowToSet).filter(s => s.id);
@@ -86,13 +101,14 @@ export async function addSet(set) {
   const newSet = { ...set, id };
   await sheetsPost(
     '/values/Sets!A:I:append?valueInputOption=USER_ENTERED&insertDataOption=INSERT_ROWS',
-    { values: [setToRow(newSet)] }
+    { values: [setToRow(newSet)] },
+    'saving set'
   );
   return newSet;
 }
 
 export async function deleteSet(id) {
-  const data = await sheetsGet('/values/Sets!A:I');
+  const data = await sheetsGet('/values/Sets!A:I', 'deleting set');
   const rows = data.values ?? [];
   // rows[0] is header; find the data row (1-based in the sheet)
   const rowIndex = rows.findIndex((r, i) => i > 0 && r[0] === id);
@@ -109,7 +125,7 @@ export async function deleteSet(id) {
         },
       },
     }],
-  });
+  }, 'deleting set');
 }
 
 // ─── Exercises ───────────────────────────────────────────────────────────────
@@ -126,7 +142,7 @@ export function exerciseToRow(ex) {
 }
 
 export async function getExercises() {
-  const data = await sheetsGet('/values/Exercises!A:D');
+  const data = await sheetsGet('/values/Exercises!A:D', 'loading exercises');
   const rows = data.values ?? [];
   return rows.slice(1).map(rowToExercise).filter(e => e.name);
 }
@@ -138,23 +154,24 @@ export async function addExercise(exercise) {
   const newExercise = { ...exercise, id };
   await sheetsPost(
     '/values/Exercises!A:D:append?valueInputOption=USER_ENTERED&insertDataOption=INSERT_ROWS',
-    { values: [exerciseToRow(newExercise)] }
+    { values: [exerciseToRow(newExercise)] },
+    'adding exercise'
   );
   return newExercise;
 }
 
 export async function updateExercise(exerciseId, updatedExercise) {
-  const data = await sheetsGet('/values/Exercises!A:D');
+  const data = await sheetsGet('/values/Exercises!A:D', 'updating exercise');
   const rows = data.values ?? [];
   const rowIndex = rows.findIndex((r, i) => i > 0 && r[0] === exerciseId);
   if (rowIndex === -1) return;
 
   const merged = { ...rowToExercise(rows[rowIndex]), ...updatedExercise };
-  // rowIndex is 0-based in array; sheet rows are 1-based, so sheet row = rowIndex + 1
   const sheetRow = rowIndex + 1;
   await sheetsPut(
     `/values/Exercises!A${sheetRow}:D${sheetRow}?valueInputOption=RAW`,
-    { values: [exerciseToRow(merged)] }
+    { values: [exerciseToRow(merged)] },
+    'updating exercise'
   );
 }
 
@@ -177,7 +194,7 @@ export function planToRow(plan) {
 
 export async function getPlans() {
   try {
-    const data = await sheetsGet('/values/Plans!A:C');
+    const data = await sheetsGet('/values/Plans!A:C', 'loading plans');
     const rows = data.values ?? [];
     return rows.slice(1).map(rowToPlan).filter(p => p.id);
   } catch {
@@ -192,13 +209,14 @@ export async function addPlan(plan) {
   const newPlan = { ...plan, id };
   await sheetsPost(
     '/values/Plans!A:C:append?valueInputOption=USER_ENTERED&insertDataOption=INSERT_ROWS',
-    { values: [planToRow(newPlan)] }
+    { values: [planToRow(newPlan)] },
+    'adding plan'
   );
   return newPlan;
 }
 
 export async function updatePlan(planId, updatedPlan) {
-  const data = await sheetsGet('/values/Plans!A:C');
+  const data = await sheetsGet('/values/Plans!A:C', 'updating plan');
   const rows = data.values ?? [];
   const rowIndex = rows.findIndex((r, i) => i > 0 && r[0] === planId);
   if (rowIndex === -1) return;
@@ -207,7 +225,8 @@ export async function updatePlan(planId, updatedPlan) {
   const sheetRow = rowIndex + 1;
   await sheetsPut(
     `/values/Plans!A${sheetRow}:C${sheetRow}?valueInputOption=RAW`,
-    { values: [planToRow(merged)] }
+    { values: [planToRow(merged)] },
+    'updating plan'
   );
 }
 
@@ -218,7 +237,7 @@ async function getSheetGid(tabTitle) {
 }
 
 export async function deletePlan(id) {
-  const data = await sheetsGet('/values/Plans!A:C');
+  const data = await sheetsGet('/values/Plans!A:C', 'deleting plan');
   const rows = data.values ?? [];
   const rowIndex = rows.findIndex((r, i) => i > 0 && r[0] === id);
   if (rowIndex === -1) return;
@@ -232,7 +251,7 @@ export async function deletePlan(id) {
         range: { sheetId: gid, dimension: 'ROWS', startIndex: rowIndex, endIndex: rowIndex + 1 },
       },
     }],
-  });
+  }, 'deleting plan');
 }
 
 // ─── Sheet management ────────────────────────────────────────────────────────
@@ -246,7 +265,11 @@ export async function createNewSheet() {
     headers: { ...authHeaders(), 'Content-Type': 'application/json' },
     body: JSON.stringify({ properties: { title: 'YAWT Workout Tracker' } }),
   });
-  if (!createRes.ok) throw Object.assign(new Error('Failed to create sheet'), { status: createRes.status });
+  if (!createRes.ok) {
+    const err = Object.assign(new Error('Failed to create sheet'), { status: createRes.status });
+    errorCallback?.({ message: err.message, status: createRes.status, operation: 'creating sheet' });
+    throw err;
+  }
   const created = await createRes.json();
   const id = created.spreadsheetId;
   const defaultSheetId = created.sheets[0].properties.sheetId;

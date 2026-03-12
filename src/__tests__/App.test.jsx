@@ -17,6 +17,7 @@ vi.mock('../data/sheetsApi', () => ({
   getExercises: vi.fn(() => new Promise(() => {})), // never resolves
   getPlans: vi.fn(() => new Promise(() => {})),     // never resolves
   setSheetId: vi.fn(),
+  setApiErrorHandler: vi.fn(),
 }));
 
 // Mock child views that aren't under test here to keep rendering lightweight
