@@ -101,6 +101,39 @@ describe('Log set flow', () => {
     });
   });
 
+  it('shows recent notes when selecting an exercise with notes', async () => {
+    const user = userEvent.setup();
+    render(<App />);
+    await waitForAppLoad();
+
+    const exerciseSelect = getExerciseSelect();
+    await user.selectOptions(exerciseSelect, 'Bench Press');
+
+    await waitFor(() => {
+      const notesSection = document.querySelector('.recent-notes');
+      expect(notesSection).toBeInTheDocument();
+      const notes = notesSection.querySelectorAll('.recent-note');
+      expect(notes).toHaveLength(2);
+      expect(notes[0].textContent).toBe('keep elbows tucked');
+      expect(notes[1].textContent).toBe('shoulder felt tight');
+    });
+  });
+
+  it('does not show recent notes for an exercise without notes', async () => {
+    const user = userEvent.setup();
+    render(<App />);
+    await waitForAppLoad();
+
+    const exerciseSelect = getExerciseSelect();
+    await user.selectOptions(exerciseSelect, 'Deadlift');
+
+    await waitFor(() => {
+      expect(screen.getByText('Best set (5+ reps)')).toBeInTheDocument();
+    });
+
+    expect(screen.queryByText('Recent notes')).not.toBeInTheDocument();
+  });
+
   it('shows plan filter chips when plans exist', async () => {
     render(<App />);
     await waitForAppLoad();

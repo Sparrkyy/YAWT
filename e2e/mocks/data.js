@@ -17,11 +17,11 @@ const YESTERDAY = new Date(Date.now() - 86400000).toLocaleDateString('en-CA');
 
 export const MOCK_SETS_ROWS = [
   ['id', 'date', 'user', 'exercise', 'exercise_id', 'reps', 'weight', 'notes', 'createdAt'], // header
-  ['set-1', TODAY, 'Ethan', 'Bench Press', 'ex-1', '8', '185', '', `${TODAY}T10:00:00.000Z`],
+  ['set-1', TODAY, 'Ethan', 'Bench Press', 'ex-1', '8', '185', 'keep elbows tucked', `${TODAY}T10:00:00.000Z`],
   ['set-2', TODAY, 'Ethan', 'Squat', 'ex-2', '5', '275', 'felt good', `${TODAY}T10:05:00.000Z`],
   ['set-3', TODAY, 'Ava', 'Bench Press', 'ex-1', '10', '95', '', `${TODAY}T10:10:00.000Z`],
   ['set-4', YESTERDAY, 'Ethan', 'Deadlift', 'ex-3', '5', '315', '', `${YESTERDAY}T09:00:00.000Z`],
-  ['set-5', YESTERDAY, 'Ethan', 'Bench Press', 'ex-1', '6', '195', '', `${YESTERDAY}T09:05:00.000Z`],
+  ['set-5', YESTERDAY, 'Ethan', 'Bench Press', 'ex-1', '6', '195', 'shoulder felt tight', `${YESTERDAY}T09:05:00.000Z`],
   ['set-6', YESTERDAY, 'Ava', 'Squat', 'ex-2', '8', '135', '', `${YESTERDAY}T09:10:00.000Z`],
 ];
 

@@ -3,7 +3,7 @@ import { addSet, deleteSet } from '../data/sheetsApi';
 import SwipeableRow from '../components/SwipeableRow';
 import ConfirmDialog from '../components/ConfirmDialog';
 import Fireworks from '../components/Fireworks';
-import { getBestSet, getLastSet, getBestRepsAtWeight, isNewPR, isNewBestSetEver } from '../data/logUtils';
+import { getBestSet, getLastSet, getBestRepsAtWeight, isNewPR, isNewBestSetEver, getRecentNotes } from '../data/logUtils';
 import ExerciseSelector from '../components/ExerciseSelector';
 
 export default function LogView({ exercises, plans = [], sets, onSetsChange, activeUser, onUserChange, logDraft, setLogDraft, users = [] }) {
@@ -168,6 +168,18 @@ export default function LogView({ exercises, plans = [], sets, onSetsChange, act
             </div>
           </div>
         )}
+
+        {exercise && (() => {
+          const recentNotes = getRecentNotes(sets, exercise, activeUser);
+          return recentNotes.length > 0 ? (
+            <div className="recent-notes">
+              <span className="recent-notes-title">Recent notes</span>
+              {recentNotes.map((note, i) => (
+                <span key={i} className="recent-note">{note}</span>
+              ))}
+            </div>
+          ) : null;
+        })()}
 
         <div className="field-row">
           <div className="field">

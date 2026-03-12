@@ -28,6 +28,19 @@ export function isNewPR(sets, exercise, user, weight, reps) {
   return reps > previous.reps;
 }
 
+export function getRecentNotes(sets, exercise, user, count = 3) {
+  const seen = new Set();
+  return sets
+    .filter(s => s.exercise === exercise && s.user === user && s.notes)
+    .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+    .reduce((acc, s) => {
+      if (acc.length >= count || seen.has(s.notes)) return acc;
+      seen.add(s.notes);
+      acc.push(s.notes);
+      return acc;
+    }, []);
+}
+
 export function isNewBestSetEver(sets, exercise, user, weight, reps) {
   if (reps == null || reps < 5) return false;
   const best = getBestSet(sets, exercise, user);
