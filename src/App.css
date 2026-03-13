@@ -1048,6 +1048,31 @@
 .error-status { font-size: 0.8rem; }
 .error-hint { font-size: 0.85rem; color: var(--accent); margin: 8px 0 0; }
 
+/* Loading overlay */
+.loading-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 50;
+  background: rgba(0, 0, 0, 0.08);
+  pointer-events: all;
+}
+
+.loading-bar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: var(--accent);
+  z-index: 50;
+  animation: loading-progress 1.2s ease-in-out infinite;
+}
+
+@keyframes loading-progress {
+  0%   { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
 /* Toast */
 .toast {
   position: fixed;

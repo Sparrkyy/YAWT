@@ -6,7 +6,6 @@ import { groupExercises } from '../data/grouping';
 export default function PlanEditSheet({ plan, exercises, onSave, onClose }) {
   const [selectedIds, setSelectedIds] = useState(new Set(plan.exerciseIds));
   const [planName, setPlanName] = useState(plan.name);
-  const [saving, setSaving] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
 
   const visibleExercises = exercises.filter(ex => !ex.archived);
@@ -25,13 +24,8 @@ export default function PlanEditSheet({ plan, exercises, onSave, onClose }) {
   }
 
   async function handleSave() {
-    setSaving(true);
-    try {
-      await updatePlan(plan.id, { name: planName.trim() || plan.name, exerciseIds: [...selectedIds] });
-      await onSave();
-    } finally {
-      setSaving(false);
-    }
+    await updatePlan(plan.id, { name: planName.trim() || plan.name, exerciseIds: [...selectedIds] });
+    await onSave();
   }
 
   async function handleDelete() {
@@ -85,9 +79,8 @@ export default function PlanEditSheet({ plan, exercises, onSave, onClose }) {
                 type="button"
                 className="btn-primary"
                 onClick={handleSave}
-                disabled={saving}
               >
-                {saving ? 'Saving…' : 'Save'}
+                Save
               </button>
             </div>
           </div>

@@ -1,4 +1,5 @@
 import { getToken } from './auth';
+import { startLoading, stopLoading } from './loadingTracker';
 
 let sheetId = null;
 export function setSheetId(id) { sheetId = id; }
@@ -17,41 +18,56 @@ function authHeaders() {
 }
 
 async function sheetsGet(path, operation) {
-  const res = await fetch(`${getBase()}${path}`, { headers: authHeaders() });
-  if (!res.ok) {
-    const err = Object.assign(new Error('Sheets GET failed'), { status: res.status });
-    errorCallback?.({ message: err.message, status: res.status, operation });
-    throw err;
+  startLoading();
+  try {
+    const res = await fetch(`${getBase()}${path}`, { headers: authHeaders() });
+    if (!res.ok) {
+      const err = Object.assign(new Error('Sheets GET failed'), { status: res.status });
+      errorCallback?.({ message: err.message, status: res.status, operation });
+      throw err;
+    }
+    return res.json();
+  } finally {
+    stopLoading();
   }
-  return res.json();
 }
 
 async function sheetsPost(path, body, operation) {
-  const res = await fetch(`${getBase()}${path}`, {
-    method: 'POST',
-    headers: { ...authHeaders(), 'Content-Type': 'application/json' },
-    body: JSON.stringify(body),
-  });
-  if (!res.ok) {
-    const err = Object.assign(new Error('Sheets POST failed'), { status: res.status });
-    errorCallback?.({ message: err.message, status: res.status, operation });
-    throw err;
+  startLoading();
+  try {
+    const res = await fetch(`${getBase()}${path}`, {
+      method: 'POST',
+      headers: { ...authHeaders(), 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
+    });
+    if (!res.ok) {
+      const err = Object.assign(new Error('Sheets POST failed'), { status: res.status });
+      errorCallback?.({ message: err.message, status: res.status, operation });
+      throw err;
+    }
+    return res.json();
+  } finally {
+    stopLoading();
   }
-  return res.json();
 }
 
 async function sheetsPut(path, body, operation) {
-  const res = await fetch(`${getBase()}${path}`, {
-    method: 'PUT',
-    headers: { ...authHeaders(), 'Content-Type': 'application/json' },
-    body: JSON.stringify(body),
-  });
-  if (!res.ok) {
-    const err = Object.assign(new Error('Sheets PUT failed'), { status: res.status });
-    errorCallback?.({ message: err.message, status: res.status, operation });
-    throw err;
+  startLoading();
+  try {
+    const res = await fetch(`${getBase()}${path}`, {
+      method: 'PUT',
+      headers: { ...authHeaders(), 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
+    });
+    if (!res.ok) {
+      const err = Object.assign(new Error('Sheets PUT failed'), { status: res.status });
+      errorCallback?.({ message: err.message, status: res.status, operation });
+      throw err;
+    }
+    return res.json();
+  } finally {
+    stopLoading();
   }
-  return res.json();
 }
 
 // ─── Sets ────────────────────────────────────────────────────────────────────
@@ -257,6 +273,11 @@ export async function deletePlan(id) {
 // ─── Sheet management ────────────────────────────────────────────────────────
 
 export async function createNewSheet() {
+  startLoading();
+  try { return await _createNewSheet(); } finally { stopLoading(); }
+}
+
+async function _createNewSheet() {
   const BASE_SHEETS = 'https://sheets.googleapis.com/v4/spreadsheets';
 
   // 1. Create the spreadsheet

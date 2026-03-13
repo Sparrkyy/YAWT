@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { initAuth, signIn, signOut, getUserSub, tryRestoreSession, hasStoredSession, trySilentSignIn } from './data/auth';
 import { getSets, getExercises, getPlans, setSheetId, setApiErrorHandler } from './data/sheetsApi';
+import { setLoadingListener } from './data/loadingTracker';
 import { getLastSet } from './data/logUtils';
 import LogView from './views/LogView';
 import HistoryView from './views/HistoryView';
@@ -10,6 +11,7 @@ import StatsView from './views/StatsView';
 import SetupView from './views/SetupView';
 import SettingsView from './views/SettingsView';
 import ErrorDialog from './components/ErrorDialog';
+import LoadingOverlay from './components/LoadingOverlay';
 import './App.css';
 
 const TABS = ['Log', 'History', 'Exercises', 'Plans', 'Stats', 'Settings'];
@@ -33,6 +35,7 @@ export default function App() {
   const [setupPhase, setSetupPhase] = useState(null); // 'sheet' | 'users' | null
   const [currentSheetId, setCurrentSheetId] = useState(null);
   const [apiError, setApiError] = useState(null);
+  const [apiLoading, setApiLoading] = useState(false);
   const pendingSheetIdRef = useRef(null); // carries sheet ID from step 1 → step 2 of setup
 
   // Re-initialize drafts whenever the user list changes
@@ -66,6 +69,7 @@ export default function App() {
   useEffect(() => {
     // GIS loads async; poll until it's ready then init
     setApiErrorHandler(setApiError);
+    setLoadingListener(setApiLoading);
     function tryInit() {
       if (typeof google !== 'undefined' && google.accounts?.oauth2) {
         initAuth(onSignIn);
@@ -182,6 +186,7 @@ export default function App() {
             {authReady ? 'Sign in with Google' : 'Loading…'}
           </button>
         </div>
+        <LoadingOverlay visible={apiLoading} />
         <ErrorDialog error={apiError} onDismiss={() => setApiError(null)} />
       </div>
     );
@@ -195,6 +200,7 @@ export default function App() {
           onSheetReady={handleSheetReady}
           onUsersReady={handleUsersReady}
         />
+        <LoadingOverlay visible={apiLoading} />
         <ErrorDialog error={apiError} onDismiss={() => setApiError(null)} />
       </>
     );
@@ -207,6 +213,7 @@ export default function App() {
           <span className="loading-spinner" />
           <p>Loading…</p>
         </div>
+        <LoadingOverlay visible={apiLoading} />
         <ErrorDialog error={apiError} onDismiss={() => setApiError(null)} />
       </div>
     );
@@ -309,6 +316,7 @@ export default function App() {
           </button>
         ))}
       </nav>
+      <LoadingOverlay visible={apiLoading} />
       <ErrorDialog error={apiError} onDismiss={() => setApiError(null)} />
     </div>
   );

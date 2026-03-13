@@ -7,7 +7,6 @@ import { getBestSet, getLastSet, getBestRepsAtWeight, isNewPR, isNewBestSetEver,
 import ExerciseSelector from '../components/ExerciseSelector';
 
 export default function LogView({ exercises, plans = [], sets, onSetsChange, activeUser, onUserChange, logDraft, setLogDraft, users = [] }) {
-  const [saving, setSaving] = useState(false);
   const [pendingDelete, setPendingDelete] = useState(null);
   const [fireworksLabel, setFireworksLabel] = useState(null);
   const [activePlanId, setActivePlanId] = useState(null);
@@ -63,7 +62,6 @@ export default function LogView({ exercises, plans = [], sets, onSetsChange, act
   async function handleSubmit(e) {
     e.preventDefault();
     if (!exercise || !weight) return;
-    setSaving(true);
     // Evaluate celebration status against current sets BEFORE the save
     const numReps = reps === '' ? null : Number(reps);
     const numWeight = Number(weight);
@@ -88,9 +86,7 @@ export default function LogView({ exercises, plans = [], sets, onSetsChange, act
       setLogDraft(d => ({ ...d, reps: '', notes: '' }));
       await onSetsChange();
       if (label) setFireworksLabel(label);
-    } catch { /* error dialog shown by transport layer */ } finally {
-      setSaving(false);
-    }
+    } catch { /* error dialog shown by transport layer */ }
   }
 
   return (
@@ -218,8 +214,8 @@ export default function LogView({ exercises, plans = [], sets, onSetsChange, act
           />
         </div>
 
-        <button type="submit" className="btn-primary" disabled={saving || !exercise}>
-          {saving ? 'Saving…' : 'Add Set'}
+        <button type="submit" className="btn-primary" disabled={!exercise}>
+          Add Set
         </button>
       </form>
 
