@@ -58,4 +58,35 @@ describe('ErrorDialog', () => {
     fireEvent.click(container.querySelector('.sheet-overlay'));
     expect(onDismiss).toHaveBeenCalledTimes(1);
   });
+
+  it('shows "Sign back in" button on 401 when onReauth provided', () => {
+    render(<ErrorDialog error={{ message: 'fail', status: 401 }} onDismiss={vi.fn()} onReauth={vi.fn()} />);
+    expect(screen.getByRole('button', { name: 'Sign back in' })).toBeInTheDocument();
+  });
+
+  it('shows "Dismiss" alongside "Sign back in" on 401', () => {
+    render(<ErrorDialog error={{ message: 'fail', status: 401 }} onDismiss={vi.fn()} onReauth={vi.fn()} />);
+    expect(screen.getByRole('button', { name: 'Dismiss' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Sign back in' })).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'OK' })).not.toBeInTheDocument();
+  });
+
+  it('calls onReauth when "Sign back in" is clicked', () => {
+    const onReauth = vi.fn();
+    render(<ErrorDialog error={{ message: 'fail', status: 401 }} onDismiss={vi.fn()} onReauth={onReauth} />);
+    fireEvent.click(screen.getByRole('button', { name: 'Sign back in' }));
+    expect(onReauth).toHaveBeenCalledTimes(1);
+  });
+
+  it('does not show "Sign back in" for non-401 errors even with onReauth', () => {
+    render(<ErrorDialog error={{ message: 'fail', status: 500 }} onDismiss={vi.fn()} onReauth={vi.fn()} />);
+    expect(screen.queryByRole('button', { name: 'Sign back in' })).not.toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'OK' })).toBeInTheDocument();
+  });
+
+  it('shows updated hint text on 401 with onReauth', () => {
+    render(<ErrorDialog error={{ message: 'fail', status: 401 }} onDismiss={vi.fn()} onReauth={vi.fn()} />);
+    expect(screen.getByText('Your session has expired.')).toBeInTheDocument();
+    expect(screen.queryByText(/Try signing in again/)).not.toBeInTheDocument();
+  });
 });

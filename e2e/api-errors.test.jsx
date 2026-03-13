@@ -52,7 +52,7 @@ describe('API error dialog', () => {
     expect(screen.getByText(/Sheets POST failed/)).toBeInTheDocument();
   });
 
-  it('shows 401 re-auth hint', async () => {
+  it('shows 401 re-auth hint with sign back in button', async () => {
     worker.use(
       http.get(/spreadsheets\/[^/]+\/values\/Sets/, () => {
         return new HttpResponse(null, { status: 401 });
@@ -64,8 +64,10 @@ describe('API error dialog', () => {
     await waitFor(() => {
       expect(screen.getByRole('alertdialog')).toBeInTheDocument();
     });
-    expect(screen.getByText(/session may have expired/)).toBeInTheDocument();
+    expect(screen.getByText('Your session has expired.')).toBeInTheDocument();
     expect(screen.getByText('HTTP status: 401')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Sign back in' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Dismiss' })).toBeInTheDocument();
   });
 
   it('dismisses error dialog on OK click', async () => {

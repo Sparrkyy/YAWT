@@ -1,5 +1,7 @@
-export default function ErrorDialog({ error, onDismiss }) {
+export default function ErrorDialog({ error, onDismiss, onReauth }) {
   if (!error) return null;
+
+  const show401Reauth = error.status === 401 && onReauth;
 
   return (
     <div className="sheet-overlay" role="alertdialog" onClick={e => { if (e.target === e.currentTarget) onDismiss(); }}>
@@ -16,11 +18,20 @@ export default function ErrorDialog({ error, onDismiss }) {
             <p className="error-detail error-status">HTTP status: {error.status}</p>
           )}
           {error.status === 401 && (
-            <p className="error-hint">Your session may have expired. Try signing in again.</p>
+            <p className="error-hint">
+              {show401Reauth ? 'Your session has expired.' : 'Your session may have expired. Try signing in again.'}
+            </p>
           )}
         </div>
         <div className="sheet-footer">
-          <button className="btn-primary" onClick={onDismiss}>OK</button>
+          {show401Reauth ? (
+            <div className="sheet-footer-row">
+              <button className="btn-secondary" onClick={onDismiss}>Dismiss</button>
+              <button className="btn-primary" onClick={onReauth}>Sign back in</button>
+            </div>
+          ) : (
+            <button className="btn-primary" onClick={onDismiss}>OK</button>
+          )}
         </div>
       </div>
     </div>

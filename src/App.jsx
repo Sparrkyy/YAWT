@@ -187,7 +187,7 @@ export default function App() {
           </button>
         </div>
         <LoadingOverlay visible={apiLoading} />
-        <ErrorDialog error={apiError} onDismiss={() => setApiError(null)} />
+        <ErrorDialog error={apiError} onDismiss={() => setApiError(null)} onReauth={() => { setApiError(null); signIn(); }} />
       </div>
     );
   }
@@ -201,7 +201,7 @@ export default function App() {
           onUsersReady={handleUsersReady}
         />
         <LoadingOverlay visible={apiLoading} />
-        <ErrorDialog error={apiError} onDismiss={() => setApiError(null)} />
+        <ErrorDialog error={apiError} onDismiss={() => setApiError(null)} onReauth={() => { setApiError(null); signIn(); }} />
       </>
     );
   }
@@ -214,7 +214,7 @@ export default function App() {
           <p>Loading…</p>
         </div>
         <LoadingOverlay visible={apiLoading} />
-        <ErrorDialog error={apiError} onDismiss={() => setApiError(null)} />
+        <ErrorDialog error={apiError} onDismiss={() => setApiError(null)} onReauth={() => { setApiError(null); signIn(); }} />
       </div>
     );
   }
@@ -317,7 +317,7 @@ export default function App() {
         ))}
       </nav>
       <LoadingOverlay visible={apiLoading} />
-      <ErrorDialog error={apiError} onDismiss={() => setApiError(null)} />
+      <ErrorDialog error={apiError} onDismiss={() => setApiError(null)} onReauth={() => { setApiError(null); signIn(); }} />
     </div>
   );
 }

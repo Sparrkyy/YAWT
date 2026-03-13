@@ -1062,7 +1062,7 @@
   top: 0;
   left: 0;
   right: 0;
-  height: 3px;
+  height: 6px;
   background: var(--accent);
   z-index: 50;
   animation: loading-progress 1.2s ease-in-out infinite;
