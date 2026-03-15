@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { createNewSheet, validateSheet, migrateToGuids } from '../data/sheetsApi';
 import ConfirmDialog from '../components/ConfirmDialog';
 
-export default function SettingsView({ currentSheetId, users, onSheetChange, onUsersChange, onSignOut }) {
+export default function SettingsView({ currentSheetId, users, onSheetChange, onUsersChange, onSignOut, useAccordionPicker = false, onAccordionPickerChange }) {
   const [sheetInput, setSheetInput] = useState('');
   const [sheetLoading, setSheetLoading] = useState(false);
   const [sheetError, setSheetError] = useState('');
@@ -151,6 +151,22 @@ export default function SettingsView({ currentSheetId, users, onSheetChange, onU
             </button>
           </div>
         )}
+      </section>
+
+      <section className="settings-section">
+        <h2 className="settings-heading">Preferences</h2>
+        <label className="settings-toggle-row">
+          <span>Use grouped exercise picker</span>
+          <span className="toggle-switch">
+            <input
+              type="checkbox"
+              checked={useAccordionPicker}
+              onChange={e => onAccordionPickerChange(e.target.checked)}
+            />
+            <span className="toggle-track" />
+            <span className="toggle-knob" />
+          </span>
+        </label>
       </section>
 
       <section className="settings-section">

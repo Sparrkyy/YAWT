@@ -1093,3 +1093,140 @@
   from { opacity: 0; transform: translateX(-50%) translateY(10px); }
   to   { opacity: 1; transform: translateX(-50%) translateY(0); }
 }
+
+/* Accordion exercise picker */
+.accordion-section {
+  border-bottom: 1px solid var(--border);
+}
+
+.accordion-section:last-child {
+  border-bottom: none;
+}
+
+.accordion-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 14px 4px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  text-align: left;
+  background: none;
+  color: var(--text);
+}
+
+.accordion-chevron {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  width: 16px;
+  text-align: center;
+}
+
+.accordion-label {
+  flex: 1;
+}
+
+.accordion-count {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  font-weight: 400;
+}
+
+.accordion-items {
+  display: flex;
+  flex-direction: column;
+}
+
+.accordion-item {
+  padding: 12px 4px 12px 28px;
+  font-size: 0.9rem;
+  text-align: left;
+  background: none;
+  color: var(--text);
+  border-top: 1px solid var(--border);
+  transition: background 0.1s;
+}
+
+.accordion-item:active {
+  background: var(--surface2);
+}
+
+.accordion-item.selected {
+  color: var(--accent);
+  font-weight: 600;
+}
+
+/* Picker button (replaces <select> in accordion mode) */
+.picker-button {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 10px 12px;
+  color: var(--text);
+  width: 100%;
+  text-align: left;
+  font-size: 1rem;
+}
+
+.picker-button.placeholder {
+  color: var(--text-secondary);
+}
+
+.picker-button:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
+/* Settings toggle row */
+.settings-toggle-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 4px;
+  font-size: 0.95rem;
+  cursor: pointer;
+}
+
+/* iOS-style toggle switch */
+.toggle-switch {
+  position: relative;
+  width: 51px;
+  height: 31px;
+  flex-shrink: 0;
+}
+
+.toggle-switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+  position: absolute;
+}
+
+.toggle-track {
+  position: absolute;
+  inset: 0;
+  background: var(--border);
+  border-radius: 31px;
+  transition: background 0.25s;
+}
+
+.toggle-switch input:checked + .toggle-track {
+  background: #34C759;
+}
+
+.toggle-knob {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 27px;
+  height: 27px;
+  background: #fff;
+  border-radius: 50%;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+  transition: transform 0.25s;
+}
+
+.toggle-switch input:checked ~ .toggle-knob {
+  transform: translateX(20px);
+}

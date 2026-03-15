@@ -5,8 +5,9 @@ import ConfirmDialog from '../components/ConfirmDialog';
 import Fireworks from '../components/Fireworks';
 import { getBestSet, getLastSet, getBestRepsAtWeight, isNewPR, isNewBestSetEver, getRecentNotes } from '../data/logUtils';
 import ExerciseSelector from '../components/ExerciseSelector';
+import ExercisePickerButton from '../components/ExercisePickerButton';
 
-export default function LogView({ exercises, plans = [], sets, onSetsChange, activeUser, onUserChange, logDraft, setLogDraft, users = [] }) {
+export default function LogView({ exercises, plans = [], sets, onSetsChange, activeUser, onUserChange, logDraft, setLogDraft, users = [], useAccordionPicker = false }) {
   const [pendingDelete, setPendingDelete] = useState(null);
   const [fireworksLabel, setFireworksLabel] = useState(null);
   const [activePlanId, setActivePlanId] = useState(null);
@@ -128,16 +129,28 @@ export default function LogView({ exercises, plans = [], sets, onSetsChange, act
       <form className="log-form" onSubmit={handleSubmit}>
         <div className="field">
           <label>Exercise</label>
-          <ExerciseSelector
-            exercises={visibleExercises}
-            value={exercise}
-            onChange={e => {
-              const newExercise = e.target.value;
-              const last = getLastSet(sets, newExercise, activeUser);
-              setLogDraft(d => ({ ...d, exercise: newExercise, weight: last ? String(last.weight) : '' }));
-            }}
-            required
-          />
+          {useAccordionPicker ? (
+            <ExercisePickerButton
+              exercises={visibleExercises}
+              value={exercise}
+              onChange={e => {
+                const newExercise = e.target.value;
+                const last = getLastSet(sets, newExercise, activeUser);
+                setLogDraft(d => ({ ...d, exercise: newExercise, weight: last ? String(last.weight) : '' }));
+              }}
+            />
+          ) : (
+            <ExerciseSelector
+              exercises={visibleExercises}
+              value={exercise}
+              onChange={e => {
+                const newExercise = e.target.value;
+                const last = getLastSet(sets, newExercise, activeUser);
+                setLogDraft(d => ({ ...d, exercise: newExercise, weight: last ? String(last.weight) : '' }));
+              }}
+              required
+            />
+          )}
         </div>
 
         {exercise && (

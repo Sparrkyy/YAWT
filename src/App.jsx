@@ -36,6 +36,7 @@ export default function App() {
   const [currentSheetId, setCurrentSheetId] = useState(null);
   const [apiError, setApiError] = useState(null);
   const [apiLoading, setApiLoading] = useState(false);
+  const [useAccordionPicker, setUseAccordionPicker] = useState(false);
   const pendingSheetIdRef = useRef(null); // carries sheet ID from step 1 → step 2 of setup
 
   // Re-initialize drafts whenever the user list changes
@@ -117,6 +118,7 @@ export default function App() {
     setCurrentSheetId(id);
     setUsers(userList);
     setActiveUser(userList[0]);
+    setUseAccordionPicker(localStorage.getItem(storageKey('exercisePicker')) === 'true');
     setLoading(true);
     try {
       const [fetchedSets, fetchedExercises, fetchedPlans] = await Promise.all([getSets(), getExercises(), getPlans()]);
@@ -237,6 +239,7 @@ export default function App() {
             logDraft={logDraft}
             setLogDraft={setLogDraft}
             users={users}
+            useAccordionPicker={useAccordionPicker}
           />
         )}
         {tab === 'History' && (
@@ -258,6 +261,11 @@ export default function App() {
             onSheetChange={handleSheetChange}
             onUsersChange={handleUsersChange}
             onSignOut={handleSignOut}
+            useAccordionPicker={useAccordionPicker}
+            onAccordionPickerChange={val => {
+              setUseAccordionPicker(val);
+              localStorage.setItem(storageKey('exercisePicker'), String(val));
+            }}
           />
         )}
       </main>
