@@ -45,12 +45,13 @@ export default function ExerciseAccordionSheet({ exercises, value, onSelect, onC
       <div className="sheet" onClick={e => e.stopPropagation()}>
         <div className="sheet-header">
           <span className="sheet-title">Select Exercise</span>
-          <button className="sheet-close" onClick={onClose}>✕</button>
+          <button type="button" className="sheet-close" onClick={onClose}>✕</button>
         </div>
         <div className="sheet-body">
           {groups.map(({ key, label, exercises: group }) => (
             <div key={key} className="accordion-section">
               <button
+                type="button"
                 className="accordion-header"
                 onClick={() => handleSectionToggle(key)}
               >
@@ -64,6 +65,7 @@ export default function ExerciseAccordionSheet({ exercises, value, onSelect, onC
                 <div className="accordion-items">
                   {group.map(ex => (
                     <button
+                      type="button"
                       key={ex.name}
                       className={`accordion-item${ex.name === value ? ' selected' : ''}`}
                       onClick={() => handleSelect(ex.name)}

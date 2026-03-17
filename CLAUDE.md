@@ -125,5 +125,8 @@ npm run test:watch # re-runs on file save during development
 Any new component or view feature must ship with at least basic test coverage.
 When in doubt: add a test file alongside the implementation before marking the work done.
 
+## Git Commits
+Never include `Co-Authored-By` lines or any other mention of Claude/AI in commit messages.
+
 ## Deployment (GitHub Actions)
 On push to `main`: install → **test** → build (with Sheets secrets injected) → deploy to GitHub Pages. Push is blocked if tests fail (both locally via Husky pre-push and in CI).
