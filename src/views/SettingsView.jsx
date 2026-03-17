@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { createNewSheet, validateSheet, migrateToGuids } from '../data/sheetsApi';
 import ConfirmDialog from '../components/ConfirmDialog';
 
-export default function SettingsView({ currentSheetId, users, onSheetChange, onUsersChange, onSignOut, useAccordionPicker = false, onAccordionPickerChange }) {
+export default function SettingsView({ currentSheetId, users, onSheetChange, onUsersChange, onSignOut, useAccordionPicker = false, onAccordionPickerChange, darkMode = false, onDarkModeChange }) {
   const [sheetInput, setSheetInput] = useState('');
   const [sheetLoading, setSheetLoading] = useState(false);
   const [sheetError, setSheetError] = useState('');
@@ -155,6 +155,18 @@ export default function SettingsView({ currentSheetId, users, onSheetChange, onU
 
       <section className="settings-section">
         <h2 className="settings-heading">Preferences</h2>
+        <label className="settings-toggle-row">
+          <span>Dark mode</span>
+          <span className="toggle-switch">
+            <input
+              type="checkbox"
+              checked={darkMode}
+              onChange={e => onDarkModeChange(e.target.checked)}
+            />
+            <span className="toggle-track" />
+            <span className="toggle-knob" />
+          </span>
+        </label>
         <label className="settings-toggle-row">
           <span>Use grouped exercise picker</span>
           <span className="toggle-switch">

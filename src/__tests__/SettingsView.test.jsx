@@ -111,4 +111,15 @@ describe('SettingsView', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Migrate data to new schema' }));
     expect(screen.getByRole('button', { name: 'Migrating…' })).toBeDisabled();
   });
+
+  it('renders dark mode toggle and calls onDarkModeChange when toggled', () => {
+    const onDarkModeChange = vi.fn();
+    renderSettings({ darkMode: false, onDarkModeChange });
+    expect(screen.getByText('Dark mode')).toBeInTheDocument();
+    const toggles = screen.getAllByRole('checkbox');
+    const darkToggle = toggles[0]; // dark mode is the first toggle
+    expect(darkToggle.checked).toBe(false);
+    fireEvent.click(darkToggle);
+    expect(onDarkModeChange).toHaveBeenCalledWith(true);
+  });
 });

@@ -11,6 +11,9 @@
 .app.user-ethan { background: #EFEFFF; }
 .app.user-ava   { background: #FFF0F5; }
 
+:root[data-theme="dark"] .app.user-ethan { background: #1E1E3F; }
+:root[data-theme="dark"] .app.user-ava   { background: #2A1A2A; }
+
 .app-header {
   height: calc(var(--header-height) + env(safe-area-inset-top));
   display: flex;
@@ -266,8 +269,8 @@
 }
 
 .btn-primary {
-  background: #1C1C1E;
-  color: #fff;
+  background: var(--text);
+  color: var(--bg);
   padding: 12px;
   border-radius: var(--radius);
   font-size: 1rem;
@@ -718,6 +721,37 @@
   opacity: 0.65;
 }
 
+/* Muscle Volume */
+.muscle-volume-section {
+  background: var(--surface);
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.muscle-volume-section h3 {
+  font-size: 1rem;
+  font-weight: 700;
+}
+
+.muscle-volume-section select {
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 10px 12px;
+  color: var(--text);
+  width: 100%;
+  appearance: auto;
+}
+
+.muscle-volume-section select:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
 /* Exercise Progress */
 .exercise-progress {
   background: var(--surface);
@@ -1079,8 +1113,8 @@
   bottom: calc(70px + env(safe-area-inset-bottom));
   left: 50%;
   transform: translateX(-50%);
-  background: #333;
-  color: #fff;
+  background: var(--text);
+  color: var(--bg);
   padding: 10px 20px;
   border-radius: 8px;
   font-size: 0.875rem;

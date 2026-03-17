@@ -21,6 +21,18 @@
   --header-height: 52px;
 }
 
+:root[data-theme="dark"] {
+  --bg: #1C1C1E;
+  --surface: #2C2C2E;
+  --surface2: #3A3A3C;
+  --border: #48484A;
+  --text: #F2F2F7;
+  --text-secondary: #AEAEB2;
+  --accent: #7D7AFF;
+  --accent-dim: rgba(125, 122, 255, 0.2);
+  --danger: #FF453A;
+}
+
 html, body, #root {
   height: 100%;
 }

@@ -37,7 +37,14 @@ export default function App() {
   const [apiError, setApiError] = useState(null);
   const [apiLoading, setApiLoading] = useState(false);
   const [useAccordionPicker, setUseAccordionPicker] = useState(false);
+  const [darkMode, setDarkMode] = useState(() => localStorage.getItem('yawt_darkMode') === 'true');
   const pendingSheetIdRef = useRef(null); // carries sheet ID from step 1 → step 2 of setup
+
+  // Sync dark mode to DOM and localStorage
+  useEffect(() => {
+    document.documentElement.dataset.theme = darkMode ? 'dark' : 'light';
+    localStorage.setItem('yawt_darkMode', String(darkMode));
+  }, [darkMode]);
 
   // Re-initialize drafts whenever the user list changes
   useEffect(() => {
@@ -266,6 +273,8 @@ export default function App() {
               setUseAccordionPicker(val);
               localStorage.setItem(storageKey('exercisePicker'), String(val));
             }}
+            darkMode={darkMode}
+            onDarkModeChange={setDarkMode}
           />
         )}
       </main>
