@@ -22,7 +22,7 @@ function groupByMuscle(exercises) {
     .map(m => ({
       key: m,
       label: MUSCLE_LABELS[m] ?? m,
-      exercises: [...map[m]].sort((a, b) => a.name.localeCompare(b.name)),
+      exercises: [...map[m]].sort((a, b) => (b.muscles[m] - a.muscles[m]) || a.name.localeCompare(b.name)),
     }));
 }
 
