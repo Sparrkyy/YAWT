@@ -1,5 +1,5 @@
-import { describe, it, expect } from 'vitest';
-import { getBestSet, getLastSet, getBestRepsAtWeight, isNewPR, isNewBestSetEver } from '../data/logUtils';
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
+import { getBestSet, getLastSet, getBestRepsAtWeight, isNewPR, isNewBestSetEver, getLastExerciseToday } from '../data/logUtils';
 
 function makeSet(overrides = {}) {
   return {
@@ -163,6 +163,36 @@ describe('isNewBestSetEver', () => {
 
   it('returns false when same weight and fewer reps', () => {
     expect(isNewBestSetEver(prevBest, 'Bench Press', 'Ethan', 135, 6)).toBe(false);
+  });
+});
+
+describe('getLastExerciseToday', () => {
+  beforeEach(() => vi.useFakeTimers());
+  afterEach(() => vi.useRealTimers());
+
+  it('returns the exercise from the most recent set logged today', () => {
+    vi.setSystemTime('2026-02-19T12:00:00.000Z');
+    const sets = [
+      makeSet({ exercise: 'Squat', date: '2026-02-19', createdAt: '2026-02-19T09:00:00.000Z' }),
+      makeSet({ exercise: 'Bench Press', date: '2026-02-19', createdAt: '2026-02-19T10:00:00.000Z' }),
+    ];
+    expect(getLastExerciseToday(sets, 'Ethan')).toBe('Bench Press');
+  });
+
+  it('returns null when the user has no sets today', () => {
+    vi.setSystemTime('2026-02-19T12:00:00.000Z');
+    const sets = [
+      makeSet({ exercise: 'Squat', date: '2026-02-18', createdAt: '2026-02-18T10:00:00.000Z' }),
+    ];
+    expect(getLastExerciseToday(sets, 'Ethan')).toBeNull();
+  });
+
+  it('ignores sets from a different user', () => {
+    vi.setSystemTime('2026-02-19T12:00:00.000Z');
+    const sets = [
+      makeSet({ exercise: 'Deadlift', date: '2026-02-19', createdAt: '2026-02-19T10:00:00.000Z', user: 'Ava' }),
+    ];
+    expect(getLastExerciseToday(sets, 'Ethan')).toBeNull();
   });
 });
 

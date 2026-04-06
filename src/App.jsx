@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react';
 import { initAuth, signIn, signOut, getUserSub, tryRestoreSession, hasStoredSession, trySilentSignIn } from './data/auth';
 import { getSets, getExercises, getPlans, setSheetId, setApiErrorHandler } from './data/sheetsApi';
 import { setLoadingListener } from './data/loadingTracker';
-import { getLastSet } from './data/logUtils';
+import { getLastSet, getLastExerciseToday } from './data/logUtils';
 import LogView from './views/LogView';
 import HistoryView from './views/HistoryView';
 import ExercisesView from './views/ExercisesView';
@@ -58,8 +58,11 @@ export default function App() {
 
   function handleUserChange(u) {
     setActiveUser(u);
-    if (sharedExercise) {
-      const last = getLastSet(sets, sharedExercise, u);
+    const todayExercise = getLastExerciseToday(sets, u);
+    const exerciseToUse = todayExercise ?? sharedExercise;
+    if (todayExercise) setSharedExercise(todayExercise);
+    if (exerciseToUse) {
+      const last = getLastSet(sets, exerciseToUse, u);
       setUserDrafts(prev => ({
         ...prev,
         [u]: { ...(prev[u] ?? { reps: '', notes: '' }), weight: last ? String(last.weight) : '' },
@@ -132,6 +135,8 @@ export default function App() {
       setSets(fetchedSets);
       setExercises(fetchedExercises);
       setPlans(fetchedPlans);
+      const defaultExercise = getLastExerciseToday(fetchedSets, userList[0]);
+      if (defaultExercise) setSharedExercise(defaultExercise);
     } catch { /* error dialog shown by transport layer */ } finally {
       setLoading(false);
     }

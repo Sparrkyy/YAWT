@@ -4,6 +4,14 @@ export function getBestSet(sets, exercise, user) {
     .sort((a, b) => b.weight - a.weight || b.reps - a.reps)[0] ?? null;
 }
 
+export function getLastExerciseToday(sets, user) {
+  const today = new Date().toLocaleDateString('en-CA');
+  const last = [...sets]
+    .filter(s => s.user === user && s.date === today)
+    .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))[0];
+  return last?.exercise ?? null;
+}
+
 export function getLastSet(sets, exercise, user) {
   return [...sets
     .filter(s => s.exercise === exercise && s.user === user)]
