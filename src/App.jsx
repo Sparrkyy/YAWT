@@ -136,7 +136,17 @@ export default function App() {
       setExercises(fetchedExercises);
       setPlans(fetchedPlans);
       const defaultExercise = getLastExerciseToday(fetchedSets, userList[0]);
-      if (defaultExercise) setSharedExercise(defaultExercise);
+      if (defaultExercise) {
+        const lastSet = getLastSet(fetchedSets, defaultExercise, userList[0]);
+        setSharedExercise(defaultExercise);
+        setUserDrafts(prev => ({
+          ...prev,
+          [userList[0]]: {
+            ...(prev[userList[0]] ?? { reps: '', notes: '' }),
+            weight: lastSet ? String(lastSet.weight) : '',
+          },
+        }));
+      }
     } catch { /* error dialog shown by transport layer */ } finally {
       setLoading(false);
     }
@@ -188,6 +198,7 @@ export default function App() {
     setPlans([]);
     setUsers([]);
     setSetupPhase(null);
+    setSharedExercise('');
   }
 
   if (!signedIn) {
