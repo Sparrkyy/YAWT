@@ -20,7 +20,7 @@ describe('Accordion picker does not submit form', () => {
     await waitForAppLoad();
 
     // Open picker, select an exercise to fill the form
-    const pickerBtn = screen.getByText('— select —');
+    const pickerBtn = document.querySelector('.picker-button');
     await user.click(pickerBtn);
 
     // Expand Chest section and select Bench Press
