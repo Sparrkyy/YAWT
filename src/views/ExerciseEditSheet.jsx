@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { renameExercise } from '../data/sheetsApi';
+import { renameExercise } from '../data/api';
 import { MUSCLE_GROUPS } from '../data/exercises';
 
 const MUSCLE_LABELS = {

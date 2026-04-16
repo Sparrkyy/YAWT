@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { addExercise, updateExercise } from '../data/sheetsApi';
+import { addExercise, updateExercise } from '../data/api';
 import ExerciseEditSheet from './ExerciseEditSheet';
 import SwipeableRow from '../components/SwipeableRow';
 import ConfirmDialog from '../components/ConfirmDialog';

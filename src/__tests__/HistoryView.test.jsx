@@ -2,7 +2,7 @@ import { describe, it, expect, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import HistoryView from '../views/HistoryView';
 
-vi.mock('../data/sheetsApi', () => ({ deleteSet: vi.fn() }));
+vi.mock('../data/api', () => ({ deleteSet: vi.fn() }));
 vi.mock('../components/SwipeableRow', () => ({
   default: ({ children }) => <div>{children}</div>,
 }));

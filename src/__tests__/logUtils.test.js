@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
-import { getBestSet, getLastSet, getBestRepsAtWeight, isNewPR, isNewBestSetEver, getLastExerciseToday } from '../data/logUtils';
+import { getBestSet, getLastSet, getBestRepsAtWeight, isNewPR, isNewBestSetEver, getLastExerciseToday, resolveExerciseOnUserSwitch } from '../data/logUtils';
 
 function makeSet(overrides = {}) {
   return {
@@ -193,6 +193,29 @@ describe('getLastExerciseToday', () => {
       makeSet({ exercise: 'Deadlift', date: '2026-02-19', createdAt: '2026-02-19T10:00:00.000Z', user: 'Ava' }),
     ];
     expect(getLastExerciseToday(sets, 'Ethan')).toBeNull();
+  });
+});
+
+describe('resolveExerciseOnUserSwitch', () => {
+  beforeEach(() => vi.useFakeTimers());
+  afterEach(() => vi.useRealTimers());
+
+  it('keeps the current exercise when one is already selected', () => {
+    vi.setSystemTime('2026-04-14T12:00:00.000Z');
+    const sets = [makeSet({ user: 'Ava', date: '2026-04-14', exercise: 'Squat', createdAt: '2026-04-14T10:00:00.000Z' })];
+    expect(resolveExerciseOnUserSwitch('Bench Press', sets, 'Ava')).toBe('Bench Press');
+  });
+
+  it('falls back to last exercise today when no exercise is selected', () => {
+    vi.setSystemTime('2026-04-14T12:00:00.000Z');
+    const sets = [makeSet({ user: 'Ava', date: '2026-04-14', exercise: 'Squat', createdAt: '2026-04-14T10:00:00.000Z' })];
+    expect(resolveExerciseOnUserSwitch('', sets, 'Ava')).toBe('Squat');
+    expect(resolveExerciseOnUserSwitch(null, sets, 'Ava')).toBe('Squat');
+  });
+
+  it('returns null when no exercise selected and none logged today', () => {
+    vi.setSystemTime('2026-04-14T12:00:00.000Z');
+    expect(resolveExerciseOnUserSwitch('', [], 'Ava')).toBeNull();
   });
 });
 

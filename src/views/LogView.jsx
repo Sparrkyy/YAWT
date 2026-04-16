@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { addSet, deleteSet } from '../data/sheetsApi';
+import { addSet, deleteSet } from '../data/api';
 import SwipeableRow from '../components/SwipeableRow';
 import ConfirmDialog from '../components/ConfirmDialog';
 import Fireworks from '../components/Fireworks';

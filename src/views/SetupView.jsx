@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { createNewSheet, validateSheet } from '../data/sheetsApi';
+import { createNewSheet, validateSheet } from '../data/api';
 
 export default function SetupView({ setupPhase, onSheetReady, onUsersReady }) {
   // Sheet phase state

@@ -5,7 +5,7 @@ import ExercisesView from '../views/ExercisesView';
 const addExerciseMock = vi.fn();
 const updateExerciseMock = vi.fn();
 
-vi.mock('../data/sheetsApi', () => ({
+vi.mock('../data/api', () => ({
   addExercise: (...args) => addExerciseMock(...args),
   updateExercise: (...args) => updateExerciseMock(...args),
   renameExercise: vi.fn(),

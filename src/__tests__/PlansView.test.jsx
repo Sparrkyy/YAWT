@@ -2,7 +2,7 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import PlansView from '../views/PlansView';
 
-vi.mock('../data/sheetsApi', () => ({
+vi.mock('../data/api', () => ({
   addPlan: vi.fn(() => Promise.resolve({ id: 'new-plan', name: 'New Plan', exerciseIds: [] })),
   updatePlan: vi.fn(() => Promise.resolve()),
   deletePlan: vi.fn(() => Promise.resolve()),

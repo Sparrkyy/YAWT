@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { createNewSheet, validateSheet, migrateToGuids } from '../data/sheetsApi';
+import { createNewSheet, validateSheet, migrateToGuids } from '../data/api';
 import ConfirmDialog from '../components/ConfirmDialog';
 
 export default function SettingsView({ currentSheetId, users, onSheetChange, onUsersChange, onSignOut, useAccordionPicker = false, onAccordionPickerChange, darkMode = false, onDarkModeChange }) {

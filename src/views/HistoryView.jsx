@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { deleteSet } from '../data/sheetsApi';
+import { deleteSet } from '../data/api';
 import SwipeableRow from '../components/SwipeableRow';
 import ConfirmDialog from '../components/ConfirmDialog';
 

@@ -1,9 +1,9 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import SettingsView from '../views/SettingsView';
-import * as sheetsApi from '../data/sheetsApi';
+import * as sheetsApi from '../data/api';
 
-vi.mock('../data/sheetsApi', () => ({
+vi.mock('../data/api', () => ({
   createNewSheet: vi.fn(),
   validateSheet: vi.fn(),
   migrateToGuids: vi.fn(),

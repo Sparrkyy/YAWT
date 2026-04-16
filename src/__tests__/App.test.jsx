@@ -12,7 +12,8 @@ vi.mock('../data/auth', () => ({
   trySilentSignIn: vi.fn(),
 }));
 
-vi.mock('../data/sheetsApi', () => ({
+vi.mock('../data/api', () => ({
+  DEV_MODE: false,
   getSets: vi.fn(() => new Promise(() => {})),      // never resolves
   getExercises: vi.fn(() => new Promise(() => {})), // never resolves
   getPlans: vi.fn(() => new Promise(() => {})),     // never resolves

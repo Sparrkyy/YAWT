@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { updatePlan, deletePlan } from '../data/sheetsApi';
+import { updatePlan, deletePlan } from '../data/api';
 import ConfirmDialog from '../components/ConfirmDialog';
 import { groupExercises } from '../data/grouping';
 

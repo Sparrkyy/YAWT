@@ -2,12 +2,12 @@ import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import SetupView from '../views/SetupView';
 
-vi.mock('../data/sheetsApi', () => ({
+vi.mock('../data/api', () => ({
   createNewSheet: vi.fn(),
   validateSheet: vi.fn(),
 }));
 
-import { createNewSheet, validateSheet } from '../data/sheetsApi';
+import { createNewSheet, validateSheet } from '../data/api';
 
 beforeEach(() => {
   vi.clearAllMocks();

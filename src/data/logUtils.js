@@ -36,6 +36,11 @@ export function isNewPR(sets, exercise, user, weight, reps) {
   return reps > previous.reps;
 }
 
+export function resolveExerciseOnUserSwitch(currentExercise, sets, newUser) {
+  if (currentExercise) return currentExercise;
+  return getLastExerciseToday(sets, newUser) ?? null;
+}
+
 export function getRecentNotes(sets, exercise, user, count = 3) {
   const seen = new Set();
   return sets

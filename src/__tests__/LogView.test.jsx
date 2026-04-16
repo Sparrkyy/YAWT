@@ -3,7 +3,7 @@ import { render, screen, fireEvent, waitFor } from '@testing-library/react';
 import LogView from '../views/LogView';
 import * as logUtils from '../data/logUtils';
 
-vi.mock('../data/sheetsApi', () => ({
+vi.mock('../data/api', () => ({
   addSet: vi.fn(() => Promise.resolve()),
   deleteSet: vi.fn(),
 }));

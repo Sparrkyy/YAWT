@@ -4,7 +4,7 @@ import ExerciseEditSheet from '../views/ExerciseEditSheet';
 
 const renameExerciseMock = vi.fn();
 
-vi.mock('../data/sheetsApi', () => ({
+vi.mock('../data/api', () => ({
   renameExercise: (...args) => renameExerciseMock(...args),
 }));
 

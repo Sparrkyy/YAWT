@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { addPlan } from '../data/sheetsApi';
+import { addPlan } from '../data/api';
 import PlanEditSheet from './PlanEditSheet';
 
 export default function PlansView({ exercises, plans, onPlansChange }) {

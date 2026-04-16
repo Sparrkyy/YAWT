@@ -1,8 +1,8 @@
 import { useState, useEffect, useRef } from 'react';
 import { initAuth, signIn, signOut, getUserSub, tryRestoreSession, hasStoredSession, trySilentSignIn } from './data/auth';
-import { getSets, getExercises, getPlans, setSheetId, setApiErrorHandler } from './data/sheetsApi';
+import { getSets, getExercises, getPlans, setSheetId, setApiErrorHandler, DEV_MODE } from './data/api';
 import { setLoadingListener } from './data/loadingTracker';
-import { getLastSet, getLastExerciseToday } from './data/logUtils';
+import { getLastSet, getLastExerciseToday, resolveExerciseOnUserSwitch } from './data/logUtils';
 import LogView from './views/LogView';
 import HistoryView from './views/HistoryView';
 import ExercisesView from './views/ExercisesView';
@@ -58,9 +58,8 @@ export default function App() {
 
   function handleUserChange(u) {
     setActiveUser(u);
-    const todayExercise = getLastExerciseToday(sets, u);
-    const exerciseToUse = todayExercise ?? sharedExercise;
-    if (todayExercise) setSharedExercise(todayExercise);
+    const exerciseToUse = resolveExerciseOnUserSwitch(sharedExercise, sets, u);
+    if (exerciseToUse && !sharedExercise) setSharedExercise(exerciseToUse);
     if (exerciseToUse) {
       const last = getLastSet(sets, exerciseToUse, u);
       setUserDrafts(prev => ({
@@ -78,9 +77,17 @@ export default function App() {
   }
 
   useEffect(() => {
-    // GIS loads async; poll until it's ready then init
     setApiErrorHandler(setApiError);
     setLoadingListener(setApiLoading);
+
+    if (DEV_MODE) {
+      setAuthReady(true);
+      setSignedIn(true);
+      loadApp('mock-sheet-id', ['Ethan', 'Ava']);
+      return;
+    }
+
+    // GIS loads async; poll until it's ready then init
     function tryInit() {
       if (typeof google !== 'undefined' && google.accounts?.oauth2) {
         initAuth(onSignIn);
