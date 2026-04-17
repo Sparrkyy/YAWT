@@ -458,15 +458,27 @@
 .exercise-list {
   display: flex;
   flex-direction: column;
-  gap: 1px;
+  background: var(--surface);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+
+/* Flatten individual swipe rows inside the card */
+.exercise-list .swipe-wrap {
+  border-radius: 0;
+  margin-bottom: 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.exercise-list .swipe-wrap:last-child {
+  border-bottom: none;
 }
 
 .exercise-item {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 12px 4px;
-  border-bottom: 1px solid var(--border);
+  padding: 14px 16px;
   background: var(--surface);
   width: 100%;
 }
@@ -496,6 +508,7 @@
 .exercise-group {
   display: flex;
   flex-direction: column;
+  gap: 6px;
 }
 
 .exercise-group-header {
@@ -504,7 +517,7 @@
   color: var(--text-secondary);
   text-transform: uppercase;
   letter-spacing: 0.5px;
-  padding: 12px 4px 4px;
+  padding: 4px 0 0;
 }
 
 /* Sheet overlay */
@@ -1009,19 +1022,25 @@
 .plan-list {
   display: flex;
   flex-direction: column;
-  gap: 1px;
+  background: var(--surface);
+  border-radius: var(--radius);
+  overflow: hidden;
 }
 
 .plan-item {
   display: flex;
   align-items: center;
   gap: 8px;
-  padding: 14px 4px;
+  padding: 14px 16px;
   border-bottom: 1px solid var(--border);
-  background: var(--surface);
+  background: transparent;
   width: 100%;
   text-align: left;
   cursor: pointer;
+}
+
+.plan-item:last-child {
+  border-bottom: none;
 }
 
 .plan-name {
