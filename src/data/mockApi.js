@@ -5,18 +5,20 @@ const KEYS = {
   sets: 'yawt_mock_sets',
   exercises: 'yawt_mock_exercises',
   plans: 'yawt_mock_plans',
+  measurements: 'yawt_mock_measurements',
 };
 
 const today = new Date().toLocaleDateString('en-CA');
 const yesterday = new Date(Date.now() - 86400000).toLocaleDateString('en-CA');
+const lastWeek = new Date(Date.now() - 7 * 86400000).toLocaleDateString('en-CA');
 
 const SEED_EXERCISES = [
-  { id: 'ex-1', name: 'Bench Press',    muscles: { chest: 2, triceps: 1, shoulders: 0.5 }, archived: false },
-  { id: 'ex-2', name: 'Squat',          muscles: { quads: 2, glutes: 1.5, hamstrings: 1 }, archived: false },
-  { id: 'ex-3', name: 'Deadlift',       muscles: { back: 2, hamstrings: 1.5, glutes: 1, lowBack: 1 }, archived: false },
-  { id: 'ex-4', name: 'Overhead Press', muscles: { shoulders: 2, triceps: 1 }, archived: false },
-  { id: 'ex-5', name: 'Barbell Row',    muscles: { back: 2, biceps: 1, rearDelts: 1 }, archived: false },
-  { id: 'ex-6', name: 'Pull Up',        muscles: { back: 1.5, biceps: 1.5 }, archived: false },
+  { id: 'ex-1', name: 'Bench Press',    muscles: { chest: 1, triceps: 0.5, frontDelts: 0.25 }, archived: false },
+  { id: 'ex-2', name: 'Squat',          muscles: { quads: 1, glutes: 0.75, hamstrings: 0.5 }, archived: false },
+  { id: 'ex-3', name: 'Deadlift',       muscles: { back: 1, hamstrings: 0.75, glutes: 0.5, lowBack: 0.5 }, archived: false },
+  { id: 'ex-4', name: 'Overhead Press', muscles: { frontDelts: 1, sideDelts: 0.5, triceps: 0.5 }, archived: false },
+  { id: 'ex-5', name: 'Barbell Row',    muscles: { back: 1, biceps: 0.5, rearDelts: 0.5 }, archived: false },
+  { id: 'ex-6', name: 'Pull Up',        muscles: { back: 1, biceps: 0.75 }, archived: false },
 ];
 
 const SEED_SETS = [
@@ -32,6 +34,17 @@ const SEED_PLANS = [
   { id: 'plan-1', name: 'Push Day', exerciseIds: ['ex-1', 'ex-4'] },
   { id: 'plan-2', name: 'Pull Day', exerciseIds: ['ex-3', 'ex-5', 'ex-6'] },
   { id: 'plan-3', name: 'Leg Day',  exerciseIds: ['ex-2'] },
+];
+
+const SEED_MEASUREMENTS = [
+  { id: 'meas-1', date: today,    user: 'Ethan', type: 'weight',  value: 185,  unit: 'lbs', notes: '', createdAt: `${today}T08:00:00.000Z` },
+  { id: 'meas-2', date: today,    user: 'Ethan', type: 'waist',   value: 32,   unit: 'in',  notes: '', createdAt: `${today}T08:01:00.000Z` },
+  { id: 'meas-3', date: today,    user: 'Ethan', type: 'bicepL',  value: 15,   unit: 'in',  notes: '', createdAt: `${today}T08:02:00.000Z` },
+  { id: 'meas-4', date: today,    user: 'Ava',   type: 'weight',  value: 130,  unit: 'lbs', notes: '', createdAt: `${today}T08:10:00.000Z` },
+  { id: 'meas-5', date: today,    user: 'Ava',   type: 'waist',   value: 26,   unit: 'in',  notes: '', createdAt: `${today}T08:11:00.000Z` },
+  { id: 'meas-6', date: lastWeek, user: 'Ethan', type: 'weight',  value: 186,  unit: 'lbs', notes: '', createdAt: `${lastWeek}T08:00:00.000Z` },
+  { id: 'meas-7', date: lastWeek, user: 'Ethan', type: 'waist',   value: 32.5, unit: 'in',  notes: '', createdAt: `${lastWeek}T08:01:00.000Z` },
+  { id: 'meas-8', date: lastWeek, user: 'Ava',   type: 'weight',  value: 131,  unit: 'lbs', notes: '', createdAt: `${lastWeek}T08:10:00.000Z` },
 ];
 
 function load(key, seed) {
@@ -139,4 +152,25 @@ export async function deletePlan(id) {
   await delay();
   const plans = load(KEYS.plans, SEED_PLANS).filter(p => p.id !== id);
   save(KEYS.plans, plans);
+}
+
+// Measurements
+export async function getMeasurements() {
+  await delay();
+  return load(KEYS.measurements, SEED_MEASUREMENTS);
+}
+
+export async function addMeasurement(measurement) {
+  await delay();
+  const measurements = load(KEYS.measurements, SEED_MEASUREMENTS);
+  const newMeasurement = { id: crypto.randomUUID(), ...measurement };
+  measurements.push(newMeasurement);
+  save(KEYS.measurements, measurements);
+  return newMeasurement;
+}
+
+export async function deleteMeasurement(id) {
+  await delay();
+  const measurements = load(KEYS.measurements, SEED_MEASUREMENTS).filter(m => m.id !== id);
+  save(KEYS.measurements, measurements);
 }

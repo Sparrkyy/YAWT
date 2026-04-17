@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 110">
+  <!-- Head (small, top center) -->
+  <ellipse cx="60" cy="14" rx="13" ry="14" fill="none" stroke="#94A3B8" stroke-width="2"/>
+  <!-- Neck -->
+  <line x1="54" y1="27" x2="54" y2="37" stroke="#94A3B8" stroke-width="2"/>
+  <line x1="66" y1="27" x2="66" y2="37" stroke="#94A3B8" stroke-width="2"/>
+  <!-- Left shoulder slope to deltoid -->
+  <path d="M54,37 Q34,41 14,52" fill="none" stroke="#94A3B8" stroke-width="2"/>
+  <!-- Left arm outer side -->
+  <path d="M14,52 Q9,68 11,95" fill="none" stroke="#94A3B8" stroke-width="2"/>
+  <!-- Left torso side (armpit to waist) -->
+  <path d="M24,52 Q20,68 22,95" fill="none" stroke="#94A3B8" stroke-width="2"/>
+  <!-- Right shoulder slope to deltoid -->
+  <path d="M66,37 Q86,41 106,52" fill="none" stroke="#94A3B8" stroke-width="2"/>
+  <!-- Right arm outer side -->
+  <path d="M106,52 Q111,68 109,95" fill="none" stroke="#94A3B8" stroke-width="2"/>
+  <!-- Right torso side -->
+  <path d="M96,52 Q100,68 98,95" fill="none" stroke="#94A3B8" stroke-width="2"/>
+  <!-- Bottom crop line -->
+  <line x1="22" y1="95" x2="98" y2="95" stroke="#94A3B8" stroke-width="2"/>
+  <!-- Measurement line across shoulder tips -->
+  <line x1="4" y1="50" x2="116" y2="50" stroke="#6366F1" stroke-width="2" stroke-dasharray="5,3"/>
+  <!-- End caps -->
+  <line x1="4" y1="45" x2="4" y2="55" stroke="#6366F1" stroke-width="2.5"/>
+  <line x1="116" y1="45" x2="116" y2="55" stroke="#6366F1" stroke-width="2.5"/>
+  <!-- Contact dots at shoulder tips -->
+  <circle cx="14" cy="50" r="2.5" fill="#6366F1"/>
+  <circle cx="106" cy="50" r="2.5" fill="#6366F1"/>
+</svg>

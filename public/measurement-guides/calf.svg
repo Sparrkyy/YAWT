@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 70 140">
+  <!-- Lower leg / calf — front view, standing -->
+  <!-- Outer side (calf muscle bulge in upper third) -->
+  <path d="M14,5 Q7,32 9,58 Q12,88 15,132" fill="none" stroke="#94A3B8" stroke-width="2"/>
+  <!-- Inner side (less pronounced bulge) -->
+  <path d="M56,5 Q63,32 61,58 Q58,88 55,132" fill="none" stroke="#94A3B8" stroke-width="2"/>
+  <!-- Knee top -->
+  <path d="M14,5 Q35,0 56,5" fill="none" stroke="#94A3B8" stroke-width="2"/>
+  <!-- Ankle bottom -->
+  <path d="M15,132 Q35,138 55,132" fill="none" stroke="#94A3B8" stroke-width="2"/>
+  <!-- Measurement at widest calf (upper third, y=44) -->
+  <line x1="2" y1="44" x2="68" y2="44" stroke="#6366F1" stroke-width="2" stroke-dasharray="5,3"/>
+  <!-- End caps -->
+  <line x1="2" y1="39" x2="2" y2="49" stroke="#6366F1" stroke-width="2.5"/>
+  <line x1="68" y1="39" x2="68" y2="49" stroke="#6366F1" stroke-width="2.5"/>
+  <!-- Contact dots -->
+  <circle cx="9" cy="44" r="2.5" fill="#6366F1"/>
+  <circle cx="61" cy="44" r="2.5" fill="#6366F1"/>
+</svg>

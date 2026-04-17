@@ -14,9 +14,10 @@ vi.mock('../data/auth', () => ({
 
 vi.mock('../data/api', () => ({
   DEV_MODE: false,
-  getSets: vi.fn(() => new Promise(() => {})),      // never resolves
-  getExercises: vi.fn(() => new Promise(() => {})), // never resolves
-  getPlans: vi.fn(() => new Promise(() => {})),     // never resolves
+  getSets: vi.fn(() => new Promise(() => {})),          // never resolves
+  getExercises: vi.fn(() => new Promise(() => {})),     // never resolves
+  getPlans: vi.fn(() => new Promise(() => {})),         // never resolves
+  getMeasurements: vi.fn(() => new Promise(() => {})),  // never resolves
   setSheetId: vi.fn(),
   setApiErrorHandler: vi.fn(),
 }));

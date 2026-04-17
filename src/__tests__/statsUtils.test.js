@@ -6,7 +6,7 @@ const TODAY = '2026-02-19';
 
 const benchPress = {
   name: 'Bench Press',
-  muscles: { chest: 1, triceps: 0.5, shoulders: 0.25 },
+  muscles: { chest: 1, triceps: 0.5, frontDelts: 0.25 },
 };
 
 const squat = {
@@ -42,7 +42,7 @@ describe('computeStats', () => {
     const totals = computeStats(sets, exercises, 'week', 'Ethan');
     expect(totals.chest).toBe(1);
     expect(totals.triceps).toBe(0.5);
-    expect(totals.shoulders).toBe(0.25);
+    expect(totals.frontDelts).toBe(0.25);
   });
 
   it('returns {} when user does not match', () => {

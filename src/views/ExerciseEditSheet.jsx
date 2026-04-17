@@ -3,9 +3,11 @@ import { renameExercise } from '../data/api';
 import { MUSCLE_GROUPS } from '../data/exercises';
 
 const MUSCLE_LABELS = {
-  chest: 'Chest', back: 'Back', shoulders: 'Shoulders', biceps: 'Biceps',
-  triceps: 'Triceps', quads: 'Quads', hamstrings: 'Hamstrings', glutes: 'Glutes',
-  calves: 'Calves', tibialis: 'Tibialis', abs: 'Abs', rearDelts: 'Rear Delts', lowBack: 'Low Back',
+  chest: 'Chest', back: 'Back',
+  frontDelts: 'Front Delts', sideDelts: 'Side Delts', rearDelts: 'Rear Delts',
+  biceps: 'Biceps', triceps: 'Triceps',
+  quads: 'Quads', hamstrings: 'Hamstrings', glutes: 'Glutes',
+  calves: 'Calves', tibialis: 'Tibialis', abs: 'Abs', lowBack: 'Low Back',
 };
 
 function fmt(v) {

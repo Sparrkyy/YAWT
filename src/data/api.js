@@ -27,4 +27,7 @@ export const {
   addPlan,
   updatePlan,
   deletePlan,
+  getMeasurements,
+  addMeasurement,
+  deleteMeasurement,
 } = api;

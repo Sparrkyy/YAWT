@@ -17,7 +17,7 @@ vi.mock('recharts', () => ({
 const TODAY = '2026-02-19';
 
 const exercises = [
-  { name: 'Bench Press', muscles: { chest: 1, triceps: 0.5, shoulders: 0.25 } },
+  { name: 'Bench Press', muscles: { chest: 1, triceps: 0.5, frontDelts: 0.25 } },
   { name: 'Squat', muscles: { quads: 1, glutes: 0.5, hamstrings: 0.25 } },
 ];
 
@@ -133,7 +133,7 @@ describe('StatsView', () => {
     );
     // Switch to month so Feb 5 sets appear in the period
     fireEvent.click(screen.getByRole('button', { name: 'This Month' }));
-    // Bench Press hits chest, triceps, and shoulders — all show "last performed Feb 5"
+    // Bench Press hits chest, triceps, and frontDelts — all show "last performed Feb 5"
     const lastSpans = screen.getAllByText('last performed Feb 5');
     expect(lastSpans.length).toBeGreaterThan(0);
     expect(lastSpans[0]).toBeInTheDocument();

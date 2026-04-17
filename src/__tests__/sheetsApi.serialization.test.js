@@ -56,7 +56,7 @@ describe('exercise row serialization', () => {
     const original = {
       id: 'ex-uuid-001',
       name: 'Bench Press',
-      muscles: { chest: 1, triceps: 0.5, shoulders: 0.25 },
+      muscles: { chest: 1, triceps: 0.5, frontDelts: 0.25 },
       archived: false,
     };
     expect(rowToExercise(exerciseToRow(original))).toEqual(original);

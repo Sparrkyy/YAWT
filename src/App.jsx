@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
 import { initAuth, signIn, signOut, getUserSub, tryRestoreSession, hasStoredSession, trySilentSignIn } from './data/auth';
-import { getSets, getExercises, getPlans, setSheetId, setApiErrorHandler, DEV_MODE } from './data/api';
+import { getSets, getExercises, getPlans, getMeasurements, setSheetId, setApiErrorHandler, DEV_MODE } from './data/api';
 import { setLoadingListener } from './data/loadingTracker';
 import { getLastSet, getLastExerciseToday, resolveExerciseOnUserSwitch } from './data/logUtils';
 import LogView from './views/LogView';
@@ -10,11 +10,12 @@ import PlansView from './views/PlansView';
 import StatsView from './views/StatsView';
 import SetupView from './views/SetupView';
 import SettingsView from './views/SettingsView';
+import MeasurementsView from './views/MeasurementsView';
 import ErrorDialog from './components/ErrorDialog';
 import LoadingOverlay from './components/LoadingOverlay';
 import './App.css';
 
-const TABS = ['Log', 'History', 'Exercises', 'Plans', 'Stats', 'Settings'];
+const TABS = ['Log', 'History', 'Exercises', 'Plans', 'Stats', 'Measurements', 'Settings'];
 
 function storageKey(suffix) {
   return `yawt_${suffix}_${getUserSub() ?? 'default'}`;
@@ -28,6 +29,7 @@ export default function App() {
   const [sets, setSets] = useState([]);
   const [exercises, setExercises] = useState([]);
   const [plans, setPlans] = useState([]);
+  const [measurements, setMeasurements] = useState([]);
   const [activeUser, setActiveUser] = useState('');
   const [sharedExercise, setSharedExercise] = useState('');
   const [userDrafts, setUserDrafts] = useState({});
@@ -138,10 +140,11 @@ export default function App() {
     setUseAccordionPicker(localStorage.getItem(storageKey('exercisePicker')) === 'true');
     setLoading(true);
     try {
-      const [fetchedSets, fetchedExercises, fetchedPlans] = await Promise.all([getSets(), getExercises(), getPlans()]);
+      const [fetchedSets, fetchedExercises, fetchedPlans, fetchedMeasurements] = await Promise.all([getSets(), getExercises(), getPlans(), getMeasurements()]);
       setSets(fetchedSets);
       setExercises(fetchedExercises);
       setPlans(fetchedPlans);
+      setMeasurements(fetchedMeasurements);
       const defaultExercise = getLastExerciseToday(fetchedSets, userList[0]);
       if (defaultExercise) {
         const lastSet = getLastSet(fetchedSets, defaultExercise, userList[0]);
@@ -185,11 +188,15 @@ export default function App() {
     try { setPlans(await getPlans()); } catch { /* error dialog shown by transport layer */ }
   }
 
+  async function refreshMeasurements() {
+    try { setMeasurements(await getMeasurements()); } catch { /* error dialog shown by transport layer */ }
+  }
+
   async function handleSheetChange(id) {
     setCurrentSheetId(id);
     setSheetId(id);
     localStorage.setItem(storageKey('sheet'), id);
-    await Promise.all([refreshSets(), refreshExercises(), refreshPlans()]);
+    await Promise.all([refreshSets(), refreshExercises(), refreshPlans(), refreshMeasurements()]);
   }
 
   function handleUsersChange(newUsers) {
@@ -203,6 +210,7 @@ export default function App() {
     setSets([]);
     setExercises([]);
     setPlans([]);
+    setMeasurements([]);
     setUsers([]);
     setSetupPhase(null);
     setSharedExercise('');
@@ -284,6 +292,15 @@ export default function App() {
         {tab === 'Stats' && (
           <StatsView sets={sets} exercises={exercises} activeUser={activeUser} onUserChange={setActiveUser} users={users} />
         )}
+        {tab === 'Measurements' && (
+          <MeasurementsView
+            measurements={measurements}
+            onMeasurementsChange={refreshMeasurements}
+            activeUser={activeUser}
+            onUserChange={setActiveUser}
+            users={users}
+          />
+        )}
         {tab === 'Settings' && (
           <SettingsView
             currentSheetId={currentSheetId}
@@ -343,6 +360,15 @@ export default function App() {
                   <line x1="12" y1="20" x2="12" y2="4"/>
                   <line x1="6" y1="20" x2="6" y2="14"/>
                   <line x1="2" y1="20" x2="22" y2="20"/>
+                </svg>
+              )}
+              {t === 'Measurements' && (
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M2 12h20"/>
+                  <path d="M6 8v8"/>
+                  <path d="M10 10v4"/>
+                  <path d="M14 10v4"/>
+                  <path d="M18 8v8"/>
                 </svg>
               )}
               {t === 'Settings' && (

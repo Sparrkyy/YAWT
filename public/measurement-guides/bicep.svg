@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 70 130">
+  <!-- Upper arm — front view, arm relaxed at side -->
+  <!-- Outer (lateral) side — slight bicep bulge at midpoint -->
+  <path d="M14,5 Q7,32 9,62 Q12,88 18,122" fill="none" stroke="#94A3B8" stroke-width="2"/>
+  <!-- Inner (medial) side -->
+  <path d="M56,5 Q63,32 61,62 Q58,88 52,122" fill="none" stroke="#94A3B8" stroke-width="2"/>
+  <!-- Shoulder top -->
+  <path d="M14,5 Q35,0 56,5" fill="none" stroke="#94A3B8" stroke-width="2"/>
+  <!-- Elbow bottom -->
+  <path d="M18,122 Q35,130 52,122" fill="none" stroke="#94A3B8" stroke-width="2"/>
+  <!-- Measurement at midpoint / peak of bicep (y=52) -->
+  <line x1="2" y1="52" x2="68" y2="52" stroke="#6366F1" stroke-width="2" stroke-dasharray="5,3"/>
+  <!-- End caps -->
+  <line x1="2" y1="47" x2="2" y2="57" stroke="#6366F1" stroke-width="2.5"/>
+  <line x1="68" y1="47" x2="68" y2="57" stroke="#6366F1" stroke-width="2.5"/>
+  <!-- Contact dots -->
+  <circle cx="9" cy="52" r="2.5" fill="#6366F1"/>
+  <circle cx="61" cy="52" r="2.5" fill="#6366F1"/>
+</svg>

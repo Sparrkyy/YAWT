@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 70 130">
+  <!-- Forearm — front view, palm up, wider near elbow tapering to wrist -->
+  <!-- Outer side — widest just below elbow, tapers to wrist -->
+  <path d="M12,8 Q8,28 10,62 Q13,90 18,122" fill="none" stroke="#94A3B8" stroke-width="2"/>
+  <!-- Inner side (tapers similarly) -->
+  <path d="M58,8 Q62,28 60,62 Q57,90 52,122" fill="none" stroke="#94A3B8" stroke-width="2"/>
+  <!-- Elbow top (rounded) -->
+  <path d="M12,8 Q35,2 58,8" fill="none" stroke="#94A3B8" stroke-width="2"/>
+  <!-- Wrist bottom -->
+  <path d="M18,122 Q35,128 52,122" fill="none" stroke="#94A3B8" stroke-width="2"/>
+  <!-- Measurement at widest point just below elbow (y=26) -->
+  <line x1="2" y1="26" x2="68" y2="26" stroke="#6366F1" stroke-width="2" stroke-dasharray="5,3"/>
+  <!-- End caps -->
+  <line x1="2" y1="21" x2="2" y2="31" stroke="#6366F1" stroke-width="2.5"/>
+  <line x1="68" y1="21" x2="68" y2="31" stroke="#6366F1" stroke-width="2.5"/>
+  <!-- Contact dots -->
+  <circle cx="9" cy="26" r="2.5" fill="#6366F1"/>
+  <circle cx="61" cy="26" r="2.5" fill="#6366F1"/>
+</svg>

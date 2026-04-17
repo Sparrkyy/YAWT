@@ -3,12 +3,12 @@
 
 export const MOCK_EXERCISES_ROWS = [
   ['id', 'name', 'muscles', 'archived'], // header
-  ['ex-1', 'Bench Press', JSON.stringify({ chest: 2, triceps: 1, shoulders: 0.5 }), ''],
-  ['ex-2', 'Squat', JSON.stringify({ quads: 2, glutes: 1.5, hamstrings: 1 }), ''],
-  ['ex-3', 'Deadlift', JSON.stringify({ back: 2, hamstrings: 1.5, glutes: 1, lowBack: 1 }), ''],
-  ['ex-4', 'Overhead Press', JSON.stringify({ shoulders: 2, triceps: 1 }), ''],
-  ['ex-5', 'Barbell Row', JSON.stringify({ back: 2, biceps: 1, rearDelts: 1 }), ''],
-  ['ex-6', 'Pull Up', JSON.stringify({ back: 1.5, biceps: 1.5 }), ''],
+  ['ex-1', 'Bench Press', JSON.stringify({ chest: 1, triceps: 0.5, frontDelts: 0.25 }), ''],
+  ['ex-2', 'Squat', JSON.stringify({ quads: 1, glutes: 0.75, hamstrings: 0.5 }), ''],
+  ['ex-3', 'Deadlift', JSON.stringify({ back: 1, hamstrings: 0.75, glutes: 0.5, lowBack: 0.5 }), ''],
+  ['ex-4', 'Overhead Press', JSON.stringify({ frontDelts: 1, sideDelts: 0.5, triceps: 0.5 }), ''],
+  ['ex-5', 'Barbell Row', JSON.stringify({ back: 1, biceps: 0.5, rearDelts: 0.5 }), ''],
+  ['ex-6', 'Pull Up', JSON.stringify({ back: 1, biceps: 0.75 }), ''],
   ['ex-7', 'Archived Exercise', JSON.stringify({ chest: 1 }), 'true'],
 ];
 
@@ -30,4 +30,15 @@ export const MOCK_PLANS_ROWS = [
   ['plan-1', 'Push Day', JSON.stringify(['ex-1', 'ex-4'])],
   ['plan-2', 'Pull Day', JSON.stringify(['ex-3', 'ex-5', 'ex-6'])],
   ['plan-3', 'Leg Day', JSON.stringify(['ex-2'])],
+];
+
+const LAST_WEEK = new Date(Date.now() - 7 * 86400000).toLocaleDateString('en-CA');
+
+export const MOCK_MEASUREMENTS_ROWS = [
+  ['id', 'date', 'user', 'type', 'value', 'unit', 'notes', 'createdAt'], // header
+  ['meas-1', TODAY, 'Ethan', 'weight', '185', 'lbs', '', `${TODAY}T08:00:00.000Z`],
+  ['meas-2', TODAY, 'Ethan', 'waist',  '32',  'in',  '', `${TODAY}T08:01:00.000Z`],
+  ['meas-3', TODAY, 'Ava',   'weight', '130', 'lbs', '', `${TODAY}T08:10:00.000Z`],
+  ['meas-4', LAST_WEEK, 'Ethan', 'weight', '186', 'lbs', '', `${LAST_WEEK}T08:00:00.000Z`],
+  ['meas-5', LAST_WEEK, 'Ava',   'weight', '131', 'lbs', '', `${LAST_WEEK}T08:10:00.000Z`],
 ];

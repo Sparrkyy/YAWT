@@ -1,13 +1,14 @@
 import { http, HttpResponse } from 'msw';
-import { MOCK_SETS_ROWS, MOCK_EXERCISES_ROWS, MOCK_PLANS_ROWS } from './data';
+import { MOCK_SETS_ROWS, MOCK_EXERCISES_ROWS, MOCK_PLANS_ROWS, MOCK_MEASUREMENTS_ROWS } from './data';
 
 // Deep-copy so handlers can mutate without polluting the originals
-let setsRows, exercisesRows, plansRows;
+let setsRows, exercisesRows, plansRows, measurementsRows;
 
 export function resetMockData() {
   setsRows = JSON.parse(JSON.stringify(MOCK_SETS_ROWS));
   exercisesRows = JSON.parse(JSON.stringify(MOCK_EXERCISES_ROWS));
   plansRows = JSON.parse(JSON.stringify(MOCK_PLANS_ROWS));
+  measurementsRows = JSON.parse(JSON.stringify(MOCK_MEASUREMENTS_ROWS));
 }
 
 resetMockData();
@@ -30,7 +31,12 @@ export const handlers = [
     return HttpResponse.json({ values: plansRows });
   }),
 
-  // Append (addSet, addExercise, addPlan) — match any values path ending in :append
+  // GET Measurements
+  http.get(`${SHEETS_BASE}/values/Measurements!A:H`, () => {
+    return HttpResponse.json({ values: measurementsRows });
+  }),
+
+  // Append (addSet, addExercise, addPlan, addMeasurement) — match any values path ending in :append
   http.post(/sheets\.googleapis\.com\/v4\/spreadsheets\/[^/]+\/values\/.*:append/, async ({ request }) => {
     const body = await request.json();
     const url = new URL(request.url);
@@ -42,6 +48,8 @@ export const handlers = [
       exercisesRows.push(...(body.values ?? []));
     } else if (path.includes('Plans')) {
       plansRows.push(...(body.values ?? []));
+    } else if (path.includes('Measurements')) {
+      measurementsRows.push(...(body.values ?? []));
     }
 
     return HttpResponse.json({

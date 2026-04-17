@@ -3,7 +3,7 @@ export const SECTION_ORDER = ['Chest','Back','Shoulders','Arms','Legs','Core','O
 const MUSCLE_TO_SECTION = {
   chest: 'Chest',
   back: 'Back', rearDelts: 'Back',
-  shoulders: 'Shoulders',
+  frontDelts: 'Shoulders', sideDelts: 'Shoulders',
   biceps: 'Arms', triceps: 'Arms',
   quads: 'Legs', hamstrings: 'Legs', glutes: 'Legs', calves: 'Legs',
   abs: 'Core', lowBack: 'Core',

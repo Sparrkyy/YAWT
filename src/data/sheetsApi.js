@@ -270,6 +270,63 @@ export async function deletePlan(id) {
   }, 'deleting plan');
 }
 
+// ─── Measurements ────────────────────────────────────────────────────────────
+
+// Column layout: A=id, B=date, C=user, D=type, E=value, F=unit, G=notes, H=createdAt
+export function rowToMeasurement(row) {
+  return {
+    id: row[0] ?? '',
+    date: row[1] ?? '',
+    user: row[2] ?? '',
+    type: row[3] ?? '',
+    value: Number(row[4] ?? 0),
+    unit: row[5] ?? 'in',
+    notes: row[6] ?? '',
+    createdAt: row[7] ?? '',
+  };
+}
+
+export function measurementToRow(m) {
+  return [m.id, m.date, m.user, m.type, m.value, m.unit, m.notes ?? '', m.createdAt];
+}
+
+export async function getMeasurements() {
+  const data = await sheetsGet('/values/Measurements!A:H', 'loading measurements');
+  const rows = data.values ?? [];
+  return rows.slice(1).map(rowToMeasurement).filter(m => m.id);
+}
+
+export async function addMeasurement(measurement) {
+  const id = crypto.randomUUID
+    ? crypto.randomUUID()
+    : `${Date.now()}-${Math.random().toString(36).slice(2)}`;
+  const newMeasurement = { ...measurement, id };
+  await sheetsPost(
+    '/values/Measurements!A:H:append?valueInputOption=USER_ENTERED&insertDataOption=INSERT_ROWS',
+    { values: [measurementToRow(newMeasurement)] },
+    'saving measurement'
+  );
+  return newMeasurement;
+}
+
+export async function deleteMeasurement(id) {
+  const data = await sheetsGet('/values/Measurements!A:H', 'deleting measurement');
+  const rows = data.values ?? [];
+  const rowIndex = rows.findIndex((r, i) => i > 0 && r[0] === id);
+  if (rowIndex === -1) return;
+
+  const gid = await getSheetGid('Measurements');
+  if (gid === null) return;
+
+  await sheetsPost(':batchUpdate', {
+    requests: [{
+      deleteDimension: {
+        range: { sheetId: gid, dimension: 'ROWS', startIndex: rowIndex, endIndex: rowIndex + 1 },
+      },
+    }],
+  }, 'deleting measurement');
+}
+
 // ─── Sheet management ────────────────────────────────────────────────────────
 
 export async function createNewSheet() {
@@ -304,6 +361,7 @@ async function _createNewSheet() {
         { updateSheetProperties: { properties: { sheetId: defaultSheetId, title: 'Sets' }, fields: 'title' } },
         { addSheet: { properties: { title: 'Exercises' } } },
         { addSheet: { properties: { title: 'Plans' } } },
+        { addSheet: { properties: { title: 'Measurements' } } },
       ],
     }),
   });
@@ -323,6 +381,11 @@ async function _createNewSheet() {
     method: 'PUT',
     headers: { ...authHeaders(), 'Content-Type': 'application/json' },
     body: JSON.stringify({ values: [['id', 'name', 'exerciseIds']] }),
+  });
+  await fetch(`${BASE_SHEETS}/${id}/values/Measurements!A1:H1?valueInputOption=RAW`, {
+    method: 'PUT',
+    headers: { ...authHeaders(), 'Content-Type': 'application/json' },
+    body: JSON.stringify({ values: [['id', 'date', 'user', 'type', 'value', 'unit', 'notes', 'createdAt']] }),
   });
 
   return id;

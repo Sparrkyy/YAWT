@@ -1,13 +1,13 @@
 export const MUSCLE_GROUPS = [
-  'chest', 'back', 'shoulders', 'biceps', 'triceps',
-  'quads', 'hamstrings', 'glutes', 'calves', 'tibialis', 'abs', 'rearDelts', 'lowBack'
+  'chest', 'back', 'frontDelts', 'sideDelts', 'rearDelts', 'biceps', 'triceps',
+  'quads', 'hamstrings', 'glutes', 'calves', 'tibialis', 'abs', 'lowBack'
 ];
 
 export const EXERCISES = [
   { name: 'Back Extension', muscles: { hamstrings: 0.5, glutes: 0.5, lowBack: 0.5 } },
   { name: 'Leg Extension', muscles: { quads: 1 } },
   { name: 'Hip Adductions', muscles: { glutes: 1 } },
-  { name: 'Dumbell Shoulder Press', muscles: { shoulders: 1, triceps: 0.25 } },
+  { name: 'Dumbell Shoulder Press', muscles: { frontDelts: 1.0, sideDelts: 0.5, triceps: 0.25 } },
   { name: 'Dumbell Row (Single Arm)', muscles: { back: 1, biceps: 0.5, rearDelts: 0.5 } },
   { name: 'Incline Bench Dumbell Bicep Curl', muscles: { biceps: 1 } },
   { name: 'Lying Hamstring Curl', muscles: { hamstrings: 1 } },

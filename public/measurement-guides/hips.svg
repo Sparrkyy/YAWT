@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 140">
+  <!-- Lower torso segment showing hip flare -->
+  <!-- Left side: narrow waist, flaring out at hips, tapering below -->
+  <path d="M22,8 Q16,28 10,58 Q9,78 16,112" fill="none" stroke="#94A3B8" stroke-width="2"/>
+  <!-- Right side mirror -->
+  <path d="M78,8 Q84,28 90,58 Q91,78 84,112" fill="none" stroke="#94A3B8" stroke-width="2"/>
+  <!-- Top crop -->
+  <line x1="22" y1="8" x2="78" y2="8" stroke="#94A3B8" stroke-width="2"/>
+  <!-- Bottom crop -->
+  <line x1="16" y1="112" x2="84" y2="112" stroke="#94A3B8" stroke-width="2"/>
+  <!-- Measurement at widest hip point (y=66) -->
+  <line x1="2" y1="66" x2="98" y2="66" stroke="#6366F1" stroke-width="2" stroke-dasharray="5,3"/>
+  <!-- End caps -->
+  <line x1="2" y1="61" x2="2" y2="71" stroke="#6366F1" stroke-width="2.5"/>
+  <line x1="98" y1="61" x2="98" y2="71" stroke="#6366F1" stroke-width="2.5"/>
+  <!-- Contact dots at widest hip -->
+  <circle cx="10" cy="66" r="2.5" fill="#6366F1"/>
+  <circle cx="90" cy="66" r="2.5" fill="#6366F1"/>
+</svg>

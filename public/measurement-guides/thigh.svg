@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 80 130">
+  <!-- Upper leg / thigh — front view, standing -->
+  <!-- Outer side of thigh -->
+  <path d="M10,8 Q6,38 8,76 Q10,104 18,126" fill="none" stroke="#94A3B8" stroke-width="2"/>
+  <!-- Inner side of thigh -->
+  <path d="M70,8 Q74,38 72,76 Q70,104 62,126" fill="none" stroke="#94A3B8" stroke-width="2"/>
+  <!-- Hip/glute top -->
+  <path d="M10,8 Q40,2 70,8" fill="none" stroke="#94A3B8" stroke-width="2"/>
+  <!-- Knee bottom -->
+  <path d="M18,126 Q40,132 62,126" fill="none" stroke="#94A3B8" stroke-width="2"/>
+  <!-- Measurement just below glute fold — top of thigh (y=26) -->
+  <line x1="2" y1="26" x2="78" y2="26" stroke="#6366F1" stroke-width="2" stroke-dasharray="5,3"/>
+  <!-- End caps -->
+  <line x1="2" y1="21" x2="2" y2="31" stroke="#6366F1" stroke-width="2.5"/>
+  <line x1="78" y1="21" x2="78" y2="31" stroke="#6366F1" stroke-width="2.5"/>
+  <!-- Contact dots -->
+  <circle cx="8" cy="26" r="2.5" fill="#6366F1"/>
+  <circle cx="72" cy="26" r="2.5" fill="#6366F1"/>
+</svg>

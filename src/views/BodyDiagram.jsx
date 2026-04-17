@@ -3,10 +3,11 @@ import Model from 'react-body-highlighter';
 const INTENSITY_LEVELS = 5;
 
 // Each muscle gets a base color and a block of frequency slots for intensity
+// anteriorDelts is a virtual key: frontDelts + sideDelts combined (library has no lateral-delt slug)
 const MUSCLE_CONFIG = {
-  chest:      { slugs: ['chest'],                       color: [224, 85, 85] },
-  shoulders:  { slugs: ['front-deltoids'],              color: [232, 145, 58] },
-  biceps:     { slugs: ['biceps'],                      color: [76, 175, 80] },
+  chest:         { slugs: ['chest'],                       color: [224, 85, 85] },
+  anteriorDelts: { slugs: ['front-deltoids'],              color: [232, 145, 58] },
+  biceps:        { slugs: ['biceps'],                      color: [76, 175, 80] },
   triceps:    { slugs: ['triceps'],                     color: [38, 166, 154] },
   abs:        { slugs: ['abs'],                         color: [160, 184, 64] },
   quads:      { slugs: ['quadriceps'],                  color: [74, 144, 217] },
@@ -40,10 +41,16 @@ for (const key of MUSCLE_KEYS) {
 function buildModelData(effectiveSets, maxValue) {
   const data = [];
 
+  // Combine front and side delts — the SVG library has no lateral-delt slug
+  const augmented = {
+    ...effectiveSets,
+    anteriorDelts: (effectiveSets.frontDelts ?? 0) + (effectiveSets.sideDelts ?? 0),
+  };
+
   for (let mi = 0; mi < MUSCLE_KEYS.length; mi++) {
     const muscle = MUSCLE_KEYS[mi];
     const config = MUSCLE_CONFIG[muscle];
-    const value = effectiveSets[muscle] ?? 0;
+    const value = augmented[muscle] ?? 0;
     if (value <= 0) continue;
 
     const t = Math.min(value / maxValue, 1);

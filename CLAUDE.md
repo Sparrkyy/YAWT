@@ -2,6 +2,20 @@
 
 A personal PWA workout tracker for Ethan and Ava. Mobile-first, hosted on GitHub Pages at `/YAWT/`.
 
+## UI/Styling Rule — ALWAYS READ THIS FIRST
+
+**Every new view or component must use the existing design system classes from `App.css`.** Never use raw browser-default elements without styling. Before writing any JSX, check `App.css` for the right class:
+- Form cards → `.log-form`
+- Labeled inputs → `.field` + `.field label` + `.setup-input` / `.field input`
+- Row separators → `.muscle-row`
+- Section headers → `.exercise-group-header`
+- Buttons → `.btn-primary`, `.btn-secondary`, `.btn-small`, `.btn-danger`
+- History entries → `.set-row`, `.history-date`, `.history-day`, `.swipe-wrap`
+- Empty state → `.empty-state`
+- User toggle → `.user-toggle` + `.user-btn`
+
+Shipping a new view with unstyled/browser-default inputs is a bug, not a style preference.
+
 ## Stack
 - **React 19 + Vite 5** — frontend
 - **GitHub Pages** — hosting (`base: '/YAWT/'` in vite.config.js)
@@ -46,9 +60,9 @@ Both are also injected as GitHub Actions secrets at build time.
 {
   name: string,
   muscles: {          // all keys are camelCase, values are weightings 0–2
-    chest, back, shoulders, biceps, triceps,
+    chest, back, frontDelts, sideDelts, rearDelts, biceps, triceps,
     quads, hamstrings, glutes, calves, tibialis,
-    abs, rearDelts, lowBack
+    abs, lowBack
   }
 }
 ```
