@@ -57,10 +57,10 @@ describe('Loading overlay', () => {
   });
 
   it('shows loading overlay during initial data load', async () => {
-    // Add delay to GET endpoints
+    // Add a long delay so the overlay stays visible long enough for CI to catch it
     worker.use(
       http.get('https://sheets.googleapis.com/v4/spreadsheets/:sheetId/values/Sets!A:I', async () => {
-        await delay(300);
+        await delay(1000);
         return HttpResponse.json({ values: [] });
       }),
     );
@@ -75,6 +75,6 @@ describe('Loading overlay', () => {
     // Should eventually disappear
     await waitFor(() => {
       expect(document.querySelector('.loading-overlay')).not.toBeInTheDocument();
-    }, { timeout: 3000 });
+    }, { timeout: 5000 });
   });
 });
