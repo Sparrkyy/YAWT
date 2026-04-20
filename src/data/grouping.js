@@ -1,9 +1,9 @@
-export const SECTION_ORDER = ['Chest','Back','Shoulders','Arms','Legs','Core','Other'];
+export const SECTION_ORDER = ['Chest','Back','Delts','Arms','Legs','Core','Other'];
 
 const MUSCLE_TO_SECTION = {
   chest: 'Chest',
-  back: 'Back', rearDelts: 'Back',
-  frontDelts: 'Shoulders', sideDelts: 'Shoulders',
+  back: 'Back',
+  frontDelts: 'Delts', sideDelts: 'Delts', rearDelts: 'Delts',
   biceps: 'Arms', triceps: 'Arms',
   quads: 'Legs', hamstrings: 'Legs', glutes: 'Legs', calves: 'Legs',
   abs: 'Core', lowBack: 'Core',
