@@ -21,6 +21,10 @@ function storageKey(suffix) {
   return `yawt_${suffix}_${getUserSub() ?? 'default'}`;
 }
 
+function fromSettled(result, fallback) {
+  return result.status === 'fulfilled' ? result.value : fallback;
+}
+
 export default function App() {
   const [authReady, setAuthReady] = useState(false);
   const [signedIn, setSignedIn] = useState(false);
@@ -140,11 +144,14 @@ export default function App() {
     setUseAccordionPicker(localStorage.getItem(storageKey('exercisePicker')) === 'true');
     setLoading(true);
     try {
-      const [fetchedSets, fetchedExercises, fetchedPlans, fetchedMeasurements] = await Promise.all([getSets(), getExercises(), getPlans(), getMeasurements()]);
+      const [setsResult, exercisesResult, plansResult, measurementsResult] = await Promise.allSettled([getSets(), getExercises(), getPlans(), getMeasurements()]);
+      const fetchedSets = fromSettled(setsResult, []);
+      const fetchedExercises = fromSettled(exercisesResult, []);
+      const fetchedPlans = fromSettled(plansResult, []);
       setSets(fetchedSets);
       setExercises(fetchedExercises);
       setPlans(fetchedPlans);
-      setMeasurements(fetchedMeasurements);
+      setMeasurements(fromSettled(measurementsResult, []));
       const defaultExercise = getLastExerciseToday(fetchedSets, userList[0]);
       if (defaultExercise) {
         const lastSet = getLastSet(fetchedSets, defaultExercise, userList[0]);

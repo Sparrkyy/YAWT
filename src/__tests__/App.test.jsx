@@ -26,20 +26,79 @@ vi.mock('../data/api', () => ({
 vi.mock('../views/SetupView', () => ({
   default: ({ setupPhase }) => <div data-testid="setup-view">{setupPhase}</div>,
 }));
+vi.mock('../views/LogView', () => ({ default: () => <div data-testid="log-view" /> }));
+vi.mock('../views/HistoryView', () => ({ default: () => <div data-testid="history-view" /> }));
+vi.mock('../views/ExercisesView', () => ({ default: () => <div data-testid="exercises-view" /> }));
+vi.mock('../views/PlansView', () => ({ default: () => <div data-testid="plans-view" /> }));
+vi.mock('../views/StatsView', () => ({ default: () => <div data-testid="stats-view" /> }));
+vi.mock('../views/MeasurementsView', () => ({ default: () => <div data-testid="measurements-view" /> }));
+vi.mock('../views/SettingsView', () => ({ default: () => <div data-testid="settings-view" /> }));
 
 import { initAuth, signIn } from '../data/auth';
+import { getSets, getExercises, getPlans, getMeasurements } from '../data/api';
 
 let capturedOnSignIn;
 
 beforeEach(() => {
   global.google = { accounts: { oauth2: {} } };
   localStorage.clear();
-  vi.clearAllMocks();
+  vi.resetAllMocks();
   initAuth.mockImplementation((cb) => { capturedOnSignIn = cb; });
+  getSets.mockImplementation(() => new Promise(() => {}));
+  getExercises.mockImplementation(() => new Promise(() => {}));
+  getPlans.mockImplementation(() => new Promise(() => {}));
+  getMeasurements.mockImplementation(() => new Promise(() => {}));
 });
 
 afterEach(() => {
   delete global.google;
+});
+
+describe('App — loadApp resilience', () => {
+  beforeEach(() => {
+    localStorage.setItem('yawt_sheet_test-user', 'some-id');
+    localStorage.setItem('yawt_users_test-user', JSON.stringify(['Ethan']));
+  });
+
+  it('renders the app when all fetches succeed', async () => {
+    getSets.mockResolvedValue([]);
+    getExercises.mockResolvedValue([]);
+    getPlans.mockResolvedValue([]);
+    getMeasurements.mockResolvedValue([]);
+    render(<App />);
+    await act(async () => { capturedOnSignIn(); });
+    expect(screen.getByTestId('log-view')).toBeInTheDocument();
+  });
+
+  it('renders the app when getMeasurements fails (missing tab)', async () => {
+    getSets.mockResolvedValue([]);
+    getExercises.mockResolvedValue([]);
+    getPlans.mockResolvedValue([]);
+    getMeasurements.mockRejectedValue(new Error('Sheets GET failed: HTTP status 400'));
+    render(<App />);
+    await act(async () => { capturedOnSignIn(); });
+    expect(screen.getByTestId('log-view')).toBeInTheDocument();
+  });
+
+  it('renders the app when getSets fails', async () => {
+    getSets.mockRejectedValue(new Error('400'));
+    getExercises.mockResolvedValue([]);
+    getPlans.mockResolvedValue([]);
+    getMeasurements.mockResolvedValue([]);
+    render(<App />);
+    await act(async () => { capturedOnSignIn(); });
+    expect(screen.getByTestId('log-view')).toBeInTheDocument();
+  });
+
+  it('renders the app when all fetches fail', async () => {
+    getSets.mockRejectedValue(new Error('400'));
+    getExercises.mockRejectedValue(new Error('400'));
+    getPlans.mockRejectedValue(new Error('400'));
+    getMeasurements.mockRejectedValue(new Error('400'));
+    render(<App />);
+    await act(async () => { capturedOnSignIn(); });
+    expect(screen.getByTestId('log-view')).toBeInTheDocument();
+  });
 });
 
 describe('App — conditional rendering state machine', () => {
