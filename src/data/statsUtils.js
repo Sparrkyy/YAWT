@@ -21,15 +21,29 @@ export function getDateRange(period) {
   return (ranges[period] ?? ranges.year)();
 }
 
+function calcE1rm(weight, reps) {
+  return !reps ? weight : weight * (1 + reps / 30);
+}
+
+function isBetterE1rm(byDate, date, e1rm) {
+  return !byDate[date] || e1rm > byDate[date].e1rm;
+}
+
+function matchesExerciseAndUser(s, exercise, user) {
+  return s.exercise === exercise && s.user === user;
+}
+
+function processProgressSet(byDate, s, exercise, user) {
+  if (!matchesExerciseAndUser(s, exercise, user)) return;
+  const e1rm = calcE1rm(s.weight, s.reps);
+  if (isBetterE1rm(byDate, s.date, e1rm)) {
+    byDate[s.date] = { e1rm, reps: s.reps, weight: s.weight };
+  }
+}
+
 export function getExerciseProgress(sets, exercise, user) {
   const byDate = {};
-  for (const s of sets) {
-    if (s.exercise !== exercise || s.user !== user) continue;
-    const e1rm = (!s.reps || s.reps === 0) ? s.weight : s.weight * (1 + s.reps / 30);
-    if (!byDate[s.date] || e1rm > byDate[s.date].e1rm) {
-      byDate[s.date] = { e1rm, reps: s.reps, weight: s.weight };
-    }
-  }
+  for (const s of sets) processProgressSet(byDate, s, exercise, user);
   return Object.entries(byDate)
     .sort(([a], [b]) => a.localeCompare(b))
     .map(([date, { e1rm, reps, weight }]) => ({
@@ -40,19 +54,40 @@ export function getExerciseProgress(sets, exercise, user) {
     }));
 }
 
+function updateMuscleHit(result, muscle, date) {
+  if (!result[muscle] || date > result[muscle]) result[muscle] = date;
+}
+
+function applyMuscleIfActive(result, muscle, w, date) {
+  if (w) updateMuscleHit(result, muscle, date);
+}
+
+function applyMuscleHits(result, exMap, s) {
+  const ex = exMap[s.exercise];
+  if (!ex) return;
+  for (const [muscle, w] of Object.entries(ex.muscles)) {
+    applyMuscleIfActive(result, muscle, w, s.date);
+  }
+}
+
 export function getLastMuscleHitDates(sets, exercises, user) {
   const exMap = Object.fromEntries(exercises.map(ex => [ex.name, ex]));
   const result = {};
   for (const s of sets) {
     if (s.user !== user) continue;
-    const ex = exMap[s.exercise];
-    if (!ex) continue;
-    for (const [muscle, w] of Object.entries(ex.muscles)) {
-      if (!w) continue;
-      if (!result[muscle] || s.date > result[muscle]) result[muscle] = s.date;
-    }
+    applyMuscleHits(result, exMap, s);
   }
   return result;
+}
+
+function inPeriod(s, startStr, endStr, user) {
+  return s.date >= startStr && s.date <= endStr && s.user === user;
+}
+
+function accumulateMuscles(totals, ex) {
+  for (const [muscle, w] of Object.entries(ex.muscles)) {
+    totals[muscle] = (totals[muscle] ?? 0) + w;
+  }
 }
 
 export function computeStats(sets, exercises, period, user) {
@@ -61,13 +96,10 @@ export function computeStats(sets, exercises, period, user) {
   const endStr   = end.toLocaleDateString('en-CA');
   const exMap = Object.fromEntries(exercises.map(ex => [ex.name, ex]));
   const totals = {};
-  const inPeriod = s => s.date >= startStr && s.date <= endStr && s.user === user;
-  for (const s of sets.filter(inPeriod)) {
+  for (const s of sets.filter(s => inPeriod(s, startStr, endStr, user))) {
     const ex = exMap[s.exercise];
     if (!ex) continue;
-    for (const [muscle, w] of Object.entries(ex.muscles)) {
-      totals[muscle] = (totals[muscle] ?? 0) + w;
-    }
+    accumulateMuscles(totals, ex);
   }
   return totals;
 }

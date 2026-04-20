@@ -5,7 +5,7 @@ import ConfirmDialog from '../components/ConfirmDialog';
 
 function formatStats(s) {
   const reps = s.reps != null ? `${s.reps} reps` : '—';
-  if (!s.weight || s.weight === 0) return reps;
+  if (!s.weight) return reps;
   return `${reps} @ ${s.weight} lbs`;
 }
 

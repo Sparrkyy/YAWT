@@ -139,6 +139,10 @@ npm run test:watch # re-runs on file save during development
 Any new component or view feature must ship with at least basic test coverage.
 When in doubt: add a test file alongside the implementation before marking the work done.
 
+### Coverage and complexity standards
+- **Unit test coverage must stay at 100%** (statements, branches, functions) for all src files except the intentional exclusions listed above. Use `/* istanbul ignore next */` only for dead guards enforced by the UI (disabled buttons, etc.) — never to paper over missing tests.
+- **Cyclomatic complexity must stay ≤ 3** (max 2 decision points per named function). Each `if`, `for`, `while`, `&&`, `||`, `?:`, `?.`, `??` counts as +1. When a function exceeds this, extract a named helper rather than inlining the extra branch.
+
 ## Git Commits
 Never include `Co-Authored-By` lines or any other mention of Claude/AI in commit messages.
 

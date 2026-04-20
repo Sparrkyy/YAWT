@@ -13,6 +13,23 @@ function getCelebrationLabel(sets, exercise, user, weight, reps) {
   return null;
 }
 
+function shouldClearExercise(plan, currentEx) {
+  return currentEx && plan && !plan.exerciseIds.includes(currentEx.id);
+}
+
+function parseNumReps(reps) {
+  return reps === '' ? null : Number(reps);
+}
+
+function isFormReady(exercise, weight) {
+  return !!exercise && !!weight;
+}
+
+function resolveExerciseId(exercises, exercise) {
+  const ex = exercises.find(e => e.name === exercise);
+  return ex ? ex.id : '';
+}
+
 export default function LogView({ exercises, plans = [], sets, onSetsChange, activeUser, onUserChange, logDraft, setLogDraft, users = [], useAccordionPicker = false }) {
   const [pendingDelete, setPendingDelete] = useState(null);
   const [fireworksLabel, setFireworksLabel] = useState(null);
@@ -26,13 +43,11 @@ export default function LogView({ exercises, plans = [], sets, onSetsChange, act
 
   function handlePlanSelect(planId) {
     setActivePlanId(planId);
-    // Clear exercise if it's not in the newly selected plan
-    if (planId !== null) {
-      const plan = plans.find(p => p.id === planId);
-      const currentEx = exercises.find(ex => ex.name === exercise);
-      if (currentEx && plan && !plan.exerciseIds.includes(currentEx.id)) {
-        setLogDraft(d => ({ ...d, exercise: '', weight: '' }));
-      }
+    if (planId === null) return;
+    const plan = plans.find(p => p.id === planId);
+    const currentEx = exercises.find(ex => ex.name === exercise);
+    if (shouldClearExercise(plan, currentEx)) {
+      setLogDraft(d => ({ ...d, exercise: '', weight: '' }));
     }
   }
 
@@ -68,18 +83,16 @@ export default function LogView({ exercises, plans = [], sets, onSetsChange, act
 
   async function handleSubmit(e) {
     e.preventDefault();
-    if (!exercise || !weight) return;
-    // Evaluate celebration status against current sets BEFORE the save
-    const numReps = reps === '' ? null : Number(reps);
+    if (!isFormReady(exercise, weight)) return;
+    const numReps = parseNumReps(reps);
     const numWeight = Number(weight);
     const label = getCelebrationLabel(sets, exercise, activeUser, numWeight, numReps);
     try {
-      const selectedExercise = exercises.find(ex => ex.name === exercise);
       await addSet({
         date: today,
         user: activeUser,
         exercise,
-        exerciseId: selectedExercise?.id ?? '',
+        exerciseId: resolveExerciseId(exercises, exercise),
         reps: numReps,
         weight: numWeight,
         notes,
