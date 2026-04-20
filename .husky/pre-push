@@ -1,1 +1,3 @@
 npm run test:unit
+echo "--- Cyclomatic complexity report (warnings only) ---"
+npm run complexity || true

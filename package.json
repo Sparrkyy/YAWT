@@ -7,6 +7,7 @@
     "dev": "vite",
     "build": "vite build",
     "lint": "eslint .",
+    "complexity": "eslint --config eslint.complexity.config.js src/",
     "preview": "vite preview",
     "test": "node -r ./e2e/polyfill-crypto-hash.cjs node_modules/.bin/vitest run",
     "test:unit": "vitest run --project unit",
