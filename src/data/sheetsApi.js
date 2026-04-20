@@ -17,11 +17,12 @@ function authHeaders() {
   return { Authorization: `Bearer ${getToken()}` };
 }
 
-async function sheetsGet(path, operation) {
+async function sheetsGet(path, operation, suppressStatus = 0) {
   startLoading();
   try {
     const res = await fetch(`${getBase()}${path}`, { headers: authHeaders() });
     if (!res.ok) {
+      if (res.status === suppressStatus) return null;
       const err = Object.assign(new Error('Sheets GET failed'), { status: res.status });
       errorCallback?.({ message: err.message, status: res.status, operation });
       throw err;
@@ -291,8 +292,9 @@ export function measurementToRow(m) {
 }
 
 export async function getMeasurements() {
-  const data = await sheetsGet('/values/Measurements!A:H', 'loading measurements');
-  const rows = data.values ?? [];
+  // Suppress 400: existing sheets pre-dating this feature won't have the tab
+  const data = await sheetsGet('/values/Measurements!A:H', 'loading measurements', 400);
+  const rows = data?.values ?? [];
   return rows.slice(1).map(rowToMeasurement).filter(m => m.id);
 }
 
