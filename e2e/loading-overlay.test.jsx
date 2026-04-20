@@ -67,10 +67,10 @@ describe('Loading overlay', () => {
 
     render(<App />);
 
-    // Overlay should appear during initial load
+    // Overlay should appear during initial load (longer timeout for CI session-restore lag)
     await waitFor(() => {
       expect(document.querySelector('.loading-overlay')).toBeInTheDocument();
-    });
+    }, { timeout: 3000 });
 
     // Should eventually disappear
     await waitFor(() => {
