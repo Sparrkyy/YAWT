@@ -54,9 +54,12 @@ export function getRecentNotes(sets, exercise, user, count = 3) {
     }, []);
 }
 
+function outperforms(best, weight, reps) {
+  return weight > best.weight || (weight === best.weight && reps > best.reps);
+}
+
 export function isNewBestSetEver(sets, exercise, user, weight, reps) {
   if (reps == null || reps < 5) return false;
   const best = getBestSet(sets, exercise, user);
-  if (best === null) return false;  // no previous 5+ rep set → not a new best
-  return weight > best.weight || (weight === best.weight && reps > best.reps);
+  return best !== null && outperforms(best, weight, reps);
 }

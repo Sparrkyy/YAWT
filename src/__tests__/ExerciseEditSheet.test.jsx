@@ -115,4 +115,35 @@ describe('ExerciseEditSheet', () => {
     fireEvent.click(overlay, { target: overlay });
     expect(onClose).toHaveBeenCalled();
   });
+
+  it('increments muscle value when + stepper is clicked', () => {
+    renderSheet({ muscles: { chest: 1, back: 0 } });
+    const plusButtons = screen.getAllByRole('button', { name: '+' });
+    fireEvent.click(plusButtons[0]); // chest +
+    expect(screen.getAllByText('1.25')[0]).toBeInTheDocument();
+  });
+
+  it('decrements muscle value when − stepper is clicked', () => {
+    renderSheet({ muscles: { chest: 1, back: 0 } });
+    const minusButtons = screen.getAllByRole('button', { name: '−' });
+    fireEvent.click(minusButtons[0]); // chest −
+    expect(screen.getAllByText('0.75')[0]).toBeInTheDocument();
+  });
+
+  it('clamps muscle value at 0 when decremented below 0', () => {
+    renderSheet({ muscles: { chest: 0, back: 0 } });
+    const minusButtons = screen.getAllByRole('button', { name: '−' });
+    fireEvent.click(minusButtons[0]);
+    expect(screen.getAllByText('0')[0]).toBeInTheDocument();
+  });
+
+  it('passes updated muscle draft to onSave', async () => {
+    const { onSave } = renderSheet({ muscles: { chest: 0, back: 0 } });
+    const plusButtons = screen.getAllByRole('button', { name: '+' });
+    fireEvent.click(plusButtons[0]); // chest → 0.25
+    fireEvent.click(screen.getByRole('button', { name: 'Save' }));
+    await waitFor(() => expect(onSave).toHaveBeenCalledWith(
+      expect.objectContaining({ chest: 0.25 })
+    ));
+  });
 });

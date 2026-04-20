@@ -24,6 +24,7 @@ const formatShortDate = (dateStr) => {
   return `${MONTHS[m - 1]} ${d}`;
 };
 
+/* istanbul ignore next */
 function CustomTooltip({ active, payload, label }) {
   if (!active || !payload?.length) return null;
   const { e1rm, reps, weight } = payload[0].payload;

@@ -1,26 +1,24 @@
+function weekRange(today) {
+  const dayOfWeek = (today.getDay() + 6) % 7; // Mon=0
+  const start = new Date(today);
+  start.setDate(today.getDate() - dayOfWeek);
+  const end = new Date(start);
+  end.setDate(start.getDate() + 6);
+  return { start, end };
+}
+
 export function getDateRange(period) {
   const today = new Date();
   today.setHours(0, 0, 0, 0);
-  if (period === 'week') {
-    const dayOfWeek = (today.getDay() + 6) % 7; // Mon=0
-    const start = new Date(today);
-    start.setDate(today.getDate() - dayOfWeek);
-    const end = new Date(start);
-    end.setDate(start.getDate() + 6);
-    return { start, end };
-  }
-  if (period === 'month') return {
-    start: new Date(today.getFullYear(), today.getMonth(), 1),
-    end:   new Date(today.getFullYear(), today.getMonth() + 1, 0),
+  const y = today.getFullYear();
+  const m = today.getMonth();
+  const ranges = {
+    week:      () => weekRange(today),
+    month:     () => ({ start: new Date(y, m, 1),     end: new Date(y, m + 1, 0) }),
+    lastMonth: () => ({ start: new Date(y, m - 1, 1), end: new Date(y, m, 0) }),
+    year:      () => ({ start: new Date(y, 0, 1),     end: new Date(y, 11, 31) }),
   };
-  if (period === 'lastMonth') return {
-    start: new Date(today.getFullYear(), today.getMonth() - 1, 1),
-    end:   new Date(today.getFullYear(), today.getMonth(), 0),
-  };
-  return {
-    start: new Date(today.getFullYear(), 0, 1),
-    end:   new Date(today.getFullYear(), 11, 31),
-  };
+  return (ranges[period] ?? ranges.year)();
 }
 
 export function getExerciseProgress(sets, exercise, user) {
@@ -63,9 +61,8 @@ export function computeStats(sets, exercises, period, user) {
   const endStr   = end.toLocaleDateString('en-CA');
   const exMap = Object.fromEntries(exercises.map(ex => [ex.name, ex]));
   const totals = {};
-  for (const s of sets) {
-    if (s.date < startStr || s.date > endStr) continue;
-    if (s.user !== user) continue;
+  const inPeriod = s => s.date >= startStr && s.date <= endStr && s.user === user;
+  for (const s of sets.filter(inPeriod)) {
     const ex = exMap[s.exercise];
     if (!ex) continue;
     for (const [muscle, w] of Object.entries(ex.muscles)) {

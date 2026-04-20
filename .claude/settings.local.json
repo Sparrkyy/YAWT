@@ -29,7 +29,17 @@
       "Bash(npm ls:*)",
       "Bash(command -v nvm)",
       "Read(//Users/ethan/.nvm/versions/**)",
-      "Bash(brew list:*)"
+      "Bash(brew list:*)",
+      "Bash(git commit:*)",
+      "Bash(git push:*)",
+      "Bash(ps -p 73194 -o pid,command)",
+      "Bash(ps -p 89823 -o pid,command)",
+      "Bash(kill 73194)",
+      "Bash(ps -p 23893 -o pid,command)",
+      "Bash(kill 73254)",
+      "Bash(lsof -ti:5200)",
+      "Bash(gh run *)",
+      "Bash(npx --yes typhonjs-escomplex-runner analyze --output complexity_report.json src/App.jsx src/views/LogView.jsx src/views/StatsView.jsx src/views/HistoryView.jsx src/data/sheetsApi.js src/data/statsUtils.js src/data/logUtils.js)"
     ]
   }
 }

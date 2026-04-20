@@ -7,6 +7,12 @@ import { getBestSet, getLastSet, getBestRepsAtWeight, isNewPR, isNewBestSetEver,
 import ExerciseSelector from '../components/ExerciseSelector';
 import ExercisePickerButton from '../components/ExercisePickerButton';
 
+function getCelebrationLabel(sets, exercise, user, weight, reps) {
+  if (isNewBestSetEver(sets, exercise, user, weight, reps)) return 'New Best!';
+  if (isNewPR(sets, exercise, user, weight, reps)) return 'New PR!';
+  return null;
+}
+
 export default function LogView({ exercises, plans = [], sets, onSetsChange, activeUser, onUserChange, logDraft, setLogDraft, users = [], useAccordionPicker = false }) {
   const [pendingDelete, setPendingDelete] = useState(null);
   const [fireworksLabel, setFireworksLabel] = useState(null);
@@ -66,12 +72,7 @@ export default function LogView({ exercises, plans = [], sets, onSetsChange, act
     // Evaluate celebration status against current sets BEFORE the save
     const numReps = reps === '' ? null : Number(reps);
     const numWeight = Number(weight);
-    let label = null;
-    if (isNewBestSetEver(sets, exercise, activeUser, numWeight, numReps)) {
-      label = 'New Best!';
-    } else if (isNewPR(sets, exercise, activeUser, numWeight, numReps)) {
-      label = 'New PR!';
-    }
+    const label = getCelebrationLabel(sets, exercise, activeUser, numWeight, numReps);
     try {
       const selectedExercise = exercises.find(ex => ex.name === exercise);
       await addSet({

@@ -192,6 +192,35 @@ describe('StatsView', () => {
     expect(screen.getByText('Chest')).toBeInTheDocument();
   });
 
+  it('calls onUserChange when user toggle is clicked', () => {
+    const onUserChange = vi.fn();
+    render(
+      <StatsView
+        sets={[]}
+        exercises={exercises}
+        activeUser="Ethan"
+        onUserChange={onUserChange}
+        users={['Ethan', 'Ava']}
+      />
+    );
+    fireEvent.click(screen.getByRole('button', { name: 'Ava' }));
+    expect(onUserChange).toHaveBeenCalledWith('Ava');
+  });
+
+  it('updates selected exercise when selector is changed', () => {
+    render(
+      <StatsView
+        sets={[]}
+        exercises={exercises}
+        activeUser="Ethan"
+        onUserChange={() => {}}
+      />
+    );
+    const select = screen.getByRole('combobox', { name: /select exercise/i });
+    fireEvent.change(select, { target: { value: 'Bench Press' } });
+    expect(select.value).toBe('Bench Press');
+  });
+
   it('uses elapsed weeks for per-week average (month period)', () => {
     // TODAY = 2026-02-19: 19 days into February → ceil(19/7) = 3 elapsed weeks
     // 1 Bench Press set → chest = 1 → avg = 1/3 → "~0.33/wk"

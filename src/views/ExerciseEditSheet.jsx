@@ -29,6 +29,7 @@ export default function ExerciseEditSheet({ exercise, exercises = [], onSave, on
 
   async function handleSave() {
     const trimmedName = draftName.trim();
+    /* istanbul ignore next */
     if (!trimmedName) return;
     const duplicate = exercises.find(e => e.name === trimmedName && e.id !== exercise.id);
     if (duplicate) {

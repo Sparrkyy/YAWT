@@ -117,9 +117,123 @@ describe('SettingsView', () => {
     renderSettings({ darkMode: false, onDarkModeChange });
     expect(screen.getByText('Dark mode')).toBeInTheDocument();
     const toggles = screen.getAllByRole('checkbox');
-    const darkToggle = toggles[0]; // dark mode is the first toggle
+    const darkToggle = toggles[0];
     expect(darkToggle.checked).toBe(false);
     fireEvent.click(darkToggle);
     expect(onDarkModeChange).toHaveBeenCalledWith(true);
+  });
+
+  it('dark mode toggle reflects checked state when darkMode prop is true', () => {
+    renderSettings({ darkMode: true, onDarkModeChange: vi.fn() });
+    const toggles = screen.getAllByRole('checkbox');
+    expect(toggles[0].checked).toBe(true);
+  });
+
+  // --- Link sheet ---
+  it('calls validateSheet and onSheetChange when a valid ID is linked', async () => {
+    sheetsApi.validateSheet.mockResolvedValue(true);
+    const onSheetChange = vi.fn();
+    renderSettings({ onSheetChange });
+    fireEvent.change(screen.getByPlaceholderText(/Paste a different Sheet ID/), { target: { value: 'newid123' } });
+    fireEvent.click(screen.getByRole('button', { name: 'Link' }));
+    await waitFor(() => expect(onSheetChange).toHaveBeenCalledWith('newid123'));
+  });
+
+  it('shows an error when validateSheet returns false', async () => {
+    sheetsApi.validateSheet.mockResolvedValue(false);
+    renderSettings();
+    fireEvent.change(screen.getByPlaceholderText(/Paste a different Sheet ID/), { target: { value: 'badid' } });
+    fireEvent.click(screen.getByRole('button', { name: 'Link' }));
+    await waitFor(() =>
+      expect(screen.getByText(/Could not access that sheet/)).toBeInTheDocument()
+    );
+  });
+
+  it('shows an error when validateSheet throws', async () => {
+    sheetsApi.validateSheet.mockRejectedValue(new Error('network'));
+    renderSettings();
+    fireEvent.change(screen.getByPlaceholderText(/Paste a different Sheet ID/), { target: { value: 'anyid' } });
+    fireEvent.click(screen.getByRole('button', { name: 'Link' }));
+    await waitFor(() =>
+      expect(screen.getByText(/Failed to validate sheet/)).toBeInTheDocument()
+    );
+  });
+
+  it('Link button is disabled when the sheet input is empty', () => {
+    renderSettings();
+    expect(screen.getByRole('button', { name: 'Link' })).toBeDisabled();
+  });
+
+  // --- User management ---
+  it('adds a new user and calls onUsersChange', () => {
+    const onUsersChange = vi.fn();
+    renderSettings({ onUsersChange });
+    fireEvent.change(screen.getByPlaceholderText('New user name'), { target: { value: 'Sam' } });
+    fireEvent.click(screen.getByRole('button', { name: 'Add' }));
+    expect(onUsersChange).toHaveBeenCalledWith(['Ethan', 'Ava', 'Sam']);
+  });
+
+  it('rejects a duplicate user name', () => {
+    const onUsersChange = vi.fn();
+    renderSettings({ onUsersChange });
+    fireEvent.change(screen.getByPlaceholderText('New user name'), { target: { value: 'Ethan' } });
+    fireEvent.click(screen.getByRole('button', { name: 'Add' }));
+    expect(onUsersChange).not.toHaveBeenCalled();
+  });
+
+  it('Add button disabled for duplicate user name', () => {
+    renderSettings();
+    fireEvent.change(screen.getByPlaceholderText('New user name'), { target: { value: 'Ethan' } });
+    expect(screen.getByRole('button', { name: 'Add' })).toBeDisabled();
+  });
+
+  it('hides add-user input when 4 users already exist', () => {
+    renderSettings({ users: ['A', 'B', 'C', 'D'] });
+    expect(screen.queryByPlaceholderText('New user name')).not.toBeInTheDocument();
+  });
+
+  it('adds user on Enter key', () => {
+    const onUsersChange = vi.fn();
+    renderSettings({ onUsersChange });
+    const input = screen.getByPlaceholderText('New user name');
+    fireEvent.change(input, { target: { value: 'Sam' } });
+    fireEvent.keyDown(input, { key: 'Enter' });
+    expect(onUsersChange).toHaveBeenCalledWith(['Ethan', 'Ava', 'Sam']);
+  });
+
+  it('shows remove buttons when more than one user exists', () => {
+    renderSettings();
+    expect(screen.getAllByRole('button', { name: /Remove/ })).toHaveLength(2);
+  });
+
+  it('hides remove buttons when only one user exists', () => {
+    renderSettings({ users: ['Solo'] });
+    expect(screen.queryByRole('button', { name: /Remove/ })).not.toBeInTheDocument();
+  });
+
+  it('removes a user and calls onUsersChange', () => {
+    const onUsersChange = vi.fn();
+    renderSettings({ onUsersChange });
+    fireEvent.click(screen.getByRole('button', { name: 'Remove Ava' }));
+    expect(onUsersChange).toHaveBeenCalledWith(['Ethan']);
+  });
+
+  // --- Accordion picker ---
+  it('renders accordion picker toggle and calls onAccordionPickerChange', () => {
+    const onAccordionPickerChange = vi.fn();
+    renderSettings({ useAccordionPicker: false, onAccordionPickerChange });
+    const toggles = screen.getAllByRole('checkbox');
+    const pickerToggle = toggles[1];
+    expect(pickerToggle.checked).toBe(false);
+    fireEvent.click(pickerToggle);
+    expect(onAccordionPickerChange).toHaveBeenCalledWith(true);
+  });
+
+  // --- Sign out ---
+  it('calls onSignOut when Sign out is clicked', () => {
+    const onSignOut = vi.fn();
+    renderSettings({ onSignOut });
+    fireEvent.click(screen.getByRole('button', { name: 'Sign out' }));
+    expect(onSignOut).toHaveBeenCalled();
   });
 });

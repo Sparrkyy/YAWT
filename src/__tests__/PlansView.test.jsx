@@ -9,9 +9,10 @@ vi.mock('../data/api', () => ({
 }));
 
 vi.mock('../views/PlanEditSheet', () => ({
-  default: ({ plan, onClose }) => (
+  default: ({ plan, onSave, onClose }) => (
     <div data-testid="plan-edit-sheet">
       <span>{plan.name}</span>
+      <button onClick={onSave}>Save</button>
       <button onClick={onClose}>Close</button>
     </div>
   ),
@@ -79,5 +80,42 @@ describe('PlansView', () => {
     const emptyPlan = [{ id: 'plan-4', name: 'Empty Plan', exerciseIds: [] }];
     render(<PlansView {...defaultProps} plans={emptyPlan} />);
     expect(screen.getByText('No exercises')).toBeInTheDocument();
+  });
+
+  it('submits a new plan, clears input, and calls onPlansChange', async () => {
+    const { addPlan } = await import('../data/api');
+    const onPlansChange = vi.fn(() => Promise.resolve());
+    render(<PlansView {...defaultProps} onPlansChange={onPlansChange} />);
+    fireEvent.click(screen.getByRole('button', { name: '+ Add' }));
+    fireEvent.change(screen.getByPlaceholderText(/Plan name/), { target: { value: 'New Plan' } });
+    fireEvent.submit(screen.getByRole('button', { name: 'Add' }).closest('form'));
+    await waitFor(() => expect(addPlan).toHaveBeenCalledWith({ name: 'New Plan', exerciseIds: [] }));
+    expect(onPlansChange).toHaveBeenCalled();
+  });
+
+  it('does not submit when plan name is blank', async () => {
+    const { addPlan } = await import('../data/api');
+    render(<PlansView {...defaultProps} />);
+    fireEvent.click(screen.getByRole('button', { name: '+ Add' }));
+    fireEvent.submit(screen.getByRole('button', { name: 'Add' }).closest('form'));
+    expect(addPlan).not.toHaveBeenCalled();
+  });
+
+  it('toggles add form when + Add / Cancel is clicked', () => {
+    render(<PlansView {...defaultProps} />);
+    fireEvent.click(screen.getByRole('button', { name: '+ Add' }));
+    expect(screen.getByPlaceholderText(/Plan name/)).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: 'Cancel' }));
+    expect(screen.queryByPlaceholderText(/Plan name/)).not.toBeInTheDocument();
+  });
+
+  it('closes PlanEditSheet after onSave is called', async () => {
+    const onPlansChange = vi.fn(() => Promise.resolve());
+    render(<PlansView {...defaultProps} onPlansChange={onPlansChange} />);
+    fireEvent.click(screen.getByText('Push Day'));
+    expect(screen.getByTestId('plan-edit-sheet')).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: 'Save' }));
+    await waitFor(() => expect(screen.queryByTestId('plan-edit-sheet')).not.toBeInTheDocument());
+    expect(onPlansChange).toHaveBeenCalled();
   });
 });

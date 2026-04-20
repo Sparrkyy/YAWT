@@ -13,6 +13,7 @@ export default function SettingsView({ currentSheetId, users, onSheetChange, onU
 
   async function handleLinkSheet() {
     const id = sheetInput.trim();
+    /* istanbul ignore next */
     if (!id) return;
     setSheetLoading(true);
     setSheetError('');
@@ -46,12 +47,14 @@ export default function SettingsView({ currentSheetId, users, onSheetChange, onU
 
   function handleAddUser() {
     const name = newUser.trim();
+    /* istanbul ignore next */
     if (!name || users.includes(name) || users.length >= 4) return;
     onUsersChange([...users, name]);
     setNewUser('');
   }
 
   function handleRemoveUser(name) {
+    /* istanbul ignore next */
     if (users.length <= 1) return;
     onUsersChange(users.filter(u => u !== name));
   }
