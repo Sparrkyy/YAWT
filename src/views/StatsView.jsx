@@ -13,20 +13,23 @@ const MUSCLE_LABELS = {
   calves: 'Calves', abs: 'Abs', lowBack: 'Low Back',
 };
 
-const formatDate = (dateStr) => {
+function formatDate(dateStr) {
   const [, month, day] = dateStr.split('-');
   return `${month}/${day}`;
-};
+}
 
 const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-const formatShortDate = (dateStr) => {
+function formatShortDate(dateStr) {
   const [, m, d] = dateStr.split('-').map(Number);
   return `${MONTHS[m - 1]} ${d}`;
-};
+}
 
-/* istanbul ignore next */
+function hasData(active, payload) {
+  return active && payload?.length;
+}
+
 function CustomTooltip({ active, payload, label }) {
-  if (!active || !payload?.length) return null;
+  if (!hasData(active, payload)) return null;
   const { e1rm, reps, weight } = payload[0].payload;
   const breakdown = reps != null ? `${weight} lbs × ${reps} reps` : `${weight} lbs (bodyweight/hold)`;
   return (
@@ -38,6 +41,20 @@ function CustomTooltip({ active, payload, label }) {
   );
 }
 
+function mostRecentExercise(sets, user) {
+  const userSets = sets.filter(s => s.user === user);
+  if (userSets.length > 0) {
+    const mostRecent = [...userSets].sort((a, b) => b.date.localeCompare(a.date))[0];
+    return mostRecent.exercise;
+  }
+  return '';
+}
+
+function userBtnClass(activeUser, u) { return `user-btn${activeUser === u ? ' active' : ''}`; }
+function periodBtnClass(period, p) { return `period-btn${period === p ? ' active' : ''}`; }
+
+const periodLabels = { week: 'This Week', month: 'This Month', lastMonth: 'Last Month', year: 'This Year' };
+
 export default function StatsView({ sets, exercises, activeUser, onUserChange, users = [] }) {
   const [period, setPeriod] = useState('week');
   const [side, setSide] = useState('front');
@@ -45,17 +62,12 @@ export default function StatsView({ sets, exercises, activeUser, onUserChange, u
   const groupedExercises = useMemo(() => groupExercises(exercises), [exercises]);
 
   const defaultExercise = useMemo(() => {
-    const userSets = sets.filter(s => s.user === activeUser);
-    if (userSets.length > 0) {
-      const mostRecent = [...userSets].sort((a, b) => b.date.localeCompare(a.date))[0];
-      return mostRecent.exercise;
-    }
-    return groupedExercises[0]?.exercises[0]?.name ?? '';
+    const ex = mostRecentExercise(sets, activeUser);
+    return ex ?? groupedExercises[0]?.exercises[0]?.name ?? '';
   }, [sets, activeUser, groupedExercises]);
 
   const [selectedExercise, setSelectedExercise] = useState(defaultExercise);
 
-  // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => { setSelectedExercise(defaultExercise); }, [activeUser]);
 
   const effectiveSets = useMemo(() => {
@@ -99,28 +111,42 @@ export default function StatsView({ sets, exercises, activeUser, onUserChange, u
     .filter(([, v]) => v > 0)
     .sort(([, a], [, b]) => b - a);
 
-  const periodLabels = { week: 'This Week', month: 'This Month', lastMonth: 'Last Month', year: 'This Year' };
+  function renderMuscleTotals() {
+    if (rankedMuscles.length === 0) {
+      return <p className="empty-state">No sets logged in this period.</p>;
+    }
+    return (
+      <div className="muscle-totals">
+        {rankedMuscles.map(([muscle, value]) => (
+          <div key={muscle} className="muscle-total-row">
+            <span className="muscle-name">{MUSCLE_LABELS[muscle] ?? muscle}</span>
+            <div className="muscle-right">
+              <span className="muscle-total-value">{parseFloat(value.toFixed(2))} sets</span>
+              {period !== 'week' && (
+                <span className="muscle-avg">~{(value / weeksInPeriod).toFixed(2)}/wk</span>
+              )}
+              {lastMuscleHit[muscle] && (
+                <span className="muscle-last">last performed {formatShortDate(lastMuscleHit[muscle])}</span>
+              )}
+            </div>
+          </div>
+        ))}
+      </div>
+    );
+  }
 
   return (
     <div className="view">
       <div className="user-toggle">
         {users.map(u => (
-          <button
-            key={u}
-            className={`user-btn ${activeUser === u ? 'active' : ''}`}
-            onClick={() => onUserChange(u)}
-          >
+          <button key={u} className={userBtnClass(activeUser, u)} onClick={() => onUserChange(u)}>
             {u}
           </button>
         ))}
       </div>
       <div className="period-selector">
         {['week', 'month', 'lastMonth', 'year'].map(p => (
-          <button
-            key={p}
-            className={`period-btn ${period === p ? 'active' : ''}`}
-            onClick={() => setPeriod(p)}
-          >
+          <button key={p} className={periodBtnClass(period, p)} onClick={() => setPeriod(p)}>
             {periodLabels[p]}
           </button>
         ))}
@@ -128,26 +154,7 @@ export default function StatsView({ sets, exercises, activeUser, onUserChange, u
 
       <BodyDiagram effectiveSets={effectiveSets} side={side} onSideChange={setSide} />
 
-      {rankedMuscles.length > 0 ? (
-        <div className="muscle-totals">
-          {rankedMuscles.map(([muscle, value]) => (
-            <div key={muscle} className="muscle-total-row">
-              <span className="muscle-name">{MUSCLE_LABELS[muscle] ?? muscle}</span>
-              <div className="muscle-right">
-                <span className="muscle-total-value">{parseFloat(value.toFixed(2))} sets</span>
-                {period !== 'week' && (
-                  <span className="muscle-avg">~{(value / weeksInPeriod).toFixed(2)}/wk</span>
-                )}
-                {lastMuscleHit[muscle] && (
-                  <span className="muscle-last">last performed {formatShortDate(lastMuscleHit[muscle])}</span>
-                )}
-              </div>
-            </div>
-          ))}
-        </div>
-      ) : (
-        <p className="empty-state">No sets logged in this period.</p>
-      )}
+      {renderMuscleTotals()}
 
       <div className="exercise-progress">
         <h3>Exercise Progress</h3>

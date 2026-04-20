@@ -9,6 +9,14 @@ const MUSCLE_LABELS = {
   calves: 'Calves', tibialis: 'Tibialis', abs: 'Abs', lowBack: 'Low Back',
 };
 
+function exercisesWithMuscle(exercises, muscle) {
+  return exercises.filter(ex => (ex.muscles?.[muscle] ?? 0) > 0);
+}
+
+function sortedByMuscleWeight(exercises, muscle) {
+  return [...exercises].sort((a, b) => (b.muscles[muscle] - a.muscles[muscle]) || a.name.localeCompare(b.name));
+}
+
 function groupByMuscle(exercises) {
   const map = Object.fromEntries(MUSCLE_GROUPS.map(m => [m, []]));
   for (const ex of exercises) {
@@ -23,7 +31,7 @@ function groupByMuscle(exercises) {
     .map(m => ({
       key: m,
       label: MUSCLE_LABELS[m] ?? m,
-      exercises: [...map[m]].sort((a, b) => (b.muscles[m] - a.muscles[m]) || a.name.localeCompare(b.name)),
+      exercises: sortedByMuscleWeight(map[m], m),
     }));
 }
 

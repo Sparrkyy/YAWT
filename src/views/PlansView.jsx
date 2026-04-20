@@ -2,6 +2,34 @@ import { useState } from 'react';
 import { addPlan } from '../data/api';
 import PlanEditSheet from './PlanEditSheet';
 
+function addBtnLabel(adding) { return adding ? 'Cancel' : '+ Add'; }
+
+function exerciseCountLabel(count) {
+  if (count === 0) return 'No exercises';
+  return `${count} exercise${count === 1 ? '' : 's'}`;
+}
+
+function EmptyPlansHint({ adding, plans }) {
+  if (plans.length > 0 || adding) return null;
+  return <p className="empty-state">No plans yet. Tap + Add to create one.</p>;
+}
+
+function AddPlanForm({ adding, name, setName, handleAdd }) {
+  if (!adding) return null;
+  return (
+    <form className="add-exercise-form" onSubmit={handleAdd}>
+      <input
+        type="text"
+        placeholder="Plan name (e.g. Push Day)"
+        value={name}
+        onChange={e => setName(e.target.value)}
+        autoFocus
+      />
+      <button type="submit" className="btn-primary">Add</button>
+    </form>
+  );
+}
+
 export default function PlansView({ exercises, plans, onPlansChange }) {
   const [adding, setAdding] = useState(false);
   const [name, setName] = useState('');
@@ -22,44 +50,28 @@ export default function PlansView({ exercises, plans, onPlansChange }) {
       <div className="exercises-header">
         <h3>Plans</h3>
         <button className="btn-small" onClick={() => setAdding(!adding)}>
-          {adding ? 'Cancel' : '+ Add'}
+          {addBtnLabel(adding)}
         </button>
       </div>
 
-      {adding && (
-        <form className="add-exercise-form" onSubmit={handleAdd}>
-          <input
-            type="text"
-            placeholder="Plan name (e.g. Push Day)"
-            value={name}
-            onChange={e => setName(e.target.value)}
-            autoFocus
-          />
-          <button type="submit" className="btn-primary">Add</button>
-        </form>
-      )}
+      <AddPlanForm adding={adding} name={name} setName={setName} handleAdd={handleAdd} />
 
-      {plans.length === 0 && !adding && (
-        <p className="empty-state">No plans yet. Tap + Add to create one.</p>
-      )}
+      <EmptyPlansHint adding={adding} plans={plans} />
 
       <div className="plan-list">
-        {plans.map(plan => {
-          const count = plan.exerciseIds.length;
-          return (
-            <button
-              key={plan.id}
-              className="plan-item tappable"
-              onClick={() => setEditingPlan(plan)}
-            >
-              <span className="plan-name">{plan.name}</span>
-              <span className="plan-exercise-count">
-                {count === 0 ? 'No exercises' : `${count} exercise${count === 1 ? '' : 's'}`}
-              </span>
-              <span className="plan-chevron">›</span>
-            </button>
-          );
-        })}
+        {plans.map(plan => (
+          <button
+            key={plan.id}
+            className="plan-item tappable"
+            onClick={() => setEditingPlan(plan)}
+          >
+            <span className="plan-name">{plan.name}</span>
+            <span className="plan-exercise-count">
+              {exerciseCountLabel(plan.exerciseIds.length)}
+            </span>
+            <span className="plan-chevron">›</span>
+          </button>
+        ))}
       </div>
 
       {editingPlan && (
@@ -68,7 +80,6 @@ export default function PlansView({ exercises, plans, onPlansChange }) {
           exercises={exercises}
           onSave={async (updatedPlan) => {
             await onPlansChange();
-            // Re-sync editingPlan to the refreshed list (caller handles state)
             setEditingPlan(null);
           }}
           onClose={() => setEditingPlan(null)}

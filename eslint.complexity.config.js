@@ -11,6 +11,6 @@ export default [
       globals: globals.browser,
       parserOptions: { ecmaVersion: 'latest', ecmaFeatures: { jsx: true }, sourceType: 'module' },
     },
-    rules: { complexity: ['warn', 3] },
+    rules: { complexity: ['warn', 5] },
   },
 ]

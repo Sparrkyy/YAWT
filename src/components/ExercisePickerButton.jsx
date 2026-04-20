@@ -1,11 +1,12 @@
 import { useState } from 'react';
 import ExerciseAccordionSheet from './ExerciseAccordionSheet';
 
+function pickerClass(value) { return `picker-button${value ? '' : ' placeholder'}`; }
+
 export default function ExercisePickerButton({ exercises, value, onChange, ...rest }) {
   const [open, setOpen] = useState(false);
 
   function handleSelect(name) {
-    // Match the same event shape as a <select> onChange
     onChange({ target: { value: name } });
   }
 
@@ -13,7 +14,7 @@ export default function ExercisePickerButton({ exercises, value, onChange, ...re
     <>
       <button
         type="button"
-        className={`picker-button${value ? '' : ' placeholder'}`}
+        className={pickerClass(value)}
         onClick={() => setOpen(true)}
         {...rest}
       >

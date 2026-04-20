@@ -11,6 +11,24 @@ let tokenExpiry = null;
 let tokenClient = null;
 let userSub = null;
 
+async function fetchUserSub(token) {
+  try {
+    const res = await fetch(`https://oauth2.googleapis.com/tokeninfo?access_token=${encodeURIComponent(token)}`);
+    const info = await res.json();
+    return info.sub ?? null;
+  } catch { return null; }
+}
+
+function saveToStorage() {
+  try {
+    localStorage.setItem(AUTH_KEY, JSON.stringify({
+      access_token: accessToken,
+      expires_at: tokenExpiry,
+      user_sub: userSub,
+    }));
+  } catch {}
+}
+
 export function initAuth(onSignIn) {
   tokenClient = google.accounts.oauth2.initTokenClient({
     client_id: CLIENT_ID,
@@ -19,22 +37,8 @@ export function initAuth(onSignIn) {
       if (resp.error) return;
       accessToken = resp.access_token;
       tokenExpiry = Date.now() + resp.expires_in * 1000;
-      try {
-        const res = await fetch(
-          `https://oauth2.googleapis.com/tokeninfo?access_token=${encodeURIComponent(resp.access_token)}`
-        );
-        const info = await res.json();
-        userSub = info.sub ?? null;
-      } catch {
-        userSub = null;
-      }
-      try {
-        localStorage.setItem(AUTH_KEY, JSON.stringify({
-          access_token: accessToken,
-          expires_at: tokenExpiry,
-          user_sub: userSub,
-        }));
-      } catch {}
+      userSub = await fetchUserSub(resp.access_token);
+      saveToStorage();
       onSignIn();
     },
   });
@@ -52,16 +56,22 @@ export function getToken()   { return accessToken; }
 export function isSignedIn() { return !!accessToken; }
 export function getUserSub() { return userSub; }
 
+function parseStoredAuth() {
+  try { return JSON.parse(localStorage.getItem(AUTH_KEY)); } catch { return null; }
+}
+
+function isStoredTokenValid(stored) {
+  return stored && stored.expires_at >= Date.now() + 60_000;
+}
+
 // Returns true and restores session if stored token is still valid (>60s remaining).
 export function tryRestoreSession() {
-  try {
-    const stored = JSON.parse(localStorage.getItem(AUTH_KEY));
-    if (!stored || stored.expires_at < Date.now() + 60_000) return false;
-    accessToken = stored.access_token;
-    tokenExpiry = stored.expires_at;
-    userSub = stored.user_sub ?? null;
-    return true;
-  } catch { return false; }
+  const stored = parseStoredAuth();
+  if (!stored || !isStoredTokenValid(stored)) return false;
+  accessToken = stored.access_token;
+  tokenExpiry = stored.expires_at;
+  userSub = stored.user_sub ?? null;
+  return true;
 }
 
 // Returns true if any stored session exists (even expired) — used to decide silent re-auth.

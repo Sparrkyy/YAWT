@@ -1,6 +1,53 @@
 import { getToken } from './auth';
 import { startLoading, stopLoading } from './loadingTracker';
 
+function field(row, i, def = '') { return row[i] ?? def; }
+
+function parseReps(v) { return v !== '' && v != null ? Number(v) : null; }
+
+function parseMuscles(json) {
+  try { return JSON.parse(json ?? '{}'); } catch { return {}; }
+}
+
+function parseExerciseIds(json) {
+  try { return JSON.parse(json ?? '[]'); } catch { return []; }
+}
+
+function resolveSetExerciseId(set) { return set.exerciseId ?? set.exercise ?? ''; }
+
+function repsCellValue(reps) { return reps != null ? reps : ''; }
+
+function findSheet(sheets, title) { return (sheets ?? []).find(s => s.properties.title === title); }
+
+function sheetProperties(sheet) { return sheet?.properties; }
+
+function sheetGid(sheet) { return sheetProperties(sheet)?.sheetId ?? null; }
+
+function sheetRows(data) { return (data.values ?? []).slice(1); }
+
+function firstCell(data) { return data.values?.[0]?.[0]; }
+
+function getHeaderValue(data) { return (firstCell(data) ?? '').toLowerCase(); }
+
+function buildOldExercise(r) {
+  return { id: newUuid(), name: r[0], muscles: parseMuscles(r[1]), archived: r[2] === 'true' };
+}
+
+function resolveNameToId(nameToId, name) { return nameToId[name] ?? name; }
+
+const XLOOKUP_FORMULA = `=IFERROR(XLOOKUP(INDIRECT("E"&ROW()), Exercises!A:A, Exercises!B:B), INDIRECT("E"&ROW()))`;
+
+function buildNewSetRow(r, nameToId) {
+  return [
+    field(r, 0), field(r, 1), field(r, 2), XLOOKUP_FORMULA,
+    resolveNameToId(nameToId, field(r, 3)), field(r, 4), field(r, 5), field(r, 6), field(r, 7)
+  ];
+}
+
+function findDataRowIndex(rows, id) {
+  return rows.findIndex((r, i) => i > 0 && r[0] === id);
+}
+
 let sheetId = null;
 export function setSheetId(id) { sheetId = id; }
 

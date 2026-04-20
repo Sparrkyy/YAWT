@@ -14,6 +14,69 @@ function InfoIcon() {
   );
 }
 
+function filterByUser(measurements, user) {
+  return user ? measurements.filter(m => m.user === user) : measurements;
+}
+
+function groupByDate(measurements) {
+  return measurements.reduce((acc, m) => {
+    if (!acc[m.date]) acc[m.date] = [];
+    acc[m.date].push(m);
+    return acc;
+  }, {});
+}
+
+function labelForType(key) {
+  return MEASUREMENT_TYPES.find(t => t.key === key)?.label ?? key;
+}
+
+function toggleHint(expanded, key) {
+  return expanded === key ? null : key;
+}
+
+function MaybeHint({ expanded, type, t }) {
+  if (expanded !== type.key) return null;
+  return (
+    <div className="measurement-hint">
+      {t.guideFile && (
+        <img
+          src={`${import.meta.env.BASE_URL}measurement-guides/${t.guideFile}`}
+          alt={`How to measure ${t.label}`}
+          className="measurement-guide-img"
+          loading="lazy"
+        />
+      )}
+      <p className="measurement-hint-text">{t.hint}</p>
+    </div>
+  );
+}
+
+function renderHistorySection(sortedDates, byDate, handleRequestDelete) {
+  if (sortedDates.length === 0) {
+    return <div className="empty-state">No measurements logged yet.</div>;
+  }
+  return sortedDates.map(d => (
+    <div key={d} className="history-day">
+      <h3 className="history-date">
+        {new Date(d + 'T12:00:00').toLocaleDateString('en-US', {
+          weekday: 'short', month: 'short', day: 'numeric'
+        })}
+      </h3>
+      {byDate[d].map(m => (
+        <SwipeableRow key={m.id} onDelete={({ snapBack }) => handleRequestDelete(m.id, snapBack)}>
+          <div className="set-row">
+            <span className="set-exercise">{labelForType(m.type)}</span>
+            <span className="set-stats">{m.value} {m.unit}</span>
+            {m.notes && <span className="set-notes">{m.notes}</span>}
+          </div>
+        </SwipeableRow>
+      ))}
+    </div>
+  ));
+}
+
+function userBtnClass(activeUser, u) { return `user-btn${activeUser === u ? ' active' : ''}`; }
+
 export default function MeasurementsView({ measurements, onMeasurementsChange, activeUser, onUserChange, users = [] }) {
   const today = new Date().toLocaleDateString('en-CA');
   const [date, setDate] = useState(today);
@@ -70,30 +133,16 @@ export default function MeasurementsView({ measurements, onMeasurementsChange, a
     setPendingDelete(null);
   }
 
-  const filtered = activeUser ? measurements.filter(m => m.user === activeUser) : measurements;
-
-  const byDate = filtered.reduce((acc, m) => {
-    if (!acc[m.date]) acc[m.date] = [];
-    acc[m.date].push(m);
-    return acc;
-  }, {});
-
+  const filtered = filterByUser(measurements, activeUser);
+  const byDate = groupByDate(filtered);
   const sortedDates = Object.keys(byDate).sort((a, b) => b.localeCompare(a));
-
-  function labelForType(key) {
-    return MEASUREMENT_TYPES.find(t => t.key === key)?.label ?? key;
-  }
 
   return (
     <div className="view">
       {users.length > 0 && (
         <div className="user-toggle">
           {users.map(u => (
-            <button
-              key={u}
-              className={`user-btn ${activeUser === u ? 'active' : ''}`}
-              onClick={() => onUserChange(u)}
-            >
+            <button key={u} className={userBtnClass(activeUser, u)} onClick={() => onUserChange(u)}>
               {u}
             </button>
           ))}
@@ -122,7 +171,7 @@ export default function MeasurementsView({ measurements, onMeasurementsChange, a
                     <button
                       type="button"
                       className="measurement-hint-btn"
-                      onClick={() => setExpandedHint(expandedHint === t.key ? null : t.key)}
+                      onClick={() => setExpandedHint(toggleHint(expandedHint, t.key))}
                       aria-label={`Measurement guide for ${t.label}`}
                     >
                       <InfoIcon />
@@ -142,19 +191,7 @@ export default function MeasurementsView({ measurements, onMeasurementsChange, a
                     <span className="measurement-unit-label">{t.unit}</span>
                   </div>
                 </div>
-                {expandedHint === t.key && (
-                  <div className="measurement-hint">
-                    {t.guideFile && (
-                      <img
-                        src={`${import.meta.env.BASE_URL}measurement-guides/${t.guideFile}`}
-                        alt={`How to measure ${t.label}`}
-                        className="measurement-guide-img"
-                        loading="lazy"
-                      />
-                    )}
-                    <p className="measurement-hint-text">{t.hint}</p>
-                  </div>
-                )}
+                <MaybeHint expanded={expandedHint} type={t} t={t} />
               </div>
             ))}
           </div>
@@ -167,29 +204,7 @@ export default function MeasurementsView({ measurements, onMeasurementsChange, a
 
       <div className="measurements-history">
         <div className="exercise-group-header" style={{ paddingTop: 4 }}>History</div>
-
-        {sortedDates.length === 0 ? (
-          <div className="empty-state">No measurements logged yet.</div>
-        ) : (
-          sortedDates.map(d => (
-            <div key={d} className="history-day">
-              <h3 className="history-date">
-                {new Date(d + 'T12:00:00').toLocaleDateString('en-US', {
-                  weekday: 'short', month: 'short', day: 'numeric'
-                })}
-              </h3>
-              {byDate[d].map(m => (
-                <SwipeableRow key={m.id} onDelete={({ snapBack }) => handleRequestDelete(m.id, snapBack)}>
-                  <div className="set-row">
-                    <span className="set-exercise">{labelForType(m.type)}</span>
-                    <span className="set-stats">{m.value} {m.unit}</span>
-                    {m.notes && <span className="set-notes">{m.notes}</span>}
-                  </div>
-                </SwipeableRow>
-              ))}
-            </div>
-          ))
-        )}
+        {renderHistorySection(sortedDates, byDate, handleRequestDelete)}
       </div>
 
       {pendingDelete && (

@@ -1,3 +1,7 @@
+function handleBackdropClick(e, onCancel) {
+  if (e.target === e.currentTarget) onCancel();
+}
+
 export default function ConfirmDialog({
   title = 'Delete set?',
   confirmLabel = 'Delete',
@@ -6,7 +10,7 @@ export default function ConfirmDialog({
   onCancel,
 }) {
   return (
-    <div className="sheet-overlay" onClick={e => { if (e.target === e.currentTarget) onCancel(); }}>
+    <div className="sheet-overlay" onClick={e => handleBackdropClick(e, onCancel)}>
       <div className="sheet confirm-sheet">
         <div className="sheet-header">
           <span className="sheet-title">{title}</span>

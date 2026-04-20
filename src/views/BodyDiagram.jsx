@@ -38,14 +38,21 @@ for (const key of MUSCLE_KEYS) {
   }
 }
 
+function muscleBucket(value, maxValue) {
+  const t = Math.min(value / maxValue, 1);
+  return Math.max(0, Math.min(INTENSITY_LEVELS - 1, Math.round(t * (INTENSITY_LEVELS - 1))));
+}
+
+function augmentSets(effectiveSets) {
+  return {
+    ...effectiveSets,
+    anteriorDelts: (effectiveSets.frontDelts ?? 0) + (effectiveSets.sideDelts ?? 0)
+  };
+}
+
 function buildModelData(effectiveSets, maxValue) {
   const data = [];
-
-  // Combine front and side delts — the SVG library has no lateral-delt slug
-  const augmented = {
-    ...effectiveSets,
-    anteriorDelts: (effectiveSets.frontDelts ?? 0) + (effectiveSets.sideDelts ?? 0),
-  };
+  const augmented = augmentSets(effectiveSets);
 
   for (let mi = 0; mi < MUSCLE_KEYS.length; mi++) {
     const muscle = MUSCLE_KEYS[mi];
@@ -53,9 +60,8 @@ function buildModelData(effectiveSets, maxValue) {
     const value = augmented[muscle] ?? 0;
     if (value <= 0) continue;
 
-    const t = Math.min(value / maxValue, 1);
-    const bucket = Math.max(0, Math.min(INTENSITY_LEVELS - 1, Math.round(t * (INTENSITY_LEVELS - 1))));
-    const frequency = mi * INTENSITY_LEVELS + bucket + 1; // 1-based
+    const bucket = muscleBucket(value, maxValue);
+    const frequency = mi * INTENSITY_LEVELS + bucket + 1;
 
     data.push({
       name: muscle,
@@ -67,6 +73,9 @@ function buildModelData(effectiveSets, maxValue) {
   return data;
 }
 
+function sideClass(side, btn) { return `side-btn${side === btn ? ' active' : ''}`; }
+function modelType(side) { return side === 'front' ? 'anterior' : 'posterior'; }
+
 export default function BodyDiagram({ effectiveSets, side, onSideChange }) {
   const max = Math.max(...Object.values(effectiveSets), 4);
   const data = buildModelData(effectiveSets, max);
@@ -74,23 +83,17 @@ export default function BodyDiagram({ effectiveSets, side, onSideChange }) {
   return (
     <div className="body-diagram">
       <div className="side-toggle">
-        <button
-          className={`side-btn ${side === 'front' ? 'active' : ''}`}
-          onClick={() => onSideChange('front')}
-        >
+        <button className={sideClass(side, 'front')} onClick={() => onSideChange('front')}>
           Front
         </button>
-        <button
-          className={`side-btn ${side === 'back' ? 'active' : ''}`}
-          onClick={() => onSideChange('back')}
-        >
+        <button className={sideClass(side, 'back')} onClick={() => onSideChange('back')}>
           Back
         </button>
       </div>
 
       <Model
         data={data}
-        type={side === 'front' ? 'anterior' : 'posterior'}
+        type={modelType(side)}
         highlightedColors={HIGHLIGHT_COLORS}
         style={{ width: '100%', maxWidth: '220px', padding: '0' }}
       />

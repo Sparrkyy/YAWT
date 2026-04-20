@@ -14,6 +14,16 @@ function fmt(v) {
   return parseFloat(v.toFixed(2)).toString();
 }
 
+function findDuplicate(exercises, name, currentId) {
+  return exercises.find(e => e.name === name && e.id !== currentId);
+}
+
+async function maybeRename(exercise, trimmedName) {
+  if (trimmedName !== exercise.name) {
+    await renameExercise(exercise.id, trimmedName);
+  }
+}
+
 export default function ExerciseEditSheet({ exercise, exercises = [], onSave, onClose }) {
   const [draftName, setDraftName] = useState(exercise.name);
   const [draft, setDraft] = useState({ ...exercise.muscles });
@@ -29,17 +39,14 @@ export default function ExerciseEditSheet({ exercise, exercises = [], onSave, on
 
   async function handleSave() {
     const trimmedName = draftName.trim();
-    /* istanbul ignore next */
     if (!trimmedName) return;
-    const duplicate = exercises.find(e => e.name === trimmedName && e.id !== exercise.id);
+    const duplicate = findDuplicate(exercises, trimmedName, exercise.id);
     if (duplicate) {
       setNameError(`"${trimmedName}" already exists`);
       return;
     }
     setNameError('');
-    if (trimmedName !== exercise.name) {
-      await renameExercise(exercise.id, trimmedName);
-    }
+    await maybeRename(exercise, trimmedName);
     await onSave(draft);
     onClose();
   }

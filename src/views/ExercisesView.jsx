@@ -13,6 +13,16 @@ const MUSCLE_LABELS = {
   calves: 'Calves', abs: 'Abs', lowBack: 'Low Back',
 };
 
+function addLabel(adding) { return adding ? 'Cancel' : '+ Add'; }
+
+function primaryMuscles(muscles) {
+  return Object.entries(muscles)
+    .filter(([, v]) => v > 0)
+    .sort(([, a], [, b]) => b - a)
+    .map(([k]) => MUSCLE_LABELS[k])
+    .join(', ');
+}
+
 export default function ExercisesView({ exercises, onExercisesChange }) {
   const [adding, setAdding] = useState(false);
   const [name, setName] = useState('');
@@ -46,14 +56,6 @@ export default function ExercisesView({ exercises, onExercisesChange }) {
     setPendingArchive(null);
   }
 
-  function primaryMuscles(muscles) {
-    return Object.entries(muscles)
-      .filter(([, v]) => v > 0)
-      .sort(([, a], [, b]) => b - a)
-      .map(([k]) => MUSCLE_LABELS[k])
-      .join(', ');
-  }
-
   const visibleExercises = exercises.filter(ex => !ex.archived);
 
   return (
@@ -61,7 +63,7 @@ export default function ExercisesView({ exercises, onExercisesChange }) {
       <div className="exercises-header">
         <h3>Exercises</h3>
         <button className="btn-small" onClick={() => setAdding(!adding)}>
-          {adding ? 'Cancel' : '+ Add'}
+          {addLabel(adding)}
         </button>
       </div>
 

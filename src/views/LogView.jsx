@@ -30,28 +30,58 @@ function resolveExerciseId(exercises, exercise) {
   return ex ? ex.id : '';
 }
 
+function getActivePlan(plans, id) { return plans.find(p => p.id === id) ?? null; }
+
+function getVisibleExercises(exercises, plan) {
+  return plan ? exercises.filter(ex => plan.exerciseIds.includes(ex.id)) : exercises;
+}
+
+async function fireCelebration(label, exercise, activeUser, numWeight, numReps, today, exerciseId, notes, onSetsChange, setLogDraft) {
+  await addSet({
+    date: today,
+    user: activeUser,
+    exercise,
+    exerciseId,
+    reps: numReps,
+    weight: numWeight,
+    notes,
+    createdAt: new Date().toISOString(),
+  });
+  setLogDraft(d => ({ ...d, reps: '', notes: '' }));
+  await onSetsChange();
+  return label;
+}
+
+function handleExerciseChange(sets, activeUser, setLogDraft) {
+  return (newExercise) => {
+    const last = getLastSet(sets, newExercise, activeUser);
+    setLogDraft(d => ({ ...d, exercise: newExercise, weight: last ? String(last.weight) : '' }));
+  };
+}
+
+function planChipClass(activePlanId, p) { return `plan-chip${activePlanId === p.id ? ' active' : ''}`; }
+function userBtnClass(activeUser, u) { return `user-btn${activeUser === u ? ' active' : ''}`; }
+
 export default function LogView({ exercises, plans = [], sets, onSetsChange, activeUser, onUserChange, logDraft, setLogDraft, users = [], useAccordionPicker = false }) {
   const [pendingDelete, setPendingDelete] = useState(null);
   const [fireworksLabel, setFireworksLabel] = useState(null);
   const [activePlanId, setActivePlanId] = useState(null);
   const { exercise, reps, weight, notes } = logDraft;
 
-  const activePlan = plans.find(p => p.id === activePlanId) ?? null;
-  const visibleExercises = activePlan
-    ? exercises.filter(ex => activePlan.exerciseIds.includes(ex.id))
-    : exercises;
+  const activePlan = getActivePlan(plans, activePlanId);
+  const visibleExercises = getVisibleExercises(exercises, activePlan);
 
   function handlePlanSelect(planId) {
     setActivePlanId(planId);
     if (planId === null) return;
-    const plan = plans.find(p => p.id === planId);
+    const plan = getActivePlan(plans, planId);
     const currentEx = exercises.find(ex => ex.name === exercise);
     if (shouldClearExercise(plan, currentEx)) {
       setLogDraft(d => ({ ...d, exercise: '', weight: '' }));
     }
   }
 
-  const today = new Date().toLocaleDateString('en-CA'); // YYYY-MM-DD
+  const today = new Date().toLocaleDateString('en-CA');
 
   const todaysSets = sets
     .filter(s => s.date === today)
@@ -87,20 +117,10 @@ export default function LogView({ exercises, plans = [], sets, onSetsChange, act
     const numReps = parseNumReps(reps);
     const numWeight = Number(weight);
     const label = getCelebrationLabel(sets, exercise, activeUser, numWeight, numReps);
+    const exerciseId = resolveExerciseId(exercises, exercise);
     try {
-      await addSet({
-        date: today,
-        user: activeUser,
-        exercise,
-        exerciseId: resolveExerciseId(exercises, exercise),
-        reps: numReps,
-        weight: numWeight,
-        notes,
-        createdAt: new Date().toISOString(),
-      });
-      setLogDraft(d => ({ ...d, reps: '', notes: '' }));
-      await onSetsChange();
-      if (label) setFireworksLabel(label);
+      const result = await fireCelebration(label, exercise, activeUser, numWeight, numReps, today, exerciseId, notes, onSetsChange, setLogDraft);
+      if (result) setFireworksLabel(result);
     } catch { /* error dialog shown by transport layer */ }
   }
 
@@ -108,11 +128,7 @@ export default function LogView({ exercises, plans = [], sets, onSetsChange, act
     <div className="view">
       <div className="user-toggle">
         {users.map(u => (
-          <button
-            key={u}
-            className={`user-btn ${activeUser === u ? 'active' : ''}`}
-            onClick={() => onUserChange(u)}
-          >
+          <button key={u} className={userBtnClass(activeUser, u)} onClick={() => onUserChange(u)}>
             {u}
           </button>
         ))}
@@ -120,20 +136,11 @@ export default function LogView({ exercises, plans = [], sets, onSetsChange, act
 
       {plans.length > 0 && (
         <div className="plan-chips">
-          <button
-            type="button"
-            className={`plan-chip ${activePlanId === null ? 'active' : ''}`}
-            onClick={() => handlePlanSelect(null)}
-          >
+          <button type="button" className={`plan-chip${activePlanId === null ? ' active' : ''}`} onClick={() => handlePlanSelect(null)}>
             All
           </button>
           {plans.map(p => (
-            <button
-              key={p.id}
-              type="button"
-              className={`plan-chip ${activePlanId === p.id ? 'active' : ''}`}
-              onClick={() => handlePlanSelect(p.id)}
-            >
+            <button key={p.id} type="button" className={planChipClass(activePlanId, p)} onClick={() => handlePlanSelect(p.id)}>
               {p.name}
             </button>
           ))}
@@ -147,21 +154,13 @@ export default function LogView({ exercises, plans = [], sets, onSetsChange, act
             <ExercisePickerButton
               exercises={visibleExercises}
               value={exercise}
-              onChange={e => {
-                const newExercise = e.target.value;
-                const last = getLastSet(sets, newExercise, activeUser);
-                setLogDraft(d => ({ ...d, exercise: newExercise, weight: last ? String(last.weight) : '' }));
-              }}
+              onChange={e => handleExerciseChange(sets, activeUser, setLogDraft)(e.target.value)}
             />
           ) : (
             <ExerciseSelector
               exercises={visibleExercises}
               value={exercise}
-              onChange={e => {
-                const newExercise = e.target.value;
-                const last = getLastSet(sets, newExercise, activeUser);
-                setLogDraft(d => ({ ...d, exercise: newExercise, weight: last ? String(last.weight) : '' }));
-              }}
+              onChange={e => handleExerciseChange(sets, activeUser, setLogDraft)(e.target.value)}
               required
             />
           )}
