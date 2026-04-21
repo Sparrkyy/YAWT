@@ -2,7 +2,7 @@
 .app {
   display: flex;
   flex-direction: column;
-  height: 100dvh;
+  height: 100svh;
   max-width: 480px;
   margin: 0 auto;
   transition: background 0.25s;
@@ -49,7 +49,7 @@
 .sign-in-screen {
   justify-content: center;
   align-items: center;
-  height: 100dvh;
+  height: 100svh;
 }
 
 .sign-in-card {
@@ -98,6 +98,7 @@
 .app-main {
   flex: 1;
   overflow-y: auto;
+  padding-bottom: calc(var(--nav-height) + env(safe-area-inset-bottom));
 }
 
 /* Bottom nav */
