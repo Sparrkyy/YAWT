@@ -55,6 +55,103 @@ function periodBtnClass(period, p) { return `period-btn${period === p ? ' active
 
 const periodLabels = { week: 'This Week', month: 'This Month', lastMonth: 'Last Month', year: 'This Year' };
 
+function computeEffectiveSets(sets, exercises, period, activeUser) {
+  const { start, end } = getDateRange(period);
+  const startStr = start.toLocaleDateString('en-CA');
+  const endStr = end.toLocaleDateString('en-CA');
+  const exMap = Object.fromEntries(exercises.map(ex => [ex.name, ex]));
+  const totals = {};
+  for (const s of sets) {
+    if (s.date < startStr || s.date > endStr) continue;
+    if (s.user !== activeUser) continue;
+    const ex = exMap[s.exercise];
+    if (!ex) continue;
+    for (const [muscle, w] of Object.entries(ex.muscles)) {
+      totals[muscle] = (totals[muscle] ?? 0) + w;
+    }
+  }
+  return totals;
+}
+
+function UserToggle({ users, activeUser, onUserChange }) {
+  return (
+    <div className="user-toggle">
+      {users.map(u => (
+        <button key={u} className={userBtnClass(activeUser, u)} onClick={() => onUserChange(u)}>
+          {u}
+        </button>
+      ))}
+    </div>
+  );
+}
+
+function PeriodSelector({ period, onPeriodChange }) {
+  return (
+    <div className="period-selector">
+      {['week', 'month', 'lastMonth', 'year'].map(p => (
+        <button key={p} className={periodBtnClass(period, p)} onClick={() => onPeriodChange(p)}>
+          {periodLabels[p]}
+        </button>
+      ))}
+    </div>
+  );
+}
+
+function MuscleTotals({ rankedMuscles, weeksInPeriod, period, lastMuscleHit }) {
+  if (rankedMuscles.length === 0) {
+    return <p className="empty-state">No sets logged in this period.</p>;
+  }
+  return (
+    <div className="muscle-totals">
+      {rankedMuscles.map(([muscle, value]) => (
+        <div key={muscle} className="muscle-total-row">
+          <span className="muscle-name">{MUSCLE_LABELS[muscle] ?? muscle}</span>
+          <div className="muscle-right">
+            <span className="muscle-total-value">{parseFloat(value.toFixed(2))} sets</span>
+            {period !== 'week' && (
+              <span className="muscle-avg">~{(value / weeksInPeriod).toFixed(2)}/wk</span>
+            )}
+            {lastMuscleHit[muscle] && (
+              <span className="muscle-last">last performed {formatShortDate(lastMuscleHit[muscle])}</span>
+            )}
+          </div>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function ExerciseProgress({ progressData, selectedExercise, exercises, onExerciseChange }) {
+  return (
+    <div className="exercise-progress">
+      <h3>Exercise Progress</h3>
+      <ExerciseSelector
+        exercises={exercises}
+        value={selectedExercise}
+        onChange={e => onExerciseChange(e.target.value)}
+        includeArchived
+        aria-label="Select exercise"
+      />
+      {progressData.length > 0 ? (
+        <ResponsiveContainer width="100%" height={250}>
+          <LineChart data={progressData} margin={{ top: 5, right: 20, left: 10, bottom: 5 }}>
+            <CartesianGrid strokeDasharray="3 3" />
+            <XAxis dataKey="date" tickFormatter={formatDate} />
+            <YAxis
+              label={{ value: 'lbs (e1RM)', angle: -90, position: 'insideLeft', offset: 10 }}
+              domain={['auto', 'auto']}
+            />
+            <Tooltip content={<CustomTooltip />} />
+            <Line type="monotone" dataKey="e1rm" dot stroke="#4f8ef7" strokeWidth={2} />
+          </LineChart>
+        </ResponsiveContainer>
+      ) : (
+        <p className="empty-state">No sets logged for this exercise yet.</p>
+      )}
+    </div>
+  );
+}
+
 export default function StatsView({ sets, exercises, activeUser, onUserChange, users = [] }) {
   const [period, setPeriod] = useState('week');
   const [side, setSide] = useState('front');
@@ -70,23 +167,10 @@ export default function StatsView({ sets, exercises, activeUser, onUserChange, u
 
   useEffect(() => { setSelectedExercise(defaultExercise); }, [activeUser]);
 
-  const effectiveSets = useMemo(() => {
-    const { start, end } = getDateRange(period);
-    const startStr = start.toLocaleDateString('en-CA');
-    const endStr   = end.toLocaleDateString('en-CA');
-    const exMap = Object.fromEntries(exercises.map(ex => [ex.name, ex]));
-    const totals = {};
-    for (const s of sets) {
-      if (s.date < startStr || s.date > endStr) continue;
-      if (s.user !== activeUser) continue;
-      const ex = exMap[s.exercise];
-      if (!ex) continue;
-      for (const [muscle, w] of Object.entries(ex.muscles)) {
-        totals[muscle] = (totals[muscle] ?? 0) + w;
-      }
-    }
-    return totals;
-  }, [sets, exercises, period, activeUser]);
+  const effectiveSets = useMemo(
+    () => computeEffectiveSets(sets, exercises, period, activeUser),
+    [sets, exercises, period, activeUser]
+  );
 
   const progressData = useMemo(
     () => getExerciseProgress(sets, selectedExercise, activeUser),
@@ -111,77 +195,16 @@ export default function StatsView({ sets, exercises, activeUser, onUserChange, u
     .filter(([, v]) => v > 0)
     .sort(([, a], [, b]) => b - a);
 
-  function renderMuscleTotals() {
-    if (rankedMuscles.length === 0) {
-      return <p className="empty-state">No sets logged in this period.</p>;
-    }
-    return (
-      <div className="muscle-totals">
-        {rankedMuscles.map(([muscle, value]) => (
-          <div key={muscle} className="muscle-total-row">
-            <span className="muscle-name">{MUSCLE_LABELS[muscle] ?? muscle}</span>
-            <div className="muscle-right">
-              <span className="muscle-total-value">{parseFloat(value.toFixed(2))} sets</span>
-              {period !== 'week' && (
-                <span className="muscle-avg">~{(value / weeksInPeriod).toFixed(2)}/wk</span>
-              )}
-              {lastMuscleHit[muscle] && (
-                <span className="muscle-last">last performed {formatShortDate(lastMuscleHit[muscle])}</span>
-              )}
-            </div>
-          </div>
-        ))}
-      </div>
-    );
-  }
-
   return (
     <div className="view">
-      <div className="user-toggle">
-        {users.map(u => (
-          <button key={u} className={userBtnClass(activeUser, u)} onClick={() => onUserChange(u)}>
-            {u}
-          </button>
-        ))}
-      </div>
-      <div className="period-selector">
-        {['week', 'month', 'lastMonth', 'year'].map(p => (
-          <button key={p} className={periodBtnClass(period, p)} onClick={() => setPeriod(p)}>
-            {periodLabels[p]}
-          </button>
-        ))}
-      </div>
+      <UserToggle users={users} activeUser={activeUser} onUserChange={onUserChange} />
+      <PeriodSelector period={period} onPeriodChange={setPeriod} />
 
       <BodyDiagram effectiveSets={effectiveSets} side={side} onSideChange={setSide} />
 
-      {renderMuscleTotals()}
+      <MuscleTotals rankedMuscles={rankedMuscles} weeksInPeriod={weeksInPeriod} period={period} lastMuscleHit={lastMuscleHit} />
 
-      <div className="exercise-progress">
-        <h3>Exercise Progress</h3>
-        <ExerciseSelector
-          exercises={exercises}
-          value={selectedExercise}
-          onChange={e => setSelectedExercise(e.target.value)}
-          includeArchived
-          aria-label="Select exercise"
-        />
-        {progressData.length > 0 ? (
-          <ResponsiveContainer width="100%" height={250}>
-            <LineChart data={progressData} margin={{ top: 5, right: 20, left: 10, bottom: 5 }}>
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="date" tickFormatter={formatDate} />
-              <YAxis
-                label={{ value: 'lbs (e1RM)', angle: -90, position: 'insideLeft', offset: 10 }}
-                domain={['auto', 'auto']}
-              />
-              <Tooltip content={<CustomTooltip />} />
-              <Line type="monotone" dataKey="e1rm" dot stroke="#4f8ef7" strokeWidth={2} />
-            </LineChart>
-          </ResponsiveContainer>
-        ) : (
-          <p className="empty-state">No sets logged for this exercise yet.</p>
-        )}
-      </div>
+      <ExerciseProgress progressData={progressData} selectedExercise={selectedExercise} exercises={exercises} onExerciseChange={setSelectedExercise} />
     </div>
   );
 }
