@@ -195,7 +195,7 @@ export default function StatsView({ sets, exercises, activeUser, onUserChange, u
 
   useEffect(() => {
     setSelectedExercise(defaultExercise);
-  }, [activeUser]);
+  }, [activeUser, defaultExercise]);
 
   const effectiveSets = useMemo(
     () => computeEffectiveSets(sets, exercises, period, activeUser),

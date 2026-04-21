@@ -212,7 +212,7 @@ export default function App() {
   }, [darkMode]);
 
   // Re-initialize drafts whenever the user list changes
-  useEffect(() => {
+useEffect(() => {
     setUserDrafts(Object.fromEntries(users.map((u) => [u, { reps: '', weight: '', notes: '' }])));
     if (users.length > 0 && !users.includes(activeUser)) {
       setActiveUser(users[0]);
@@ -274,7 +274,7 @@ export default function App() {
         setTimeout(tryInit, 100);
       }
     }
-    tryInit();
+tryInit();
   }, []);
 
   async function onSignIn() {

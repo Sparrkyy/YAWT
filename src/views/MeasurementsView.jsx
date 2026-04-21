@@ -180,8 +180,9 @@ export default function MeasurementsView({
 
       <form className="log-form" onSubmit={handleSubmit}>
         <div className="field">
-          <label>Date</label>
+          <label htmlFor="measurement-date-input">Date</label>
           <input
+            id="measurement-date-input"
             type="date"
             className="setup-input"
             value={date}

@@ -80,8 +80,9 @@ export default function ExerciseEditSheet({ exercise, exercises = [], onSave, on
             className="field"
             style={{ padding: '16px 0', borderBottom: '1px solid var(--border)', marginBottom: 0 }}
           >
-            <label>Exercise Name</label>
+            <label htmlFor="exercise-name-input">Exercise Name</label>
             <input
+              id="exercise-name-input"
               type="text"
               value={draftName}
               onChange={(e) => {

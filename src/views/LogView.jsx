@@ -176,18 +176,23 @@ function LogForm({
   onSubmit,
   isExerciseReady,
 }) {
+  const weightId = 'weight-input';
+  const repsId = 'reps-input';
+  const notesId = 'notes-input';
   return (
     <form className="log-form" onSubmit={onSubmit}>
       <div className="field">
-        <label>Exercise</label>
+        <label htmlFor="exercise-select">Exercise</label>
         {useAccordionPicker ? (
           <ExercisePickerButton
+            id="exercise-select"
             exercises={visibleExercises}
             value={exercise}
             onChange={(e) => handleExerciseChange(sets, activeUser, setLogDraft)(e.target.value)}
           />
         ) : (
           <ExerciseSelector
+            id="exercise-select"
             exercises={visibleExercises}
             value={exercise}
             onChange={(e) => handleExerciseChange(sets, activeUser, setLogDraft)(e.target.value)}
@@ -201,8 +206,9 @@ function LogForm({
 
       <div className="field-row">
         <div className="field">
-          <label>Weight (lbs)</label>
+          <label htmlFor={weightId}>Weight (lbs)</label>
           <input
+            id={weightId}
             type="number"
             inputMode="decimal"
             placeholder="0"
@@ -214,8 +220,9 @@ function LogForm({
           />
         </div>
         <div className="field">
-          <label>Reps</label>
+          <label htmlFor={repsId}>Reps</label>
           <input
+            id={repsId}
             type="number"
             inputMode="numeric"
             placeholder="—"
@@ -227,8 +234,9 @@ function LogForm({
       </div>
 
       <div className="field">
-        <label>Notes</label>
+        <label htmlFor={notesId}>Notes</label>
         <input
+          id={notesId}
           type="text"
           placeholder="optional"
           value={notes}
