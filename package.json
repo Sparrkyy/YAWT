@@ -7,6 +7,8 @@
     "dev": "vite",
     "build": "vite build",
     "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "format": "prettier --write src/",
     "complexity": "eslint --config eslint.complexity.config.js src/",
     "preview": "vite preview",
     "test": "node -r ./e2e/polyfill-crypto-hash.cjs node_modules/.bin/vitest run",
@@ -40,6 +42,7 @@
     "jsdom": "^25.0.1",
     "msw": "^2.12.10",
     "playwright": "^1.58.2",
+    "prettier": "^3.8.3",
     "vite": "^5.4.21",
     "vite-plugin-pwa": "^1.2.0",
     "vitest": "^4.0.18"
