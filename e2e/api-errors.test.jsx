@@ -1,8 +1,8 @@
 import { render, screen, waitFor } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
 import { http, HttpResponse } from 'msw';
-import { worker } from './worker';
 import App from '../src/App';
+import { worker } from './worker';
 
 describe('API error dialog', () => {
   it('shows error dialog on initial load failure (GET Sets → 500)', async () => {

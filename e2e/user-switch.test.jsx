@@ -1,9 +1,9 @@
 import { render, screen, waitFor } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
 import { http, HttpResponse } from 'msw';
-import { worker } from './worker';
-import { MOCK_SETS_ROWS } from './mocks/data';
 import App from '../src/App';
+import { MOCK_SETS_ROWS } from './mocks/data';
+import { worker } from './worker';
 
 function getExerciseSelect() {
   return document.querySelector('.log-form select');

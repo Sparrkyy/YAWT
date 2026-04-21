@@ -1,6 +1,6 @@
 import { useState } from 'react';
-import { createNewSheet, validateSheet, migrateToGuids } from '../data/api';
 import ConfirmDialog from '../components/ConfirmDialog';
+import { createNewSheet, validateSheet, migrateToGuids } from '../data/api';
 
 async function validateAndLink(id, onSheetChange, setSheetInput, setSheetError, setSheetLoading) {
   setSheetLoading(true);
@@ -48,7 +48,6 @@ function SheetSection({
   onCreateClick,
   onCreateSheet,
   showConfirm,
-  onConfirmChange,
   onCancel,
 }) {
   return (
@@ -155,7 +154,6 @@ function AccountSection({ onSignOut }) {
 
 function UsersSection({
   users,
-  onUsersChange,
   newUser,
   setNewUser,
   handleAddUser,
@@ -278,7 +276,6 @@ export default function SettingsView({
 
       <UsersSection
         users={users}
-        onUsersChange={onUsersChange}
         newUser={newUser}
         setNewUser={setNewUser}
         handleAddUser={handleAddUser}

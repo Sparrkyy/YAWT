@@ -1,6 +1,6 @@
 import '@testing-library/jest-dom/vitest';
-import { resetMockData } from './mocks/handlers';
 import { mockGoogleGIS, seedLocalStorage, clearLocalStorage } from './helpers';
+import { resetMockData } from './mocks/handlers';
 import { worker } from './worker';
 
 beforeAll(async () => {

@@ -1,7 +1,7 @@
 import { useState } from 'react';
-import { deleteSet } from '../data/api';
-import SwipeableRow from '../components/SwipeableRow';
 import ConfirmDialog from '../components/ConfirmDialog';
+import SwipeableRow from '../components/SwipeableRow';
+import { deleteSet } from '../data/api';
 
 function formatStats(s) {
   const reps = s.reps != null ? `${s.reps} reps` : '—';

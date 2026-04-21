@@ -1,7 +1,7 @@
 import { render, screen, waitFor } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
-import { clearLocalStorage } from './helpers';
 import App from '../src/App';
+import { clearLocalStorage } from './helpers';
 
 function getNavButton(name) {
   return screen.getAllByRole('button').find(

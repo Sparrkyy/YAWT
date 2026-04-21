@@ -1,8 +1,10 @@
 import { useState } from 'react';
-import { addSet, deleteSet } from '../data/api';
-import SwipeableRow from '../components/SwipeableRow';
 import ConfirmDialog from '../components/ConfirmDialog';
+import ExercisePickerButton from '../components/ExercisePickerButton';
+import ExerciseSelector from '../components/ExerciseSelector';
 import Fireworks from '../components/Fireworks';
+import SwipeableRow from '../components/SwipeableRow';
+import { addSet, deleteSet } from '../data/api';
 import {
   getBestSet,
   getLastSet,
@@ -11,8 +13,6 @@ import {
   isNewBestSetEver,
   getRecentNotes,
 } from '../data/logUtils';
-import ExerciseSelector from '../components/ExerciseSelector';
-import ExercisePickerButton from '../components/ExercisePickerButton';
 
 function getCelebrationLabel(sets, exercise, user, weight, reps) {
   if (isNewBestSetEver(sets, exercise, user, weight, reps)) return 'New Best!';

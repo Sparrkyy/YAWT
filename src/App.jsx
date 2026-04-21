@@ -1,13 +1,6 @@
 import { useState, useEffect, useRef } from 'react';
-import {
-  initAuth,
-  signIn,
-  signOut,
-  getUserSub,
-  tryRestoreSession,
-  hasStoredSession,
-  trySilentSignIn,
-} from './data/auth';
+import ErrorDialog from './components/ErrorDialog';
+import LoadingOverlay from './components/LoadingOverlay';
 import {
   getSets,
   getExercises,
@@ -17,18 +10,25 @@ import {
   setApiErrorHandler,
   DEV_MODE,
 } from './data/api';
+import {
+  initAuth,
+  signIn,
+  signOut,
+  getUserSub,
+  tryRestoreSession,
+  hasStoredSession,
+  trySilentSignIn,
+} from './data/auth';
 import { setLoadingListener } from './data/loadingTracker';
 import { getLastSet, getLastExerciseToday, resolveExerciseOnUserSwitch } from './data/logUtils';
-import LogView from './views/LogView';
-import HistoryView from './views/HistoryView';
 import ExercisesView from './views/ExercisesView';
-import PlansView from './views/PlansView';
-import StatsView from './views/StatsView';
-import SetupView from './views/SetupView';
-import SettingsView from './views/SettingsView';
+import HistoryView from './views/HistoryView';
+import LogView from './views/LogView';
 import MeasurementsView from './views/MeasurementsView';
-import ErrorDialog from './components/ErrorDialog';
-import LoadingOverlay from './components/LoadingOverlay';
+import PlansView from './views/PlansView';
+import SettingsView from './views/SettingsView';
+import SetupView from './views/SetupView';
+import StatsView from './views/StatsView';
 import './App.css';
 
 const TABS = ['Log', 'History', 'Exercises', 'Plans', 'Stats', 'Measurements', 'Settings'];

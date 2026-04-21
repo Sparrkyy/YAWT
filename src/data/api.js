@@ -1,8 +1,8 @@
 // Routes API calls to mock or real backend depending on DEV_MODE.
 // DEV_MODE is active when the URL contains ?dev or VITE_DEV_MODE=true.
 
-import * as realApi from './sheetsApi';
 import * as mockApi from './mockApi';
+import * as realApi from './sheetsApi';
 
 export const DEV_MODE =
   new URLSearchParams(window.location.search).has('dev') ||

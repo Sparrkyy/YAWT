@@ -1,7 +1,7 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
-import HistoryView from '../views/HistoryView';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
 import * as api from '../data/api';
+import HistoryView from '../views/HistoryView';
 
 vi.mock('../data/api', () => ({ deleteSet: vi.fn(() => Promise.resolve()) }));
 vi.mock('../components/SwipeableRow', () => ({

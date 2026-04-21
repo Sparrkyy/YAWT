@@ -8,10 +8,10 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from 'recharts';
-import BodyDiagram from './BodyDiagram';
-import { getDateRange, getExerciseProgress, getLastMuscleHitDates } from '../data/statsUtils';
-import { groupExercises } from '../data/grouping';
 import ExerciseSelector from '../components/ExerciseSelector';
+import { groupExercises } from '../data/grouping';
+import { getDateRange, getExerciseProgress, getLastMuscleHitDates } from '../data/statsUtils';
+import BodyDiagram from './BodyDiagram';
 
 const MUSCLE_LABELS = {
   chest: 'Chest',

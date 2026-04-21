@@ -1,5 +1,5 @@
-import globals from 'globals'
 import reactHooks from 'eslint-plugin-react-hooks'
+import globals from 'globals'
 
 export default [
   {

@@ -1,8 +1,8 @@
 import { useState } from 'react';
+import ConfirmDialog from '../components/ConfirmDialog';
+import SwipeableRow from '../components/SwipeableRow';
 import { addMeasurement, deleteMeasurement } from '../data/api';
 import { MEASUREMENT_TYPES, MEASUREMENT_GROUPS } from '../data/measurementTypes';
-import SwipeableRow from '../components/SwipeableRow';
-import ConfirmDialog from '../components/ConfirmDialog';
 
 function InfoIcon() {
   return (

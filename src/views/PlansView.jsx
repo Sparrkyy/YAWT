@@ -78,7 +78,7 @@ export default function PlansView({ exercises, plans, onPlansChange }) {
         <PlanEditSheet
           plan={editingPlan}
           exercises={exercises}
-          onSave={async (updatedPlan) => {
+          onSave={async () => {
             await onPlansChange();
             setEditingPlan(null);
           }}

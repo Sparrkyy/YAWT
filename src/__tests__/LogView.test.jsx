@@ -1,7 +1,7 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
-import LogView from '../views/LogView';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
 import * as logUtils from '../data/logUtils';
+import LogView from '../views/LogView';
 
 vi.mock('../data/api', () => ({
   addSet: vi.fn(() => Promise.resolve()),

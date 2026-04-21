@@ -1,5 +1,5 @@
-import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { render, screen, fireEvent } from '@testing-library/react';
+import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import StatsView from '../views/StatsView';
 
 vi.mock('../views/BodyDiagram', () => ({ default: () => <div data-testid="body-diagram" /> }));

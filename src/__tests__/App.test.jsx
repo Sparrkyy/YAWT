@@ -1,6 +1,9 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { render, screen, fireEvent, act } from '@testing-library/react';
+import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import App from '../App';
+
+import { getSets, getExercises, getPlans, getMeasurements } from '../data/api';
+import { initAuth, signIn } from '../data/auth';
 
 vi.mock('../data/auth', () => ({
   initAuth: vi.fn(),
@@ -35,9 +38,6 @@ vi.mock('../views/MeasurementsView', () => ({
   default: () => <div data-testid="measurements-view" />,
 }));
 vi.mock('../views/SettingsView', () => ({ default: () => <div data-testid="settings-view" /> }));
-
-import { initAuth, signIn } from '../data/auth';
-import { getSets, getExercises, getPlans, getMeasurements } from '../data/api';
 
 let capturedOnSignIn;
 

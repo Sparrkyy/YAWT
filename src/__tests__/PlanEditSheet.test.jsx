@@ -1,7 +1,7 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
-import PlanEditSheet from '../views/PlanEditSheet';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
 import * as api from '../data/api';
+import PlanEditSheet from '../views/PlanEditSheet';
 
 vi.mock('../data/api', () => ({
   updatePlan: vi.fn(() => Promise.resolve()),
