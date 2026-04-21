@@ -1,46 +1,83 @@
 import { getToken } from './auth';
 import { startLoading, stopLoading } from './loadingTracker';
 
-function field(row, i, def = '') { return row[i] ?? def; }
+function field(row, i, def = '') {
+  return row[i] ?? def;
+}
 
-function parseReps(v) { return v !== '' && v != null ? Number(v) : null; }
+function parseReps(v) {
+  return v !== '' && v != null ? Number(v) : null;
+}
 
 function parseMuscles(json) {
-  try { return JSON.parse(json ?? '{}'); } catch { return {}; }
+  try {
+    return JSON.parse(json ?? '{}');
+  } catch {
+    return {};
+  }
 }
 
 function parseExerciseIds(json) {
-  try { return JSON.parse(json ?? '[]'); } catch { return []; }
+  try {
+    return JSON.parse(json ?? '[]');
+  } catch {
+    return [];
+  }
 }
 
-function resolveSetExerciseId(set) { return set.exerciseId ?? set.exercise ?? ''; }
+function resolveSetExerciseId(set) {
+  return set.exerciseId ?? set.exercise ?? '';
+}
 
-function repsCellValue(reps) { return reps != null ? reps : ''; }
+function repsCellValue(reps) {
+  return reps != null ? reps : '';
+}
 
-function findSheet(sheets, title) { return (sheets ?? []).find(s => s.properties.title === title); }
+function findSheet(sheets, title) {
+  return (sheets ?? []).find((s) => s.properties.title === title);
+}
 
-function sheetProperties(sheet) { return sheet?.properties; }
+function sheetProperties(sheet) {
+  return sheet?.properties;
+}
 
-function sheetGid(sheet) { return sheetProperties(sheet)?.sheetId ?? null; }
+function sheetGid(sheet) {
+  return sheetProperties(sheet)?.sheetId ?? null;
+}
 
-function sheetRows(data) { return (data.values ?? []).slice(1); }
+function sheetRows(data) {
+  return (data.values ?? []).slice(1);
+}
 
-function firstCell(data) { return data.values?.[0]?.[0]; }
+function firstCell(data) {
+  return data.values?.[0]?.[0];
+}
 
-function getHeaderValue(data) { return (firstCell(data) ?? '').toLowerCase(); }
+function getHeaderValue(data) {
+  return (firstCell(data) ?? '').toLowerCase();
+}
 
 function buildOldExercise(r) {
   return { id: newUuid(), name: r[0], muscles: parseMuscles(r[1]), archived: r[2] === 'true' };
 }
 
-function resolveNameToId(nameToId, name) { return nameToId[name] ?? name; }
+function resolveNameToId(nameToId, name) {
+  return nameToId[name] ?? name;
+}
 
 const XLOOKUP_FORMULA = `=IFERROR(XLOOKUP(INDIRECT("E"&ROW()), Exercises!A:A, Exercises!B:B), INDIRECT("E"&ROW()))`;
 
 function buildNewSetRow(r, nameToId) {
   return [
-    field(r, 0), field(r, 1), field(r, 2), XLOOKUP_FORMULA,
-    resolveNameToId(nameToId, field(r, 3)), field(r, 4), field(r, 5), field(r, 6), field(r, 7)
+    field(r, 0),
+    field(r, 1),
+    field(r, 2),
+    XLOOKUP_FORMULA,
+    resolveNameToId(nameToId, field(r, 3)),
+    field(r, 4),
+    field(r, 5),
+    field(r, 6),
+    field(r, 7),
   ];
 }
 
@@ -49,12 +86,18 @@ function findDataRowIndex(rows, id) {
 }
 
 let sheetId = null;
-export function setSheetId(id) { sheetId = id; }
+export function setSheetId(id) {
+  sheetId = id;
+}
 
 let errorCallback = null;
-export function setApiErrorHandler(handler) { errorCallback = handler; }
+export function setApiErrorHandler(handler) {
+  errorCallback = handler;
+}
 
-function getBase() { return `https://sheets.googleapis.com/v4/spreadsheets/${sheetId}`; }
+function getBase() {
+  return `https://sheets.googleapis.com/v4/spreadsheets/${sheetId}`;
+}
 
 // Numeric GID for each tab — found in the sheet URL fragment (#gid=...)
 // Sets tab is typically gid=0, Exercises is gid=1 (update if yours differ)
@@ -154,7 +197,10 @@ export async function getSets() {
   const data = await sheetsGet('/values/Sets!A:I', 'loading sets');
   const rows = data.values ?? [];
   // skip header row (index 0)
-  return rows.slice(1).map(rowToSet).filter(s => s.id);
+  return rows
+    .slice(1)
+    .map(rowToSet)
+    .filter((s) => s.id);
 }
 
 export async function addSet(set) {
@@ -177,18 +223,24 @@ export async function deleteSet(id) {
   const rowIndex = rows.findIndex((r, i) => i > 0 && r[0] === id);
   if (rowIndex === -1) return;
 
-  await sheetsPost(':batchUpdate', {
-    requests: [{
-      deleteDimension: {
-        range: {
-          sheetId: SETS_GID,
-          dimension: 'ROWS',
-          startIndex: rowIndex,     // 0-based absolute (header = 0, first data = 1)
-          endIndex: rowIndex + 1,
+  await sheetsPost(
+    ':batchUpdate',
+    {
+      requests: [
+        {
+          deleteDimension: {
+            range: {
+              sheetId: SETS_GID,
+              dimension: 'ROWS',
+              startIndex: rowIndex, // 0-based absolute (header = 0, first data = 1)
+              endIndex: rowIndex + 1,
+            },
+          },
         },
-      },
-    }],
-  }, 'deleting set');
+      ],
+    },
+    'deleting set'
+  );
 }
 
 // ─── Exercises ───────────────────────────────────────────────────────────────
@@ -196,7 +248,11 @@ export async function deleteSet(id) {
 // New column layout: A=id, B=name, C=muscles, D=archived
 export function rowToExercise(row) {
   let muscles = {};
-  try { muscles = JSON.parse(row[2] ?? '{}'); } catch { /* ignore */ }
+  try {
+    muscles = JSON.parse(row[2] ?? '{}');
+  } catch {
+    /* ignore */
+  }
   return { id: row[0] ?? '', name: row[1] ?? '', muscles, archived: row[3] === 'true' };
 }
 
@@ -207,7 +263,10 @@ export function exerciseToRow(ex) {
 export async function getExercises() {
   const data = await sheetsGet('/values/Exercises!A:D', 'loading exercises');
   const rows = data.values ?? [];
-  return rows.slice(1).map(rowToExercise).filter(e => e.name);
+  return rows
+    .slice(1)
+    .map(rowToExercise)
+    .filter((e) => e.name);
 }
 
 export async function addExercise(exercise) {
@@ -247,7 +306,11 @@ export function renameExercise(exerciseId, newName) {
 // Column layout: A=id, B=name, C=exerciseIds (JSON array)
 export function rowToPlan(row) {
   let exerciseIds = [];
-  try { exerciseIds = JSON.parse(row[2] ?? '[]'); } catch { /* ignore */ }
+  try {
+    exerciseIds = JSON.parse(row[2] ?? '[]');
+  } catch {
+    /* ignore */
+  }
   return { id: row[0] ?? '', name: row[1] ?? '', exerciseIds };
 }
 
@@ -259,7 +322,10 @@ export async function getPlans() {
   try {
     const data = await sheetsGet('/values/Plans!A:C', 'loading plans');
     const rows = data.values ?? [];
-    return rows.slice(1).map(rowToPlan).filter(p => p.id);
+    return rows
+      .slice(1)
+      .map(rowToPlan)
+      .filter((p) => p.id);
   } catch {
     return [];
   }
@@ -295,7 +361,7 @@ export async function updatePlan(planId, updatedPlan) {
 
 async function getSheetGid(tabTitle) {
   const data = await sheetsGet('');
-  const sheet = (data.sheets ?? []).find(s => s.properties.title === tabTitle);
+  const sheet = (data.sheets ?? []).find((s) => s.properties.title === tabTitle);
   return sheet?.properties?.sheetId ?? null;
 }
 
@@ -308,13 +374,24 @@ export async function deletePlan(id) {
   const gid = await getSheetGid('Plans');
   if (gid === null) return;
 
-  await sheetsPost(':batchUpdate', {
-    requests: [{
-      deleteDimension: {
-        range: { sheetId: gid, dimension: 'ROWS', startIndex: rowIndex, endIndex: rowIndex + 1 },
-      },
-    }],
-  }, 'deleting plan');
+  await sheetsPost(
+    ':batchUpdate',
+    {
+      requests: [
+        {
+          deleteDimension: {
+            range: {
+              sheetId: gid,
+              dimension: 'ROWS',
+              startIndex: rowIndex,
+              endIndex: rowIndex + 1,
+            },
+          },
+        },
+      ],
+    },
+    'deleting plan'
+  );
 }
 
 // ─── Measurements ────────────────────────────────────────────────────────────
@@ -340,7 +417,10 @@ export function measurementToRow(m) {
 export async function getMeasurements() {
   const data = await sheetsGet('/values/Measurements!A:H', 'loading measurements');
   const rows = data.values ?? [];
-  return rows.slice(1).map(rowToMeasurement).filter(m => m.id);
+  return rows
+    .slice(1)
+    .map(rowToMeasurement)
+    .filter((m) => m.id);
 }
 
 export async function addMeasurement(measurement) {
@@ -365,20 +445,35 @@ export async function deleteMeasurement(id) {
   const gid = await getSheetGid('Measurements');
   if (gid === null) return;
 
-  await sheetsPost(':batchUpdate', {
-    requests: [{
-      deleteDimension: {
-        range: { sheetId: gid, dimension: 'ROWS', startIndex: rowIndex, endIndex: rowIndex + 1 },
-      },
-    }],
-  }, 'deleting measurement');
+  await sheetsPost(
+    ':batchUpdate',
+    {
+      requests: [
+        {
+          deleteDimension: {
+            range: {
+              sheetId: gid,
+              dimension: 'ROWS',
+              startIndex: rowIndex,
+              endIndex: rowIndex + 1,
+            },
+          },
+        },
+      ],
+    },
+    'deleting measurement'
+  );
 }
 
 // ─── Sheet management ────────────────────────────────────────────────────────
 
 export async function createNewSheet() {
   startLoading();
-  try { return await _createNewSheet(); } finally { stopLoading(); }
+  try {
+    return await _createNewSheet();
+  } finally {
+    stopLoading();
+  }
 }
 
 async function _createNewSheet() {
@@ -392,7 +487,11 @@ async function _createNewSheet() {
   });
   if (!createRes.ok) {
     const err = Object.assign(new Error('Failed to create sheet'), { status: createRes.status });
-    errorCallback?.({ message: err.message, status: createRes.status, operation: 'creating sheet' });
+    errorCallback?.({
+      message: err.message,
+      status: createRes.status,
+      operation: 'creating sheet',
+    });
     throw err;
   }
   const created = await createRes.json();
@@ -405,7 +504,12 @@ async function _createNewSheet() {
     headers: { ...authHeaders(), 'Content-Type': 'application/json' },
     body: JSON.stringify({
       requests: [
-        { updateSheetProperties: { properties: { sheetId: defaultSheetId, title: 'Sets' }, fields: 'title' } },
+        {
+          updateSheetProperties: {
+            properties: { sheetId: defaultSheetId, title: 'Sets' },
+            fields: 'title',
+          },
+        },
         { addSheet: { properties: { title: 'Exercises' } } },
         { addSheet: { properties: { title: 'Plans' } } },
         { addSheet: { properties: { title: 'Measurements' } } },
@@ -417,7 +521,11 @@ async function _createNewSheet() {
   await fetch(`${BASE_SHEETS}/${id}/values/Sets!A1:I1?valueInputOption=RAW`, {
     method: 'PUT',
     headers: { ...authHeaders(), 'Content-Type': 'application/json' },
-    body: JSON.stringify({ values: [['id', 'date', 'user', 'exercise', 'exercise_id', 'reps', 'weight', 'notes', 'createdAt']] }),
+    body: JSON.stringify({
+      values: [
+        ['id', 'date', 'user', 'exercise', 'exercise_id', 'reps', 'weight', 'notes', 'createdAt'],
+      ],
+    }),
   });
   await fetch(`${BASE_SHEETS}/${id}/values/Exercises!A1:D1?valueInputOption=RAW`, {
     method: 'PUT',
@@ -432,7 +540,9 @@ async function _createNewSheet() {
   await fetch(`${BASE_SHEETS}/${id}/values/Measurements!A1:H1?valueInputOption=RAW`, {
     method: 'PUT',
     headers: { ...authHeaders(), 'Content-Type': 'application/json' },
-    body: JSON.stringify({ values: [['id', 'date', 'user', 'type', 'value', 'unit', 'notes', 'createdAt']] }),
+    body: JSON.stringify({
+      values: [['id', 'date', 'user', 'type', 'value', 'unit', 'notes', 'createdAt']],
+    }),
   });
 
   return id;
@@ -440,10 +550,9 @@ async function _createNewSheet() {
 
 export async function validateSheet(id) {
   try {
-    const res = await fetch(
-      `https://sheets.googleapis.com/v4/spreadsheets/${id}/values/Sets!A1`,
-      { headers: authHeaders() }
-    );
+    const res = await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${id}/values/Sets!A1`, {
+      headers: authHeaders(),
+    });
     return res.ok;
   } catch {
     return false;
@@ -497,49 +606,58 @@ export async function migrateToGuids() {
   const exData = await sheetsGet('/values/Exercises!A:C');
   const exRows = (exData.values ?? []).slice(1);
   const oldExercises = exRows
-    .filter(r => r[0])
-    .map(r => {
+    .filter((r) => r[0])
+    .map((r) => {
       let muscles = {};
-      try { muscles = JSON.parse(r[1] ?? '{}'); } catch { /* ignore */ }
+      try {
+        muscles = JSON.parse(r[1] ?? '{}');
+      } catch {
+        /* ignore */
+      }
       return { id: newUuid(), name: r[0], muscles, archived: r[2] === 'true' };
     });
 
   // Fetch all sets (old format: id, date, user, exercise_name, reps, weight, notes, createdAt)
   const setsData = await sheetsGet('/values/Sets!A:H');
-  const oldSetRows = (setsData.values ?? []).slice(1).filter(r => r[0]);
+  const oldSetRows = (setsData.values ?? []).slice(1).filter((r) => r[0]);
 
   // Build name → uuid map
-  const nameToId = Object.fromEntries(oldExercises.map(e => [e.name, e.id]));
+  const nameToId = Object.fromEntries(oldExercises.map((e) => [e.name, e.id]));
 
   const XLOOKUP_FORMULA = `=IFERROR(XLOOKUP(INDIRECT("E"&ROW()), Exercises!A:A, Exercises!B:B), INDIRECT("E"&ROW()))`;
 
   // Build new sets rows (columns: id, date, user, formula, exercise_id, reps, weight, notes, createdAt)
-  const newSetRows = oldSetRows.map(r => [
-    r[0] ?? '',               // id
-    r[1] ?? '',               // date
-    r[2] ?? '',               // user
-    XLOOKUP_FORMULA,          // exercise (formula resolves to name)
-    nameToId[r[3]] ?? r[3],   // exercise_id (UUID or original name as fallback)
-    r[4] ?? '',               // reps
-    r[5] ?? '',               // weight
-    r[6] ?? '',               // notes
-    r[7] ?? '',               // createdAt
+  const newSetRows = oldSetRows.map((r) => [
+    r[0] ?? '', // id
+    r[1] ?? '', // date
+    r[2] ?? '', // user
+    XLOOKUP_FORMULA, // exercise (formula resolves to name)
+    nameToId[r[3]] ?? r[3], // exercise_id (UUID or original name as fallback)
+    r[4] ?? '', // reps
+    r[5] ?? '', // weight
+    r[6] ?? '', // notes
+    r[7] ?? '', // createdAt
   ]);
 
   // Rewrite Exercises tab
   await sheetsClear('Exercises!A:D');
   const exerciseHeader = [['id', 'name', 'muscles', 'archived']];
-  const exerciseData = oldExercises.map(e => [e.id, e.name, JSON.stringify(e.muscles), e.archived ? 'true' : '']);
-  await sheetsPut(
-    `/values/Exercises!A1:D${1 + oldExercises.length}?valueInputOption=RAW`,
-    { values: [...exerciseHeader, ...exerciseData] }
-  );
+  const exerciseData = oldExercises.map((e) => [
+    e.id,
+    e.name,
+    JSON.stringify(e.muscles),
+    e.archived ? 'true' : '',
+  ]);
+  await sheetsPut(`/values/Exercises!A1:D${1 + oldExercises.length}?valueInputOption=RAW`, {
+    values: [...exerciseHeader, ...exerciseData],
+  });
 
   // Rewrite Sets tab
   await sheetsClear('Sets!A:I');
-  const setHeader = [['id', 'date', 'user', 'exercise', 'exercise_id', 'reps', 'weight', 'notes', 'createdAt']];
-  await sheetsPut(
-    `/values/Sets!A1:I${1 + newSetRows.length}?valueInputOption=USER_ENTERED`,
-    { values: [...setHeader, ...newSetRows] }
-  );
+  const setHeader = [
+    ['id', 'date', 'user', 'exercise', 'exercise_id', 'reps', 'weight', 'notes', 'createdAt'],
+  ];
+  await sheetsPut(`/values/Sets!A1:I${1 + newSetRows.length}?valueInputOption=USER_ENTERED`, {
+    values: [...setHeader, ...newSetRows],
+  });
 }

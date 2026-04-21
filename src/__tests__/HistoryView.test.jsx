@@ -67,7 +67,12 @@ describe('HistoryView', () => {
   it('calls onUserChange when a user toggle button is clicked', () => {
     const onUserChange = vi.fn();
     render(
-      <HistoryView sets={[makeSet()]} onSetsChange={() => {}} users={['Ethan', 'Ava']} onUserChange={onUserChange} />
+      <HistoryView
+        sets={[makeSet()]}
+        onSetsChange={() => {}}
+        users={['Ethan', 'Ava']}
+        onUserChange={onUserChange}
+      />
     );
     fireEvent.click(screen.getByRole('button', { name: 'Ava' }));
     expect(onUserChange).toHaveBeenCalledWith('Ava');
@@ -76,16 +81,20 @@ describe('HistoryView', () => {
   it('filters sets by activeUser', () => {
     const sets = [
       makeSet({ user: 'Ethan', exercise: 'Bench Press' }),
-      makeSet({ user: 'Ava',   exercise: 'Squat' }),
+      makeSet({ user: 'Ava', exercise: 'Squat' }),
     ];
-    render(<HistoryView sets={sets} onSetsChange={() => {}} activeUser="Ava" users={['Ethan', 'Ava']} />);
+    render(
+      <HistoryView sets={sets} onSetsChange={() => {}} activeUser="Ava" users={['Ethan', 'Ava']} />
+    );
     expect(screen.queryByText('Bench Press')).not.toBeInTheDocument();
     expect(screen.getByText('Squat')).toBeInTheDocument();
   });
 
   it('shows filtered-empty state when activeUser has no sets', () => {
     const sets = [makeSet({ user: 'Ethan' })];
-    render(<HistoryView sets={sets} onSetsChange={() => {}} activeUser="Ava" users={['Ethan', 'Ava']} />);
+    render(
+      <HistoryView sets={sets} onSetsChange={() => {}} activeUser="Ava" users={['Ethan', 'Ava']} />
+    );
     expect(screen.getByText('No sets for Ava.')).toBeInTheDocument();
   });
 

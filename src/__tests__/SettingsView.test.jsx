@@ -63,7 +63,9 @@ describe('SettingsView', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Create a new sheet' }));
     fireEvent.click(screen.getByRole('button', { name: 'Create' }));
     await waitFor(() => {
-      expect(screen.getByText('Failed to create sheet. Check your Google Drive permissions.')).toBeInTheDocument();
+      expect(
+        screen.getByText('Failed to create sheet. Check your Google Drive permissions.')
+      ).toBeInTheDocument();
     });
     expect(screen.queryByText('Create a new sheet?')).toBeNull();
   });
@@ -134,7 +136,9 @@ describe('SettingsView', () => {
     sheetsApi.validateSheet.mockResolvedValue(true);
     const onSheetChange = vi.fn();
     renderSettings({ onSheetChange });
-    fireEvent.change(screen.getByPlaceholderText(/Paste a different Sheet ID/), { target: { value: 'newid123' } });
+    fireEvent.change(screen.getByPlaceholderText(/Paste a different Sheet ID/), {
+      target: { value: 'newid123' },
+    });
     fireEvent.click(screen.getByRole('button', { name: 'Link' }));
     await waitFor(() => expect(onSheetChange).toHaveBeenCalledWith('newid123'));
   });
@@ -142,7 +146,9 @@ describe('SettingsView', () => {
   it('shows an error when validateSheet returns false', async () => {
     sheetsApi.validateSheet.mockResolvedValue(false);
     renderSettings();
-    fireEvent.change(screen.getByPlaceholderText(/Paste a different Sheet ID/), { target: { value: 'badid' } });
+    fireEvent.change(screen.getByPlaceholderText(/Paste a different Sheet ID/), {
+      target: { value: 'badid' },
+    });
     fireEvent.click(screen.getByRole('button', { name: 'Link' }));
     await waitFor(() =>
       expect(screen.getByText(/Could not access that sheet/)).toBeInTheDocument()
@@ -152,11 +158,11 @@ describe('SettingsView', () => {
   it('shows an error when validateSheet throws', async () => {
     sheetsApi.validateSheet.mockRejectedValue(new Error('network'));
     renderSettings();
-    fireEvent.change(screen.getByPlaceholderText(/Paste a different Sheet ID/), { target: { value: 'anyid' } });
+    fireEvent.change(screen.getByPlaceholderText(/Paste a different Sheet ID/), {
+      target: { value: 'anyid' },
+    });
     fireEvent.click(screen.getByRole('button', { name: 'Link' }));
-    await waitFor(() =>
-      expect(screen.getByText(/Failed to validate sheet/)).toBeInTheDocument()
-    );
+    await waitFor(() => expect(screen.getByText(/Failed to validate sheet/)).toBeInTheDocument());
   });
 
   it('Link button is disabled when the sheet input is empty', () => {

@@ -10,8 +10,8 @@ vi.mock('../data/api', () => ({
 
 const exercises = [
   { id: 'ex-1', name: 'Bench Press', muscles: { chest: 2 }, archived: false },
-  { id: 'ex-2', name: 'Squat',       muscles: { quads: 2 }, archived: false },
-  { id: 'ex-3', name: 'Old Move',    muscles: { chest: 1 }, archived: true },
+  { id: 'ex-2', name: 'Squat', muscles: { quads: 2 }, archived: false },
+  { id: 'ex-3', name: 'Old Move', muscles: { chest: 1 }, archived: true },
 ];
 
 const plan = { id: 'plan-1', name: 'Push Day', exerciseIds: ['ex-1'] };
@@ -66,21 +66,27 @@ describe('PlanEditSheet', () => {
     const onSave = vi.fn(() => Promise.resolve());
     renderSheet({ onSave });
     fireEvent.click(screen.getByRole('button', { name: 'Save' }));
-    await waitFor(() => expect(api.updatePlan).toHaveBeenCalledWith('plan-1', {
-      name: 'Push Day',
-      exerciseIds: ['ex-1'],
-    }));
+    await waitFor(() =>
+      expect(api.updatePlan).toHaveBeenCalledWith('plan-1', {
+        name: 'Push Day',
+        exerciseIds: ['ex-1'],
+      })
+    );
     expect(onSave).toHaveBeenCalled();
   });
 
   it('uses original name when input is cleared before saving', async () => {
     renderSheet();
-    fireEvent.change(screen.getByRole('textbox', { name: /plan name/i }), { target: { value: '' } });
+    fireEvent.change(screen.getByRole('textbox', { name: /plan name/i }), {
+      target: { value: '' },
+    });
     fireEvent.click(screen.getByRole('button', { name: 'Save' }));
-    await waitFor(() => expect(api.updatePlan).toHaveBeenCalledWith('plan-1', {
-      name: 'Push Day',
-      exerciseIds: expect.any(Array),
-    }));
+    await waitFor(() =>
+      expect(api.updatePlan).toHaveBeenCalledWith('plan-1', {
+        name: 'Push Day',
+        exerciseIds: expect.any(Array),
+      })
+    );
   });
 
   it('shows confirm dialog when Delete Plan is clicked', () => {

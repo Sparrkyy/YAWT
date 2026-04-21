@@ -15,10 +15,7 @@ function makeSet(overrides = {}) {
 
 describe('getRecentNotes', () => {
   it('returns empty array when no sets have notes', () => {
-    const sets = [
-      makeSet({ notes: '' }),
-      makeSet({ notes: '' }),
-    ];
+    const sets = [makeSet({ notes: '' }), makeSet({ notes: '' })];
     expect(getRecentNotes(sets, 'Bench Press', 'Ethan')).toEqual([]);
   });
 

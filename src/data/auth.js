@@ -13,19 +13,26 @@ let userSub = null;
 
 async function fetchUserSub(token) {
   try {
-    const res = await fetch(`https://oauth2.googleapis.com/tokeninfo?access_token=${encodeURIComponent(token)}`);
+    const res = await fetch(
+      `https://oauth2.googleapis.com/tokeninfo?access_token=${encodeURIComponent(token)}`
+    );
     const info = await res.json();
     return info.sub ?? null;
-  } catch { return null; }
+  } catch {
+    return null;
+  }
 }
 
 function saveToStorage() {
   try {
-    localStorage.setItem(AUTH_KEY, JSON.stringify({
-      access_token: accessToken,
-      expires_at: tokenExpiry,
-      user_sub: userSub,
-    }));
+    localStorage.setItem(
+      AUTH_KEY,
+      JSON.stringify({
+        access_token: accessToken,
+        expires_at: tokenExpiry,
+        user_sub: userSub,
+      })
+    );
   } catch {}
 }
 
@@ -44,20 +51,34 @@ export function initAuth(onSignIn) {
   });
 }
 
-export function signIn()     { tokenClient.requestAccessToken(); }
-export function signOut()    {
+export function signIn() {
+  tokenClient.requestAccessToken();
+}
+export function signOut() {
   google.accounts.oauth2.revoke(accessToken);
   accessToken = null;
   tokenExpiry = null;
   userSub = null;
-  try { localStorage.removeItem(AUTH_KEY); } catch {}
+  try {
+    localStorage.removeItem(AUTH_KEY);
+  } catch {}
 }
-export function getToken()   { return accessToken; }
-export function isSignedIn() { return !!accessToken; }
-export function getUserSub() { return userSub; }
+export function getToken() {
+  return accessToken;
+}
+export function isSignedIn() {
+  return !!accessToken;
+}
+export function getUserSub() {
+  return userSub;
+}
 
 function parseStoredAuth() {
-  try { return JSON.parse(localStorage.getItem(AUTH_KEY)); } catch { return null; }
+  try {
+    return JSON.parse(localStorage.getItem(AUTH_KEY));
+  } catch {
+    return null;
+  }
 }
 
 function isStoredTokenValid(stored) {

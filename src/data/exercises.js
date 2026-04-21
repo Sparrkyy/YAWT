@@ -1,6 +1,18 @@
 export const MUSCLE_GROUPS = [
-  'chest', 'back', 'frontDelts', 'sideDelts', 'rearDelts', 'biceps', 'triceps',
-  'quads', 'hamstrings', 'glutes', 'calves', 'tibialis', 'abs', 'lowBack'
+  'chest',
+  'back',
+  'frontDelts',
+  'sideDelts',
+  'rearDelts',
+  'biceps',
+  'triceps',
+  'quads',
+  'hamstrings',
+  'glutes',
+  'calves',
+  'tibialis',
+  'abs',
+  'lowBack',
 ];
 
 export const EXERCISES = [

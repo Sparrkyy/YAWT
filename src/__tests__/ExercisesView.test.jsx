@@ -42,7 +42,9 @@ function makeExercise(overrides = {}) {
 
 describe('ExercisesView', () => {
   beforeEach(() => {
-    addExerciseMock.mockImplementation(exercise => Promise.resolve({ id: 'new-ex-id', ...exercise }));
+    addExerciseMock.mockImplementation((exercise) =>
+      Promise.resolve({ id: 'new-ex-id', ...exercise })
+    );
     updateExerciseMock.mockResolvedValue(undefined);
   });
 
@@ -61,7 +63,9 @@ describe('ExercisesView', () => {
     render(<ExercisesView exercises={[]} onExercisesChange={onExercisesChange} />);
 
     fireEvent.click(screen.getByText('+ Add'));
-    fireEvent.change(screen.getByPlaceholderText('Exercise name'), { target: { value: 'Pull Up' } });
+    fireEvent.change(screen.getByPlaceholderText('Exercise name'), {
+      target: { value: 'Pull Up' },
+    });
     fireEvent.click(screen.getByRole('button', { name: 'Add' }));
 
     await waitFor(() => {
@@ -75,11 +79,17 @@ describe('ExercisesView', () => {
     render(<ExercisesView exercises={[]} onExercisesChange={onExercisesChange} />);
 
     fireEvent.click(screen.getByText('+ Add'));
-    fireEvent.change(screen.getByPlaceholderText('Exercise name'), { target: { value: 'Pull Up' } });
+    fireEvent.change(screen.getByPlaceholderText('Exercise name'), {
+      target: { value: 'Pull Up' },
+    });
     fireEvent.click(screen.getByRole('button', { name: 'Add' }));
 
     await waitFor(() => {
-      expect(addExerciseMock).toHaveBeenCalledWith({ name: 'Pull Up', muscles: {}, archived: false });
+      expect(addExerciseMock).toHaveBeenCalledWith({
+        name: 'Pull Up',
+        muscles: {},
+        archived: false,
+      });
     });
   });
 

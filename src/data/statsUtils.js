@@ -13,10 +13,10 @@ export function getDateRange(period) {
   const y = today.getFullYear();
   const m = today.getMonth();
   const ranges = {
-    week:      () => weekRange(today),
-    month:     () => ({ start: new Date(y, m, 1),     end: new Date(y, m + 1, 0) }),
+    week: () => weekRange(today),
+    month: () => ({ start: new Date(y, m, 1), end: new Date(y, m + 1, 0) }),
     lastMonth: () => ({ start: new Date(y, m - 1, 1), end: new Date(y, m, 0) }),
-    year:      () => ({ start: new Date(y, 0, 1),     end: new Date(y, 11, 31) }),
+    year: () => ({ start: new Date(y, 0, 1), end: new Date(y, 11, 31) }),
   };
   return (ranges[period] ?? ranges.year)();
 }
@@ -71,7 +71,7 @@ function applyMuscleHits(result, exMap, s) {
 }
 
 export function getLastMuscleHitDates(sets, exercises, user) {
-  const exMap = Object.fromEntries(exercises.map(ex => [ex.name, ex]));
+  const exMap = Object.fromEntries(exercises.map((ex) => [ex.name, ex]));
   const result = {};
   for (const s of sets) {
     if (s.user !== user) continue;
@@ -93,10 +93,10 @@ function accumulateMuscles(totals, ex) {
 export function computeStats(sets, exercises, period, user) {
   const { start, end } = getDateRange(period);
   const startStr = start.toLocaleDateString('en-CA');
-  const endStr   = end.toLocaleDateString('en-CA');
-  const exMap = Object.fromEntries(exercises.map(ex => [ex.name, ex]));
+  const endStr = end.toLocaleDateString('en-CA');
+  const exMap = Object.fromEntries(exercises.map((ex) => [ex.name, ex]));
   const totals = {};
-  for (const s of sets.filter(s => inPeriod(s, startStr, endStr, user))) {
+  for (const s of sets.filter((s) => inPeriod(s, startStr, endStr, user))) {
     const ex = exMap[s.exercise];
     if (!ex) continue;
     accumulateMuscles(totals, ex);

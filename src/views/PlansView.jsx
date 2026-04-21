@@ -2,7 +2,9 @@ import { useState } from 'react';
 import { addPlan } from '../data/api';
 import PlanEditSheet from './PlanEditSheet';
 
-function addBtnLabel(adding) { return adding ? 'Cancel' : '+ Add'; }
+function addBtnLabel(adding) {
+  return adding ? 'Cancel' : '+ Add';
+}
 
 function exerciseCountLabel(count) {
   if (count === 0) return 'No exercises';
@@ -22,10 +24,12 @@ function AddPlanForm({ adding, name, setName, handleAdd }) {
         type="text"
         placeholder="Plan name (e.g. Push Day)"
         value={name}
-        onChange={e => setName(e.target.value)}
+        onChange={(e) => setName(e.target.value)}
         autoFocus
       />
-      <button type="submit" className="btn-primary">Add</button>
+      <button type="submit" className="btn-primary">
+        Add
+      </button>
     </form>
   );
 }
@@ -59,12 +63,8 @@ export default function PlansView({ exercises, plans, onPlansChange }) {
       <EmptyPlansHint adding={adding} plans={plans} />
 
       <div className="plan-list">
-        {plans.map(plan => (
-          <button
-            key={plan.id}
-            className="plan-item tappable"
-            onClick={() => setEditingPlan(plan)}
-          >
+        {plans.map((plan) => (
+          <button key={plan.id} className="plan-item tappable" onClick={() => setEditingPlan(plan)}>
             <span className="plan-name">{plan.name}</span>
             <span className="plan-exercise-count">
               {exerciseCountLabel(plan.exerciseIds.length)}

@@ -38,7 +38,19 @@ function isValidNewUser(name, users) {
   return trimmed && !users.includes(trimmed) && users.length < 4;
 }
 
-function SheetSection({ currentSheetId, sheetInput, sheetError, sheetLoading, onInputChange, onLinkSheet, onCreateClick, onCreateSheet, showConfirm, onConfirmChange, onCancel }) {
+function SheetSection({
+  currentSheetId,
+  sheetInput,
+  sheetError,
+  sheetLoading,
+  onInputChange,
+  onLinkSheet,
+  onCreateClick,
+  onCreateSheet,
+  showConfirm,
+  onConfirmChange,
+  onCancel,
+}) {
   return (
     <section className="settings-section">
       <h2 className="settings-heading">Linked sheet</h2>
@@ -54,7 +66,7 @@ function SheetSection({ currentSheetId, sheetInput, sheetError, sheetLoading, on
           className="setup-input"
           placeholder="Paste a different Sheet ID"
           value={sheetInput}
-          onChange={e => onInputChange(e.target.value)}
+          onChange={(e) => onInputChange(e.target.value)}
           disabled={sheetLoading}
         />
         <button
@@ -65,11 +77,7 @@ function SheetSection({ currentSheetId, sheetInput, sheetError, sheetLoading, on
           {sheetLoading ? 'Checking…' : 'Link'}
         </button>
       </div>
-      <button
-        className="settings-text-btn"
-        onClick={onCreateClick}
-        disabled={sheetLoading}
-      >
+      <button className="settings-text-btn" onClick={onCreateClick} disabled={sheetLoading}>
         Create a new sheet
       </button>
       {showConfirm && (
@@ -85,7 +93,12 @@ function SheetSection({ currentSheetId, sheetInput, sheetError, sheetLoading, on
   );
 }
 
-function PreferencesSection({ darkMode, useAccordionPicker, onDarkModeChange, onAccordionPickerChange }) {
+function PreferencesSection({
+  darkMode,
+  useAccordionPicker,
+  onDarkModeChange,
+  onAccordionPickerChange,
+}) {
   return (
     <section className="settings-section">
       <h2 className="settings-heading">Preferences</h2>
@@ -95,7 +108,7 @@ function PreferencesSection({ darkMode, useAccordionPicker, onDarkModeChange, on
           <input
             type="checkbox"
             checked={darkMode}
-            onChange={e => onDarkModeChange(e.target.checked)}
+            onChange={(e) => onDarkModeChange(e.target.checked)}
           />
           <span className="toggle-track" />
           <span className="toggle-knob" />
@@ -107,7 +120,7 @@ function PreferencesSection({ darkMode, useAccordionPicker, onDarkModeChange, on
           <input
             type="checkbox"
             checked={useAccordionPicker}
-            onChange={e => onAccordionPickerChange(e.target.checked)}
+            onChange={(e) => onAccordionPickerChange(e.target.checked)}
           />
           <span className="toggle-track" />
           <span className="toggle-knob" />
@@ -122,11 +135,7 @@ function DataSection({ migrateStatus, migrateLoading, onMigrate }) {
     <section className="settings-section">
       <h2 className="settings-heading">Data</h2>
       {migrateStatus && <p className="settings-migrate-status">{migrateStatus}</p>}
-      <button
-        className="settings-text-btn"
-        onClick={onMigrate}
-        disabled={migrateLoading}
-      >
+      <button className="settings-text-btn" onClick={onMigrate} disabled={migrateLoading}>
         {migrateLoading ? 'Migrating…' : 'Migrate data to new schema'}
       </button>
     </section>
@@ -144,12 +153,19 @@ function AccountSection({ onSignOut }) {
   );
 }
 
-function UsersSection({ users, onUsersChange, newUser, setNewUser, handleAddUser, handleRemoveUser }) {
+function UsersSection({
+  users,
+  onUsersChange,
+  newUser,
+  setNewUser,
+  handleAddUser,
+  handleRemoveUser,
+}) {
   return (
     <section className="settings-section">
       <h2 className="settings-heading">Users</h2>
       <ul className="settings-user-list">
-        {users.map(u => (
+        {users.map((u) => (
           <li key={u} className="settings-user-item">
             <span>{u}</span>
             {users.length > 1 && (
@@ -171,8 +187,8 @@ function UsersSection({ users, onUsersChange, newUser, setNewUser, handleAddUser
             className="setup-input"
             placeholder="New user name"
             value={newUser}
-            onChange={e => setNewUser(e.target.value)}
-            onKeyDown={e => e.key === 'Enter' && handleAddUser()}
+            onChange={(e) => setNewUser(e.target.value)}
+            onKeyDown={(e) => e.key === 'Enter' && handleAddUser()}
           />
           <button
             className="btn-primary"
@@ -187,7 +203,17 @@ function UsersSection({ users, onUsersChange, newUser, setNewUser, handleAddUser
   );
 }
 
-export default function SettingsView({ currentSheetId, users, onSheetChange, onUsersChange, onSignOut, useAccordionPicker = false, onAccordionPickerChange, darkMode = false, onDarkModeChange }) {
+export default function SettingsView({
+  currentSheetId,
+  users,
+  onSheetChange,
+  onUsersChange,
+  onSignOut,
+  useAccordionPicker = false,
+  onAccordionPickerChange,
+  darkMode = false,
+  onDarkModeChange,
+}) {
   const [sheetInput, setSheetInput] = useState('');
   const [sheetLoading, setSheetLoading] = useState(false);
   const [sheetError, setSheetError] = useState('');
@@ -215,7 +241,7 @@ export default function SettingsView({ currentSheetId, users, onSheetChange, onU
 
   function handleRemoveUser(name) {
     if (users.length <= 1) return;
-    onUsersChange(users.filter(u => u !== name));
+    onUsersChange(users.filter((u) => u !== name));
   }
 
   async function handleMigrate() {
@@ -241,7 +267,10 @@ export default function SettingsView({ currentSheetId, users, onSheetChange, onU
         onInputChange={setSheetInput}
         onLinkSheet={handleLinkSheet}
         onCreateClick={() => setConfirmCreate(true)}
-        onCreateSheet={() => { setConfirmCreate(false); handleCreateSheet(); }}
+        onCreateSheet={() => {
+          setConfirmCreate(false);
+          handleCreateSheet();
+        }}
         showConfirm={confirmCreate}
         onConfirmChange={setConfirmCreate}
         onCancel={() => setConfirmCreate(false)}

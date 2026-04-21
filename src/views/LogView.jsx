@@ -3,7 +3,14 @@ import { addSet, deleteSet } from '../data/api';
 import SwipeableRow from '../components/SwipeableRow';
 import ConfirmDialog from '../components/ConfirmDialog';
 import Fireworks from '../components/Fireworks';
-import { getBestSet, getLastSet, getBestRepsAtWeight, isNewPR, isNewBestSetEver, getRecentNotes } from '../data/logUtils';
+import {
+  getBestSet,
+  getLastSet,
+  getBestRepsAtWeight,
+  isNewPR,
+  isNewBestSetEver,
+  getRecentNotes,
+} from '../data/logUtils';
 import ExerciseSelector from '../components/ExerciseSelector';
 import ExercisePickerButton from '../components/ExercisePickerButton';
 
@@ -26,17 +33,30 @@ function isFormReady(exercise, weight) {
 }
 
 function resolveExerciseId(exercises, exercise) {
-  const ex = exercises.find(e => e.name === exercise);
+  const ex = exercises.find((e) => e.name === exercise);
   return ex ? ex.id : '';
 }
 
-function getActivePlan(plans, id) { return plans.find(p => p.id === id) ?? null; }
-
-function getVisibleExercises(exercises, plan) {
-  return plan ? exercises.filter(ex => plan.exerciseIds.includes(ex.id)) : exercises;
+function getActivePlan(plans, id) {
+  return plans.find((p) => p.id === id) ?? null;
 }
 
-async function fireCelebration(label, exercise, activeUser, numWeight, numReps, today, exerciseId, notes, onSetsChange, setLogDraft) {
+function getVisibleExercises(exercises, plan) {
+  return plan ? exercises.filter((ex) => plan.exerciseIds.includes(ex.id)) : exercises;
+}
+
+async function fireCelebration(
+  label,
+  exercise,
+  activeUser,
+  numWeight,
+  numReps,
+  today,
+  exerciseId,
+  notes,
+  onSetsChange,
+  setLogDraft
+) {
   await addSet({
     date: today,
     user: activeUser,
@@ -47,7 +67,7 @@ async function fireCelebration(label, exercise, activeUser, numWeight, numReps, 
     notes,
     createdAt: new Date().toISOString(),
   });
-  setLogDraft(d => ({ ...d, reps: '', notes: '' }));
+  setLogDraft((d) => ({ ...d, reps: '', notes: '' }));
   await onSetsChange();
   return label;
 }
@@ -55,22 +75,33 @@ async function fireCelebration(label, exercise, activeUser, numWeight, numReps, 
 function handleExerciseChange(sets, activeUser, setLogDraft) {
   return (newExercise) => {
     const last = getLastSet(sets, newExercise, activeUser);
-    setLogDraft(d => ({ ...d, exercise: newExercise, weight: last ? String(last.weight) : '' }));
+    setLogDraft((d) => ({ ...d, exercise: newExercise, weight: last ? String(last.weight) : '' }));
   };
 }
 
-function planChipClass(activePlanId, p) { return `plan-chip${activePlanId === p.id ? ' active' : ''}`; }
-function userBtnClass(activeUser, u) { return `user-btn${activeUser === u ? ' active' : ''}`; }
+function planChipClass(activePlanId, p) {
+  return `plan-chip${activePlanId === p.id ? ' active' : ''}`;
+}
+function userBtnClass(activeUser, u) {
+  return `user-btn${activeUser === u ? ' active' : ''}`;
+}
 
 function selectPlan(plans, planId, exercises, currentExercise, setLogDraft) {
   const plan = getActivePlan(plans, planId);
-  if (shouldClearExercise(plan, exercises.find(ex => ex.name === currentExercise))) {
-    setLogDraft(d => ({ ...d, exercise: '', weight: '' }));
+  if (
+    shouldClearExercise(
+      plan,
+      exercises.find((ex) => ex.name === currentExercise)
+    )
+  ) {
+    setLogDraft((d) => ({ ...d, exercise: '', weight: '' }));
   }
 }
 
 function getTodaysSets(sets, today) {
-  return sets.filter(s => s.date === today).sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+  return sets
+    .filter((s) => s.date === today)
+    .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
 }
 
 function RecentNotes({ sets, exercise, activeUser }) {
@@ -79,7 +110,11 @@ function RecentNotes({ sets, exercise, activeUser }) {
   return (
     <div className="recent-notes">
       <span className="recent-notes-title">Recent notes</span>
-      {notes.map((note, i) => <span key={i} className="recent-note">{note}</span>)}
+      {notes.map((note, i) => (
+        <span key={i} className="recent-note">
+          {note}
+        </span>
+      ))}
     </div>
   );
 }
@@ -88,11 +123,20 @@ function PlanChips({ plans, activePlanId, onSelect }) {
   if (plans.length === 0) return null;
   return (
     <div className="plan-chips">
-      <button type="button" className={`plan-chip${activePlanId === null ? ' active' : ''}`} onClick={() => onSelect(null)}>
+      <button
+        type="button"
+        className={`plan-chip${activePlanId === null ? ' active' : ''}`}
+        onClick={() => onSelect(null)}
+      >
         All
       </button>
-      {plans.map(p => (
-        <button key={p.id} type="button" className={planChipClass(activePlanId, p)} onClick={() => onSelect(p.id)}>
+      {plans.map((p) => (
+        <button
+          key={p.id}
+          type="button"
+          className={planChipClass(activePlanId, p)}
+          onClick={() => onSelect(p.id)}
+        >
           {p.name}
         </button>
       ))}
@@ -110,7 +154,8 @@ function SetRow({ set, onDelete }) {
         <span className="set-user">{set.user}</span>
         <span className="set-exercise">{set.exercise}</span>
         <span className="set-stats">
-          {set.reps != null ? `${set.reps} reps` : '—'}{set.weight ? ` @ ${set.weight} lbs` : ''}
+          {set.reps != null ? `${set.reps} reps` : '—'}
+          {set.weight ? ` @ ${set.weight} lbs` : ''}
         </span>
         {set.notes && <span className="set-notes">{set.notes}</span>}
       </div>
@@ -119,8 +164,17 @@ function SetRow({ set, onDelete }) {
 }
 
 function LogForm({
-  exercise, reps, weight, notes, visibleExercises, useAccordionPicker,
-  sets, activeUser, setLogDraft, onSubmit, isExerciseReady
+  exercise,
+  reps,
+  weight,
+  notes,
+  visibleExercises,
+  useAccordionPicker,
+  sets,
+  activeUser,
+  setLogDraft,
+  onSubmit,
+  isExerciseReady,
 }) {
   return (
     <form className="log-form" onSubmit={onSubmit}>
@@ -130,13 +184,13 @@ function LogForm({
           <ExercisePickerButton
             exercises={visibleExercises}
             value={exercise}
-            onChange={e => handleExerciseChange(sets, activeUser, setLogDraft)(e.target.value)}
+            onChange={(e) => handleExerciseChange(sets, activeUser, setLogDraft)(e.target.value)}
           />
         ) : (
           <ExerciseSelector
             exercises={visibleExercises}
             value={exercise}
-            onChange={e => handleExerciseChange(sets, activeUser, setLogDraft)(e.target.value)}
+            onChange={(e) => handleExerciseChange(sets, activeUser, setLogDraft)(e.target.value)}
             required
           />
         )}
@@ -153,7 +207,7 @@ function LogForm({
             inputMode="decimal"
             placeholder="0"
             value={weight}
-            onChange={e => setLogDraft(d => ({ ...d, weight: e.target.value }))}
+            onChange={(e) => setLogDraft((d) => ({ ...d, weight: e.target.value }))}
             min="0"
             step="0.5"
             required
@@ -166,7 +220,7 @@ function LogForm({
             inputMode="numeric"
             placeholder="—"
             value={reps}
-            onChange={e => setLogDraft(d => ({ ...d, reps: e.target.value }))}
+            onChange={(e) => setLogDraft((d) => ({ ...d, reps: e.target.value }))}
             min="0"
           />
         </div>
@@ -178,7 +232,7 @@ function LogForm({
           type="text"
           placeholder="optional"
           value={notes}
-          onChange={e => setLogDraft(d => ({ ...d, notes: e.target.value }))}
+          onChange={(e) => setLogDraft((d) => ({ ...d, notes: e.target.value }))}
         />
       </div>
 
@@ -194,7 +248,9 @@ function TodaysSets({ todaysSets, onSetDelete }) {
   return (
     <div className="todays-sets">
       <h3>Today</h3>
-      {todaysSets.map(s => <SetRow key={s.id} set={s} onDelete={onSetDelete} />)}
+      {todaysSets.map((s) => (
+        <SetRow key={s.id} set={s} onDelete={onSetDelete} />
+      ))}
     </div>
   );
 }
@@ -212,7 +268,7 @@ function FireworksCelebration({ label, onDismiss }) {
 function UserToggle({ users, activeUser, onUserChange }) {
   return (
     <div className="user-toggle">
-      {users.map(u => (
+      {users.map((u) => (
         <button key={u} className={userBtnClass(activeUser, u)} onClick={() => onUserChange(u)}>
           {u}
         </button>
@@ -220,8 +276,6 @@ function UserToggle({ users, activeUser, onUserChange }) {
     </div>
   );
 }
-
-
 
 function ExerciseStats({ sets, exercise, activeUser, weight }) {
   if (!exercise) return null;
@@ -232,11 +286,17 @@ function ExerciseStats({ sets, exercise, activeUser, weight }) {
     <div className="exercise-stats">
       <div className="stat-block">
         <span className="stat-label">Best set (5+ reps)</span>
-        <span className="stat-value">{bestSet ? `${bestSet.weight} lbs × ${bestSet.reps}` : '—'}</span>
+        <span className="stat-value">
+          {bestSet ? `${bestSet.weight} lbs × ${bestSet.reps}` : '—'}
+        </span>
       </div>
       <div className="stat-block">
         <span className="stat-label">Last set</span>
-        <span className="stat-value">{lastSet ? `${lastSet.weight} lbs${lastSet.reps != null ? ` × ${lastSet.reps}` : ''}` : '—'}</span>
+        <span className="stat-value">
+          {lastSet
+            ? `${lastSet.weight} lbs${lastSet.reps != null ? ` × ${lastSet.reps}` : ''}`
+            : '—'}
+        </span>
       </div>
       <div className="stat-block">
         <span className="stat-label">Best at {weight || '0'} lbs</span>
@@ -246,7 +306,18 @@ function ExerciseStats({ sets, exercise, activeUser, weight }) {
   );
 }
 
-export default function LogView({ exercises, plans = [], sets, onSetsChange, activeUser, onUserChange, logDraft, setLogDraft, users = [], useAccordionPicker = false }) {
+export default function LogView({
+  exercises,
+  plans = [],
+  sets,
+  onSetsChange,
+  activeUser,
+  onUserChange,
+  logDraft,
+  setLogDraft,
+  users = [],
+  useAccordionPicker = false,
+}) {
   const [pendingDelete, setPendingDelete] = useState(null);
   const [fireworksLabel, setFireworksLabel] = useState(null);
   const [activePlanId, setActivePlanId] = useState(null);
@@ -264,7 +335,9 @@ export default function LogView({ exercises, plans = [], sets, onSetsChange, act
     }
   }
 
-  function handleRequestDelete(id, snapBack) { setPendingDelete({ id, snapBack }); }
+  function handleRequestDelete(id, snapBack) {
+    setPendingDelete({ id, snapBack });
+  }
 
   async function handleConfirmDelete() {
     const { id } = pendingDelete;
@@ -272,7 +345,9 @@ export default function LogView({ exercises, plans = [], sets, onSetsChange, act
     try {
       await deleteSet(id);
       onSetsChange();
-    } catch { /* error dialog shown by transport layer */ }
+    } catch {
+      /* error dialog shown by transport layer */
+    }
   }
 
   function handleCancelDelete() {
@@ -288,9 +363,22 @@ export default function LogView({ exercises, plans = [], sets, onSetsChange, act
     const label = getCelebrationLabel(sets, exercise, activeUser, numWeight, numReps);
     const exerciseId = resolveExerciseId(exercises, exercise);
     try {
-      const result = await fireCelebration(label, exercise, activeUser, numWeight, numReps, today, exerciseId, notes, onSetsChange, setLogDraft);
+      const result = await fireCelebration(
+        label,
+        exercise,
+        activeUser,
+        numWeight,
+        numReps,
+        today,
+        exerciseId,
+        notes,
+        onSetsChange,
+        setLogDraft
+      );
       if (result) setFireworksLabel(result);
-    } catch { /* error dialog shown by transport layer */ }
+    } catch {
+      /* error dialog shown by transport layer */
+    }
   }
 
   return (
@@ -313,8 +401,15 @@ export default function LogView({ exercises, plans = [], sets, onSetsChange, act
         isExerciseReady={exercise}
       />
 
-<TodaysSets todaysSets={todaysSets} onSetDelete={({ id, snapBack }) => handleRequestDelete(id, snapBack)} />
-      <DeleteConfirm pendingDelete={pendingDelete} onConfirm={handleConfirmDelete} onCancel={handleCancelDelete} />
+      <TodaysSets
+        todaysSets={todaysSets}
+        onSetDelete={({ id, snapBack }) => handleRequestDelete(id, snapBack)}
+      />
+      <DeleteConfirm
+        pendingDelete={pendingDelete}
+        onConfirm={handleConfirmDelete}
+        onCancel={handleCancelDelete}
+      />
       <FireworksCelebration label={fireworksLabel} onDismiss={() => setFireworksLabel(null)} />
     </div>
   );

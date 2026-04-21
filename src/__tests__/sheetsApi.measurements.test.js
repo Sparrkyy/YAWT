@@ -31,7 +31,16 @@ describe('measurement row serialization', () => {
   });
 
   it('rowToMeasurement coerces value to Number', () => {
-    const row = ['meas-1', '2026-02-19', 'Ethan', 'bicepL', '15.5', 'in', '', '2026-02-19T08:00:00.000Z'];
+    const row = [
+      'meas-1',
+      '2026-02-19',
+      'Ethan',
+      'bicepL',
+      '15.5',
+      'in',
+      '',
+      '2026-02-19T08:00:00.000Z',
+    ];
     const result = rowToMeasurement(row);
     expect(result.value).toBe(15.5);
     expect(typeof result.value).toBe('number');

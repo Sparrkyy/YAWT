@@ -1,5 +1,12 @@
 import { describe, it, expect } from 'vitest';
-import { rowToSet, setToRow, rowToExercise, exerciseToRow, rowToPlan, planToRow } from '../data/sheetsApi';
+import {
+  rowToSet,
+  setToRow,
+  rowToExercise,
+  exerciseToRow,
+  rowToPlan,
+  planToRow,
+} from '../data/sheetsApi';
 
 describe('set row serialization', () => {
   it('setToRow writes XLOOKUP formula in col D and exerciseId in col E', () => {
@@ -17,24 +24,39 @@ describe('set row serialization', () => {
     const row = setToRow(set);
     expect(row[3]).toContain('XLOOKUP');
     expect(row[4]).toBe('ex-uuid-001');
-    expect(row[5]).toBe(8);    // reps
-    expect(row[6]).toBe(135);  // weight
+    expect(row[5]).toBe(8); // reps
+    expect(row[6]).toBe(135); // weight
     expect(row[7]).toBe('felt strong'); // notes
     expect(row[8]).toBe('2026-02-19T10:00:00.000Z'); // createdAt
   });
 
   it('setToRow falls back to exercise name in col E when exerciseId is absent', () => {
     const set = {
-      id: 'abc-123', date: '2026-02-19', user: 'Ethan',
+      id: 'abc-123',
+      date: '2026-02-19',
+      user: 'Ethan',
       exercise: 'Bench Press',
-      reps: 5, weight: 100, notes: '', createdAt: '2026-02-19T10:00:00.000Z',
+      reps: 5,
+      weight: 100,
+      notes: '',
+      createdAt: '2026-02-19T10:00:00.000Z',
     };
     const row = setToRow(set);
     expect(row[4]).toBe('Bench Press');
   });
 
   it('rowToSet reads exercise name from col D and exerciseId from col E', () => {
-    const row = ['abc-123', '2026-02-19', 'Ethan', 'Bench Press', 'ex-uuid-001', 8, 135, 'felt strong', '2026-02-19T10:00:00.000Z'];
+    const row = [
+      'abc-123',
+      '2026-02-19',
+      'Ethan',
+      'Bench Press',
+      'ex-uuid-001',
+      8,
+      135,
+      'felt strong',
+      '2026-02-19T10:00:00.000Z',
+    ];
     const set = rowToSet(row);
     expect(set.exercise).toBe('Bench Press');
     expect(set.exerciseId).toBe('ex-uuid-001');
@@ -45,7 +67,17 @@ describe('set row serialization', () => {
   });
 
   it('preserves reps: null through rowToSet (not coerced to 0)', () => {
-    const row = ['xyz-456', '2026-02-19', 'Ava', 'Plank', 'ex-uuid-002', '', 0, '', '2026-02-19T11:00:00.000Z'];
+    const row = [
+      'xyz-456',
+      '2026-02-19',
+      'Ava',
+      'Plank',
+      'ex-uuid-002',
+      '',
+      0,
+      '',
+      '2026-02-19T11:00:00.000Z',
+    ];
     const result = rowToSet(row);
     expect(result.reps).toBeNull();
   });

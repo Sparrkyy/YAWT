@@ -15,30 +15,34 @@ function matchesWeightWithReps(s, weight) {
 }
 
 export function getBestSet(sets, exercise, user) {
-  return sets
-    .filter(s => matchesExerciseUser(s, exercise, user))
-    .filter(s => isEligibleReps(s.reps))
-    .sort(compareByWeightThenReps)[0] ?? null;
+  return (
+    sets
+      .filter((s) => matchesExerciseUser(s, exercise, user))
+      .filter((s) => isEligibleReps(s.reps))
+      .sort(compareByWeightThenReps)[0] ?? null
+  );
 }
 
 export function getLastExerciseToday(sets, user) {
   const today = new Date().toLocaleDateString('en-CA');
   const last = [...sets]
-    .filter(s => s.user === user && s.date === today)
+    .filter((s) => s.user === user && s.date === today)
     .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))[0];
   return last ? last.exercise : null;
 }
 
 export function getLastSet(sets, exercise, user) {
-  return [...sets
-    .filter(s => s.exercise === exercise && s.user === user)]
-    .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))[0] ?? null;
+  return (
+    [...sets.filter((s) => s.exercise === exercise && s.user === user)].sort(
+      (a, b) => new Date(b.createdAt) - new Date(a.createdAt)
+    )[0] ?? null
+  );
 }
 
 export function getBestRepsAtWeight(sets, exercise, user, weight) {
   const filtered = sets
-    .filter(s => matchesExerciseUser(s, exercise, user))
-    .filter(s => matchesWeightWithReps(s, weight));
+    .filter((s) => matchesExerciseUser(s, exercise, user))
+    .filter((s) => matchesWeightWithReps(s, weight));
   if (!filtered.length) return null;
   return filtered.reduce((best, s) => (s.reps > best.reps ? s : best));
 }
@@ -46,7 +50,7 @@ export function getBestRepsAtWeight(sets, exercise, user, weight) {
 export function isNewPR(sets, exercise, user, weight, reps) {
   if (reps == null) return false;
   const previous = getBestRepsAtWeight(sets, exercise, user, weight);
-  if (previous === null) return false;   // first time at this weight → not a PR
+  if (previous === null) return false; // first time at this weight → not a PR
   return reps > previous.reps;
 }
 
@@ -62,7 +66,7 @@ function hasNoteForUser(s, exercise, user) {
 export function getRecentNotes(sets, exercise, user, count = 3) {
   const seen = new Set();
   return sets
-    .filter(s => hasNoteForUser(s, exercise, user))
+    .filter((s) => hasNoteForUser(s, exercise, user))
     .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
     .reduce((acc, s) => {
       if (acc.length >= count || seen.has(s.notes)) return acc;

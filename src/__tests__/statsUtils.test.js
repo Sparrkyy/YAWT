@@ -82,7 +82,12 @@ describe('computeStats', () => {
     const set2 = makeSet({ reps: 10 });
     const sets = [set1, set2];
     const before = computeStats(sets, exercises, 'week', 'Ethan');
-    const after = computeStats(sets.filter(s => s !== set2), exercises, 'week', 'Ethan');
+    const after = computeStats(
+      sets.filter((s) => s !== set2),
+      exercises,
+      'week',
+      'Ethan'
+    );
     expect(after.chest).toBe(before.chest / 2);
   });
 
@@ -123,9 +128,7 @@ describe('getLastMuscleHitDates', () => {
   });
 
   it('respects user filter and ignores other users sets', () => {
-    const sets = [
-      makeSet({ date: '2026-02-19', exercise: 'Bench Press', user: 'Ava' }),
-    ];
+    const sets = [makeSet({ date: '2026-02-19', exercise: 'Bench Press', user: 'Ava' })];
     const result = getLastMuscleHitDates(sets, exercises, 'Ethan');
     expect(result).toEqual({});
   });
@@ -162,8 +165,8 @@ describe('getExerciseProgress', () => {
 
   it('groups sets on same date and keeps best e1RM', () => {
     const sets = [
-      makeProgressSet({ reps: 5, weight: 135 }),   // 135 * (1 + 5/30) = 157.5
-      makeProgressSet({ reps: 10, weight: 135 }),  // 135 * (1 + 10/30) = 180
+      makeProgressSet({ reps: 5, weight: 135 }), // 135 * (1 + 5/30) = 157.5
+      makeProgressSet({ reps: 10, weight: 135 }), // 135 * (1 + 10/30) = 180
     ];
     const result = getExerciseProgress(sets, 'Bench Press', 'Ethan');
     expect(result).toHaveLength(1);

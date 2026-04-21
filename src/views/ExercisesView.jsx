@@ -6,14 +6,24 @@ import ConfirmDialog from '../components/ConfirmDialog';
 import { groupExercises } from '../data/grouping';
 
 const MUSCLE_LABELS = {
-  chest: 'Chest', back: 'Back',
-  frontDelts: 'Front Delts', sideDelts: 'Side Delts', rearDelts: 'Rear Delts',
-  biceps: 'Biceps', triceps: 'Triceps',
-  quads: 'Quads', hamstrings: 'Hamstrings', glutes: 'Glutes',
-  calves: 'Calves', abs: 'Abs', lowBack: 'Low Back',
+  chest: 'Chest',
+  back: 'Back',
+  frontDelts: 'Front Delts',
+  sideDelts: 'Side Delts',
+  rearDelts: 'Rear Delts',
+  biceps: 'Biceps',
+  triceps: 'Triceps',
+  quads: 'Quads',
+  hamstrings: 'Hamstrings',
+  glutes: 'Glutes',
+  calves: 'Calves',
+  abs: 'Abs',
+  lowBack: 'Low Back',
 };
 
-function addLabel(adding) { return adding ? 'Cancel' : '+ Add'; }
+function addLabel(adding) {
+  return adding ? 'Cancel' : '+ Add';
+}
 
 function primaryMuscles(muscles) {
   return Object.entries(muscles)
@@ -56,7 +66,7 @@ export default function ExercisesView({ exercises, onExercisesChange }) {
     setPendingArchive(null);
   }
 
-  const visibleExercises = exercises.filter(ex => !ex.archived);
+  const visibleExercises = exercises.filter((ex) => !ex.archived);
 
   return (
     <div className="view">
@@ -73,10 +83,12 @@ export default function ExercisesView({ exercises, onExercisesChange }) {
             type="text"
             placeholder="Exercise name"
             value={name}
-            onChange={e => setName(e.target.value)}
+            onChange={(e) => setName(e.target.value)}
             autoFocus
           />
-          <button type="submit" className="btn-primary">Add</button>
+          <button type="submit" className="btn-primary">
+            Add
+          </button>
         </form>
       )}
 
@@ -84,8 +96,11 @@ export default function ExercisesView({ exercises, onExercisesChange }) {
         <div key={label} className="exercise-group">
           <div className="exercise-group-header">{label}</div>
           <div className="exercise-list">
-            {group.map(ex => (
-              <SwipeableRow key={ex.name} onDelete={({ snapBack }) => handleArchiveRequest(ex, snapBack)}>
+            {group.map((ex) => (
+              <SwipeableRow
+                key={ex.name}
+                onDelete={({ snapBack }) => handleArchiveRequest(ex, snapBack)}
+              >
                 <div className="exercise-item tappable" onClick={() => setEditingExercise(ex)}>
                   <span className="exercise-name">{ex.name}</span>
                   {Object.keys(ex.muscles).length > 0 && (

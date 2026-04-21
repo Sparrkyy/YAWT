@@ -18,7 +18,7 @@ function groupByDate(sets) {
 }
 
 function filterSetsByUser(sets, user) {
-  return user ? sets.filter(s => s.user === user) : sets;
+  return user ? sets.filter((s) => s.user === user) : sets;
 }
 
 export default function HistoryView({ sets, onSetsChange, activeUser, onUserChange, users = [] }) {
@@ -42,7 +42,9 @@ export default function HistoryView({ sets, onSetsChange, activeUser, onUserChan
     try {
       await deleteSet(id);
       onSetsChange();
-    } catch { /* error dialog shown by transport layer */ }
+    } catch {
+      /* error dialog shown by transport layer */
+    }
   }
 
   function handleCancelDelete() {
@@ -50,13 +52,15 @@ export default function HistoryView({ sets, onSetsChange, activeUser, onUserChan
     setPendingDelete(null);
   }
 
-  function userActiveClass(u) { return `user-btn${activeUser === u ? ' active' : ''}`; }
+  function userActiveClass(u) {
+    return `user-btn${activeUser === u ? ' active' : ''}`;
+  }
 
   function renderUserToggle() {
     if (users.length === 0) return null;
     return (
       <div className="user-toggle">
-        {users.map(u => (
+        {users.map((u) => (
           <button key={u} className={userActiveClass(u)} onClick={() => onUserChange(u)}>
             {u}
           </button>
@@ -69,14 +73,16 @@ export default function HistoryView({ sets, onSetsChange, activeUser, onUserChan
     if (sortedDates.length === 0) {
       return <div className="empty-state">No sets for {activeUser}.</div>;
     }
-    return sortedDates.map(date => (
+    return sortedDates.map((date) => (
       <div key={date} className="history-day">
         <h3 className="history-date">
           {new Date(date + 'T12:00:00').toLocaleDateString('en-US', {
-            weekday: 'short', month: 'short', day: 'numeric'
+            weekday: 'short',
+            month: 'short',
+            day: 'numeric',
           })}
         </h3>
-        {byDate[date].map(s => (
+        {byDate[date].map((s) => (
           <SwipeableRow key={s.id} onDelete={({ snapBack }) => handleRequestDelete(s.id, snapBack)}>
             <div className={`set-row ${s.user?.toLowerCase()}`}>
               <span className="set-user">{s.user}</span>

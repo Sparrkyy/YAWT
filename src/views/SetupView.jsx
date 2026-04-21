@@ -1,8 +1,12 @@
 import { useState } from 'react';
 import { createNewSheet, validateSheet } from '../data/api';
 
-function linkBtnLabel(loading) { return loading ? 'Checking…' : 'Link existing sheet'; }
-function createBtnLabel(loading) { return loading ? 'Creating…' : 'Create a new YAWT sheet in your Google Drive'; }
+function linkBtnLabel(loading) {
+  return loading ? 'Checking…' : 'Link existing sheet';
+}
+function createBtnLabel(loading) {
+  return loading ? 'Creating…' : 'Create a new YAWT sheet in your Google Drive';
+}
 
 async function validateExistingSheet(id, setLoading, setError, onSheetReady) {
   if (!id) return;
@@ -32,8 +36,13 @@ function UserFieldsForm({ userNames, handleUsersSubmit, updateUserName, addAnoth
           className="setup-input"
           placeholder={`User ${i + 1} name`}
           value={name}
-          onChange={e => updateUserName(i, e.target.value)}
-          style={{ display: 'block', width: '100%', marginBottom: '0.75rem', boxSizing: 'border-box' }}
+          onChange={(e) => updateUserName(i, e.target.value)}
+          style={{
+            display: 'block',
+            width: '100%',
+            marginBottom: '0.75rem',
+            boxSizing: 'border-box',
+          }}
         />
       ))}
       {userNames.length < 4 && (
@@ -49,7 +58,7 @@ function UserFieldsForm({ userNames, handleUsersSubmit, updateUserName, addAnoth
       <button
         type="submit"
         className="btn-primary sign-in-btn"
-        disabled={userNames.every(n => !n.trim())}
+        disabled={userNames.every((n) => !n.trim())}
       >
         Get started
       </button>
@@ -57,13 +66,30 @@ function UserFieldsForm({ userNames, handleUsersSubmit, updateUserName, addAnoth
   );
 }
 
-function SheetSetupForm({ loading, error, existingId, setExistingId, handleCreateNew, handleLinkExisting }) {
+function SheetSetupForm({
+  loading,
+  error,
+  existingId,
+  setExistingId,
+  handleCreateNew,
+  handleLinkExisting,
+}) {
   return (
     <div className="sign-in-card">
       <h1 className="app-title">YAWT</h1>
       <p className="sign-in-subtitle">Set up your workout sheet</p>
 
-      {error && <p style={{ color: 'var(--color-error, #e53e3e)', marginBottom: '1rem', fontSize: '0.875rem' }}>{error}</p>}
+      {error && (
+        <p
+          style={{
+            color: 'var(--color-error, #e53e3e)',
+            marginBottom: '1rem',
+            fontSize: '0.875rem',
+          }}
+        >
+          {error}
+        </p>
+      )}
 
       <button
         className="btn-primary sign-in-btn"
@@ -74,7 +100,9 @@ function SheetSetupForm({ loading, error, existingId, setExistingId, handleCreat
         {createBtnLabel(loading)}
       </button>
 
-      <p style={{ color: 'var(--color-muted, #888)', fontSize: '0.875rem', marginBottom: '0.75rem' }}>
+      <p
+        style={{ color: 'var(--color-muted, #888)', fontSize: '0.875rem', marginBottom: '0.75rem' }}
+      >
         — or use an existing sheet —
       </p>
 
@@ -83,9 +111,14 @@ function SheetSetupForm({ loading, error, existingId, setExistingId, handleCreat
         className="setup-input"
         placeholder="Paste your Sheet ID here"
         value={existingId}
-        onChange={e => setExistingId(e.target.value)}
+        onChange={(e) => setExistingId(e.target.value)}
         disabled={loading}
-        style={{ display: 'block', width: '100%', marginBottom: '0.75rem', boxSizing: 'border-box' }}
+        style={{
+          display: 'block',
+          width: '100%',
+          marginBottom: '0.75rem',
+          boxSizing: 'border-box',
+        }}
       />
       <button
         className="btn-primary sign-in-btn"
@@ -123,17 +156,17 @@ export default function SetupView({ setupPhase, onSheetReady, onUsersReady }) {
 
   function handleUsersSubmit(e) {
     e.preventDefault();
-    const names = userNames.map(n => n.trim()).filter(Boolean);
+    const names = userNames.map((n) => n.trim()).filter(Boolean);
     if (names.length === 0) return;
     onUsersReady(names);
   }
 
   function updateUserName(index, value) {
-    setUserNames(prev => prev.map((n, i) => (i === index ? value : n)));
+    setUserNames((prev) => prev.map((n, i) => (i === index ? value : n)));
   }
 
   function addAnotherUser() {
-    setUserNames(prev => [...prev, '']);
+    setUserNames((prev) => [...prev, '']);
   }
 
   if (setupPhase === 'users') {

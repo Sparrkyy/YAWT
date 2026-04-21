@@ -89,7 +89,9 @@ describe('PlansView', () => {
     fireEvent.click(screen.getByRole('button', { name: '+ Add' }));
     fireEvent.change(screen.getByPlaceholderText(/Plan name/), { target: { value: 'New Plan' } });
     fireEvent.submit(screen.getByRole('button', { name: 'Add' }).closest('form'));
-    await waitFor(() => expect(addPlan).toHaveBeenCalledWith({ name: 'New Plan', exerciseIds: [] }));
+    await waitFor(() =>
+      expect(addPlan).toHaveBeenCalledWith({ name: 'New Plan', exerciseIds: [] })
+    );
     expect(onPlansChange).toHaveBeenCalled();
   });
 

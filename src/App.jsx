@@ -1,6 +1,22 @@
 import { useState, useEffect, useRef } from 'react';
-import { initAuth, signIn, signOut, getUserSub, tryRestoreSession, hasStoredSession, trySilentSignIn } from './data/auth';
-import { getSets, getExercises, getPlans, getMeasurements, setSheetId, setApiErrorHandler, DEV_MODE } from './data/api';
+import {
+  initAuth,
+  signIn,
+  signOut,
+  getUserSub,
+  tryRestoreSession,
+  hasStoredSession,
+  trySilentSignIn,
+} from './data/auth';
+import {
+  getSets,
+  getExercises,
+  getPlans,
+  getMeasurements,
+  setSheetId,
+  setApiErrorHandler,
+  DEV_MODE,
+} from './data/api';
 import { setLoadingListener } from './data/loadingTracker';
 import { getLastSet, getLastExerciseToday, resolveExerciseOnUserSwitch } from './data/logUtils';
 import LogView from './views/LogView';
@@ -20,38 +36,115 @@ const TABS = ['Log', 'History', 'Exercises', 'Plans', 'Stats', 'Measurements', '
 function getTabIcon(tab) {
   const icons = {
     Log: (
-      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
-        <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/>
+      <svg
+        width="22"
+        height="22"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.75"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      >
+        <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7" />
+        <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z" />
       </svg>
     ),
     History: (
-      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
-        <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
+      <svg
+        width="22"
+        height="22"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.75"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      >
+        <circle cx="12" cy="12" r="10" />
+        <polyline points="12 6 12 12 16 14" />
       </svg>
     ),
     Exercises: (
-      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
-        <path d="M6 4v16M18 4v16M6 9h12M6 15h12M2 9v6M22 9v6"/>
+      <svg
+        width="22"
+        height="22"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.75"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      >
+        <path d="M6 4v16M18 4v16M6 9h12M6 15h12M2 9v6M22 9v6" />
       </svg>
     ),
     Plans: (
-      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
-        <rect x="3" y="3" width="18" height="18" rx="2"/><line x1="9" y1="9" x2="15" y2="9"/><line x1="9" y1="12" x2="15" y2="12"/><line x1="9" y1="15" x2="13" y2="15"/><polyline points="6 9 7 10 6 11"/>
+      <svg
+        width="22"
+        height="22"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.75"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      >
+        <rect x="3" y="3" width="18" height="18" rx="2" />
+        <line x1="9" y1="9" x2="15" y2="9" />
+        <line x1="9" y1="12" x2="15" y2="12" />
+        <line x1="9" y1="15" x2="13" y2="15" />
+        <polyline points="6 9 7 10 6 11" />
       </svg>
     ),
     Stats: (
-      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
-        <line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/><line x1="2" y1="20" x2="22" y2="20"/>
+      <svg
+        width="22"
+        height="22"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.75"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      >
+        <line x1="18" y1="20" x2="18" y2="10" />
+        <line x1="12" y1="20" x2="12" y2="4" />
+        <line x1="6" y1="20" x2="6" y2="14" />
+        <line x1="2" y1="20" x2="22" y2="20" />
       </svg>
     ),
     Measurements: (
-      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
-        <path d="M2 12h20"/><path d="M6 8v8"/><path d="M10 10v4"/><path d="M14 10v4"/><path d="M18 8v8"/>
+      <svg
+        width="22"
+        height="22"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.75"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      >
+        <path d="M2 12h20" />
+        <path d="M6 8v8" />
+        <path d="M10 10v4" />
+        <path d="M14 10v4" />
+        <path d="M18 8v8" />
       </svg>
     ),
     Settings: (
-      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round">
-        <circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+      <svg
+        width="22"
+        height="22"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.75"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      >
+        <circle cx="12" cy="12" r="3" />
+        <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z" />
       </svg>
     ),
   };
@@ -66,8 +159,12 @@ function NavBar({ tab, onTabChange, apiLoading, apiError, onErrorDismiss, onReau
       </header>
       <main className="app-main">{/* tabs render here */}</main>
       <nav className="app-nav">
-        {TABS.map(t => (
-          <button key={t} className={`nav-btn ${tab === t ? 'active' : ''}`} onClick={() => onTabChange(t)}>
+        {TABS.map((t) => (
+          <button
+            key={t}
+            className={`nav-btn ${tab === t ? 'active' : ''}`}
+            onClick={() => onTabChange(t)}
+          >
             <span className="nav-icon">{getTabIcon(t)}</span>
             <span>{t}</span>
           </button>
@@ -116,13 +213,16 @@ export default function App() {
 
   // Re-initialize drafts whenever the user list changes
   useEffect(() => {
-    setUserDrafts(Object.fromEntries(users.map(u => [u, { reps: '', weight: '', notes: '' }])));
+    setUserDrafts(Object.fromEntries(users.map((u) => [u, { reps: '', weight: '', notes: '' }])));
     if (users.length > 0 && !users.includes(activeUser)) {
       setActiveUser(users[0]);
     }
   }, [users]);
 
-  const logDraft = { exercise: sharedExercise, ...(userDrafts[activeUser] ?? { reps: '', weight: '', notes: '' }) };
+  const logDraft = {
+    exercise: sharedExercise,
+    ...(userDrafts[activeUser] ?? { reps: '', weight: '', notes: '' }),
+  };
 
   function handleUserChange(u) {
     setActiveUser(u);
@@ -130,7 +230,7 @@ export default function App() {
     if (exerciseToUse && !sharedExercise) setSharedExercise(exerciseToUse);
     if (exerciseToUse) {
       const last = getLastSet(sets, exerciseToUse, u);
-      setUserDrafts(prev => ({
+      setUserDrafts((prev) => ({
         ...prev,
         [u]: { ...(prev[u] ?? { reps: '', notes: '' }), weight: last ? String(last.weight) : '' },
       }));
@@ -141,7 +241,7 @@ export default function App() {
     const next = typeof updater === 'function' ? updater(logDraft) : updater;
     const { exercise: ex, ...userFields } = next;
     if (ex !== sharedExercise) setSharedExercise(ex);
-    setUserDrafts(prev => ({ ...prev, [activeUser]: userFields }));
+    setUserDrafts((prev) => ({ ...prev, [activeUser]: userFields }));
   }
 
   useEffect(() => {
@@ -206,7 +306,8 @@ export default function App() {
     setUseAccordionPicker(localStorage.getItem(storageKey('exercisePicker')) === 'true');
     setLoading(true);
     try {
-      const [setsResult, exercisesResult, plansResult, measurementsResult] = await Promise.allSettled([getSets(), getExercises(), getPlans(), getMeasurements()]);
+      const [setsResult, exercisesResult, plansResult, measurementsResult] =
+        await Promise.allSettled([getSets(), getExercises(), getPlans(), getMeasurements()]);
       const fetchedSets = fromSettled(setsResult, []);
       const fetchedExercises = fromSettled(exercisesResult, []);
       const fetchedPlans = fromSettled(plansResult, []);
@@ -218,7 +319,7 @@ export default function App() {
       if (defaultExercise) {
         const lastSet = getLastSet(fetchedSets, defaultExercise, userList[0]);
         setSharedExercise(defaultExercise);
-        setUserDrafts(prev => ({
+        setUserDrafts((prev) => ({
           ...prev,
           [userList[0]]: {
             ...(prev[userList[0]] ?? { reps: '', notes: '' }),
@@ -226,7 +327,9 @@ export default function App() {
           },
         }));
       }
-    } catch { /* error dialog shown by transport layer */ } finally {
+    } catch {
+      /* error dialog shown by transport layer */
+    } finally {
       setLoading(false);
     }
   }
@@ -246,19 +349,35 @@ export default function App() {
   }
 
   async function refreshSets() {
-    try { setSets(await getSets()); } catch { /* error dialog shown by transport layer */ }
+    try {
+      setSets(await getSets());
+    } catch {
+      /* error dialog shown by transport layer */
+    }
   }
 
   async function refreshExercises() {
-    try { setExercises(await getExercises()); } catch { /* error dialog shown by transport layer */ }
+    try {
+      setExercises(await getExercises());
+    } catch {
+      /* error dialog shown by transport layer */
+    }
   }
 
   async function refreshPlans() {
-    try { setPlans(await getPlans()); } catch { /* error dialog shown by transport layer */ }
+    try {
+      setPlans(await getPlans());
+    } catch {
+      /* error dialog shown by transport layer */
+    }
   }
 
   async function refreshMeasurements() {
-    try { setMeasurements(await getMeasurements()); } catch { /* error dialog shown by transport layer */ }
+    try {
+      setMeasurements(await getMeasurements());
+    } catch {
+      /* error dialog shown by transport layer */
+    }
   }
 
   async function handleSheetChange(id) {
@@ -296,7 +415,14 @@ export default function App() {
           </button>
         </div>
         <LoadingOverlay visible={apiLoading} />
-        <ErrorDialog error={apiError} onDismiss={() => setApiError(null)} onReauth={() => { setApiError(null); signIn(); }} />
+        <ErrorDialog
+          error={apiError}
+          onDismiss={() => setApiError(null)}
+          onReauth={() => {
+            setApiError(null);
+            signIn();
+          }}
+        />
       </div>
     );
   }
@@ -310,7 +436,14 @@ export default function App() {
           onUsersReady={handleUsersReady}
         />
         <LoadingOverlay visible={apiLoading} />
-        <ErrorDialog error={apiError} onDismiss={() => setApiError(null)} onReauth={() => { setApiError(null); signIn(); }} />
+        <ErrorDialog
+          error={apiError}
+          onDismiss={() => setApiError(null)}
+          onReauth={() => {
+            setApiError(null);
+            signIn();
+          }}
+        />
       </>
     );
   }
@@ -323,7 +456,14 @@ export default function App() {
           <p>Loading…</p>
         </div>
         <LoadingOverlay visible={apiLoading} />
-        <ErrorDialog error={apiError} onDismiss={() => setApiError(null)} onReauth={() => { setApiError(null); signIn(); }} />
+        <ErrorDialog
+          error={apiError}
+          onDismiss={() => setApiError(null)}
+          onReauth={() => {
+            setApiError(null);
+            signIn();
+          }}
+        />
       </div>
     );
   }
@@ -350,7 +490,13 @@ export default function App() {
           />
         )}
         {tab === 'History' && (
-          <HistoryView sets={sets} onSetsChange={refreshSets} activeUser={activeUser} onUserChange={setActiveUser} users={users} />
+          <HistoryView
+            sets={sets}
+            onSetsChange={refreshSets}
+            activeUser={activeUser}
+            onUserChange={setActiveUser}
+            users={users}
+          />
         )}
         {tab === 'Exercises' && (
           <ExercisesView exercises={exercises} onExercisesChange={refreshExercises} />
@@ -359,7 +505,13 @@ export default function App() {
           <PlansView exercises={exercises} plans={plans} onPlansChange={refreshPlans} />
         )}
         {tab === 'Stats' && (
-          <StatsView sets={sets} exercises={exercises} activeUser={activeUser} onUserChange={setActiveUser} users={users} />
+          <StatsView
+            sets={sets}
+            exercises={exercises}
+            activeUser={activeUser}
+            onUserChange={setActiveUser}
+            users={users}
+          />
         )}
         {tab === 'Measurements' && (
           <MeasurementsView
@@ -378,7 +530,7 @@ export default function App() {
             onUsersChange={handleUsersChange}
             onSignOut={handleSignOut}
             useAccordionPicker={useAccordionPicker}
-            onAccordionPickerChange={val => {
+            onAccordionPickerChange={(val) => {
               setUseAccordionPicker(val);
               localStorage.setItem(storageKey('exercisePicker'), String(val));
             }}
@@ -389,15 +541,26 @@ export default function App() {
       </main>
 
       <nav className="app-nav">
-        {TABS.map(t => (
-          <button key={t} className={`nav-btn ${tab === t ? 'active' : ''}`} onClick={() => setTab(t)}>
+        {TABS.map((t) => (
+          <button
+            key={t}
+            className={`nav-btn ${tab === t ? 'active' : ''}`}
+            onClick={() => setTab(t)}
+          >
             <span className="nav-icon">{getTabIcon(t)}</span>
             <span>{t}</span>
           </button>
         ))}
       </nav>
       <LoadingOverlay visible={apiLoading} />
-      <ErrorDialog error={apiError} onDismiss={() => setApiError(null)} onReauth={() => { setApiError(null); signIn(); }} />
+      <ErrorDialog
+        error={apiError}
+        onDismiss={() => setApiError(null)}
+        onReauth={() => {
+          setApiError(null);
+          signIn();
+        }}
+      />
     </div>
   );
 }

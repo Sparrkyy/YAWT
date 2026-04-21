@@ -19,14 +19,20 @@ vi.mock('../components/SwipeableRow', () => ({
 
 vi.mock('../components/Fireworks', () => ({
   default: ({ onDismiss, label }) => (
-    <div data-testid="fireworks" onClick={onDismiss}>{label}</div>
+    <div data-testid="fireworks" onClick={onDismiss}>
+      {label}
+    </div>
   ),
 }));
 
 vi.mock('../components/ExercisePickerButton', () => ({
   default: ({ exercises, value, onChange }) => (
     <select data-testid="accordion-picker" value={value} onChange={onChange}>
-      {exercises.map(ex => <option key={ex.name} value={ex.name}>{ex.name}</option>)}
+      {exercises.map((ex) => (
+        <option key={ex.name} value={ex.name}>
+          {ex.name}
+        </option>
+      ))}
     </select>
   ),
 }));
@@ -128,27 +134,54 @@ describe('LogView', () => {
 
   it('pre-fills weight from last set when exercise is selected', () => {
     const sets = [
-      { id: '1', date: '2026-02-01', user: 'Ethan', exercise: 'Bench Press', reps: 5, weight: 135, notes: '', createdAt: '2026-02-01T10:00:00.000Z' },
+      {
+        id: '1',
+        date: '2026-02-01',
+        user: 'Ethan',
+        exercise: 'Bench Press',
+        reps: 5,
+        weight: 135,
+        notes: '',
+        createdAt: '2026-02-01T10:00:00.000Z',
+      },
     ];
     const setLogDraft = vi.fn();
-    render(<LogView {...defaultProps} sets={sets} logDraft={{ exercise: '', reps: '', weight: '', notes: '' }} setLogDraft={setLogDraft} />);
+    render(
+      <LogView
+        {...defaultProps}
+        sets={sets}
+        logDraft={{ exercise: '', reps: '', weight: '', notes: '' }}
+        setLogDraft={setLogDraft}
+      />
+    );
 
     fireEvent.change(screen.getByRole('combobox'), { target: { value: 'Bench Press' } });
 
     expect(setLogDraft).toHaveBeenCalled();
     const updater = setLogDraft.mock.calls[0][0];
-    expect(updater({ exercise: '', reps: '', weight: '', notes: '' })).toMatchObject({ weight: '135' });
+    expect(updater({ exercise: '', reps: '', weight: '', notes: '' })).toMatchObject({
+      weight: '135',
+    });
   });
 
   it('leaves weight empty when no prior sets exist for the exercise', () => {
     const setLogDraft = vi.fn();
-    render(<LogView {...defaultProps} sets={[]} logDraft={{ exercise: '', reps: '', weight: '', notes: '' }} setLogDraft={setLogDraft} />);
+    render(
+      <LogView
+        {...defaultProps}
+        sets={[]}
+        logDraft={{ exercise: '', reps: '', weight: '', notes: '' }}
+        setLogDraft={setLogDraft}
+      />
+    );
 
     fireEvent.change(screen.getByRole('combobox'), { target: { value: 'Bench Press' } });
 
     expect(setLogDraft).toHaveBeenCalled();
     const updater = setLogDraft.mock.calls[0][0];
-    expect(updater({ exercise: '', reps: '', weight: '', notes: '' })).toMatchObject({ weight: '' });
+    expect(updater({ exercise: '', reps: '', weight: '', notes: '' })).toMatchObject({
+      weight: '',
+    });
   });
 
   it('calls onUserChange with the new user when user toggle is clicked', () => {
@@ -179,8 +212,8 @@ describe('LogView', () => {
     render(<LogView {...defaultProps} plans={plans} exercises={exercises} />);
     fireEvent.click(screen.getByRole('button', { name: 'Push Day' }));
     const options = screen.getAllByRole('option');
-    expect(options.map(o => o.textContent)).toContain('Bench Press');
-    expect(options.map(o => o.textContent)).not.toContain('Squat');
+    expect(options.map((o) => o.textContent)).toContain('Bench Press');
+    expect(options.map((o) => o.textContent)).not.toContain('Squat');
   });
 
   it('clicking All chip restores all exercises', () => {
@@ -193,14 +226,20 @@ describe('LogView', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Push Day' }));
     fireEvent.click(screen.getByRole('button', { name: 'All' }));
     const options = screen.getAllByRole('option');
-    expect(options.map(o => o.textContent)).toContain('Squat');
+    expect(options.map((o) => o.textContent)).toContain('Squat');
   });
 
   it('shows confirm dialog and cancels delete without calling API', async () => {
     const today = new Date().toLocaleDateString('en-CA');
     const todaySet = {
-      id: 's1', date: today, user: 'Ethan', exercise: 'Bench Press',
-      reps: 5, weight: 100, notes: '', createdAt: new Date().toISOString(),
+      id: 's1',
+      date: today,
+      user: 'Ethan',
+      exercise: 'Bench Press',
+      reps: 5,
+      weight: 100,
+      notes: '',
+      createdAt: new Date().toISOString(),
     };
     render(<LogView {...defaultProps} sets={[todaySet]} />);
     fireEvent.click(screen.getByRole('button', { name: 'swipe-delete' }));
@@ -213,8 +252,14 @@ describe('LogView', () => {
   it('calls deleteSet and onSetsChange when delete is confirmed', async () => {
     const today = new Date().toLocaleDateString('en-CA');
     const todaySet = {
-      id: 's1', date: today, user: 'Ethan', exercise: 'Bench Press',
-      reps: 5, weight: 100, notes: '', createdAt: new Date().toISOString(),
+      id: 's1',
+      date: today,
+      user: 'Ethan',
+      exercise: 'Bench Press',
+      reps: 5,
+      weight: 100,
+      notes: '',
+      createdAt: new Date().toISOString(),
     };
     const onSetsChange = vi.fn(() => Promise.resolve());
     render(<LogView {...defaultProps} sets={[todaySet]} onSetsChange={onSetsChange} />);
@@ -229,16 +274,18 @@ describe('LogView', () => {
     const setLogDraft = vi.fn();
     const exercises = [
       { id: 'ex-1', name: 'Bench Press', muscles: {} },
-      { id: 'ex-2', name: 'Squat',       muscles: {} },
+      { id: 'ex-2', name: 'Squat', muscles: {} },
     ];
     const plans = [{ id: 'p1', name: 'Leg Day', exerciseIds: ['ex-2'] }];
-    render(<LogView
-      {...defaultProps}
-      exercises={exercises}
-      plans={plans}
-      logDraft={{ exercise: 'Bench Press', reps: '10', weight: '135', notes: '' }}
-      setLogDraft={setLogDraft}
-    />);
+    render(
+      <LogView
+        {...defaultProps}
+        exercises={exercises}
+        plans={plans}
+        logDraft={{ exercise: 'Bench Press', reps: '10', weight: '135', notes: '' }}
+        setLogDraft={setLogDraft}
+      />
+    );
     fireEvent.click(screen.getByRole('button', { name: 'Leg Day' }));
     expect(setLogDraft).toHaveBeenCalled();
   });
@@ -252,23 +299,42 @@ describe('LogView', () => {
 
   it('does not submit when weight is empty', async () => {
     const { addSet } = await import('../data/api');
-    render(<LogView {...defaultProps} logDraft={{ exercise: 'Bench Press', reps: '10', weight: '', notes: '' }} />);
+    render(
+      <LogView
+        {...defaultProps}
+        logDraft={{ exercise: 'Bench Press', reps: '10', weight: '', notes: '' }}
+      />
+    );
     fireEvent.submit(screen.getByRole('button', { name: 'Add Set' }).closest('form'));
     expect(addSet).not.toHaveBeenCalled();
   });
 
   it('selects exercise via accordion picker when useAccordionPicker=true', () => {
     const setLogDraft = vi.fn();
-    render(<LogView {...defaultProps} useAccordionPicker setLogDraft={setLogDraft}
-      logDraft={{ exercise: '', reps: '', weight: '', notes: '' }} />);
+    render(
+      <LogView
+        {...defaultProps}
+        useAccordionPicker
+        setLogDraft={setLogDraft}
+        logDraft={{ exercise: '', reps: '', weight: '', notes: '' }}
+      />
+    );
     fireEvent.change(screen.getByTestId('accordion-picker'), { target: { value: 'Squat' } });
     expect(setLogDraft).toHaveBeenCalled();
   });
 
   it('shows last set with null reps as weight-only', () => {
     const sets = [
-      { id: '1', date: '2026-02-01', user: 'Ethan', exercise: 'Bench Press',
-        reps: null, weight: 100, notes: '', createdAt: '2026-02-01T10:00:00.000Z' },
+      {
+        id: '1',
+        date: '2026-02-01',
+        user: 'Ethan',
+        exercise: 'Bench Press',
+        reps: null,
+        weight: 100,
+        notes: '',
+        createdAt: '2026-02-01T10:00:00.000Z',
+      },
     ];
     render(<LogView {...defaultProps} sets={sets} />);
     expect(screen.getByText('100 lbs')).toBeInTheDocument();
@@ -277,8 +343,14 @@ describe('LogView', () => {
   it('shows null-reps stat as "— @ weight" for today set', () => {
     const today = new Date().toLocaleDateString('en-CA');
     const todaySet = {
-      id: 's2', date: today, user: 'Ethan', exercise: 'Bench Press',
-      reps: null, weight: 100, notes: '', createdAt: new Date().toISOString(),
+      id: 's2',
+      date: today,
+      user: 'Ethan',
+      exercise: 'Bench Press',
+      reps: null,
+      weight: 100,
+      notes: '',
+      createdAt: new Date().toISOString(),
     };
     render(<LogView {...defaultProps} sets={[todaySet]} />);
     expect(screen.getByText('— @ 100 lbs')).toBeInTheDocument();
@@ -287,8 +359,14 @@ describe('LogView', () => {
   it('shows notes for today sets', () => {
     const today = new Date().toLocaleDateString('en-CA');
     const todaySet = {
-      id: 's3', date: today, user: 'Ethan', exercise: 'Bench Press',
-      reps: 5, weight: 100, notes: 'paused reps', createdAt: new Date().toISOString(),
+      id: 's3',
+      date: today,
+      user: 'Ethan',
+      exercise: 'Bench Press',
+      reps: 5,
+      weight: 100,
+      notes: 'paused reps',
+      createdAt: new Date().toISOString(),
     };
     render(<LogView {...defaultProps} sets={[todaySet]} />);
     expect(screen.getAllByText('paused reps').length).toBeGreaterThan(0);

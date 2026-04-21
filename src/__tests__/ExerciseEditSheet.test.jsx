@@ -50,7 +50,9 @@ describe('ExerciseEditSheet', () => {
 
   it('shows the rename hint text', () => {
     renderSheet();
-    expect(screen.getByText('Renaming updates all historical sets automatically')).toBeInTheDocument();
+    expect(
+      screen.getByText('Renaming updates all historical sets automatically')
+    ).toBeInTheDocument();
   });
 
   it('disables Save button when name input is empty', () => {
@@ -75,7 +77,9 @@ describe('ExerciseEditSheet', () => {
   it('calls renameExercise with new name when name changed on save', async () => {
     renameExerciseMock.mockResolvedValue(undefined);
     const { onSave, onClose } = renderSheet();
-    fireEvent.change(screen.getByPlaceholderText('Exercise name'), { target: { value: 'Flat Bench' } });
+    fireEvent.change(screen.getByPlaceholderText('Exercise name'), {
+      target: { value: 'Flat Bench' },
+    });
     fireEvent.click(screen.getByRole('button', { name: 'Save' }));
     await waitFor(() => expect(onClose).toHaveBeenCalled());
     expect(renameExerciseMock).toHaveBeenCalledWith('ex-001', 'Flat Bench');
@@ -142,8 +146,8 @@ describe('ExerciseEditSheet', () => {
     const plusButtons = screen.getAllByRole('button', { name: '+' });
     fireEvent.click(plusButtons[0]); // chest → 0.25
     fireEvent.click(screen.getByRole('button', { name: 'Save' }));
-    await waitFor(() => expect(onSave).toHaveBeenCalledWith(
-      expect.objectContaining({ chest: 0.25 })
-    ));
+    await waitFor(() =>
+      expect(onSave).toHaveBeenCalledWith(expect.objectContaining({ chest: 0.25 }))
+    );
   });
 });

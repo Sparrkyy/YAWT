@@ -20,12 +20,7 @@ beforeEach(() => {
 describe('SetupView — sheet phase', () => {
   function renderSheet(overrides = {}) {
     return render(
-      <SetupView
-        setupPhase="sheet"
-        onSheetReady={vi.fn()}
-        onUsersReady={vi.fn()}
-        {...overrides}
-      />
+      <SetupView setupPhase="sheet" onSheetReady={vi.fn()} onUsersReady={vi.fn()} {...overrides} />
     );
   }
 
@@ -48,9 +43,7 @@ describe('SetupView — sheet phase', () => {
     createNewSheet.mockRejectedValue(new Error('drive error'));
     renderSheet();
     fireEvent.click(screen.getByRole('button', { name: /Create a new YAWT sheet/i }));
-    await waitFor(() =>
-      expect(screen.getByText(/Failed to create sheet/i)).toBeInTheDocument()
-    );
+    await waitFor(() => expect(screen.getByText(/Failed to create sheet/i)).toBeInTheDocument());
   });
 
   it('Create → loading state shows "Creating…" and disables button', async () => {
@@ -96,9 +89,7 @@ describe('SetupView — sheet phase', () => {
       target: { value: 'some-id' },
     });
     fireEvent.click(screen.getByRole('button', { name: /Link existing sheet/i }));
-    await waitFor(() =>
-      expect(screen.getByText(/Failed to validate/i)).toBeInTheDocument()
-    );
+    await waitFor(() => expect(screen.getByText(/Failed to validate/i)).toBeInTheDocument());
   });
 });
 
@@ -109,12 +100,7 @@ describe('SetupView — sheet phase', () => {
 describe('SetupView — users phase', () => {
   function renderUsers(overrides = {}) {
     return render(
-      <SetupView
-        setupPhase="users"
-        onSheetReady={vi.fn()}
-        onUsersReady={vi.fn()}
-        {...overrides}
-      />
+      <SetupView setupPhase="users" onSheetReady={vi.fn()} onUsersReady={vi.fn()} {...overrides} />
     );
   }
 

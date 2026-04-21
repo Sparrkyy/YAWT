@@ -8,11 +8,11 @@ export default function PlanEditSheet({ plan, exercises, onSave, onClose }) {
   const [planName, setPlanName] = useState(plan.name);
   const [confirmDelete, setConfirmDelete] = useState(false);
 
-  const visibleExercises = exercises.filter(ex => !ex.archived);
+  const visibleExercises = exercises.filter((ex) => !ex.archived);
   const groups = groupExercises(visibleExercises);
 
   function toggleExercise(id) {
-    setSelectedIds(prev => {
+    setSelectedIds((prev) => {
       const next = new Set(prev);
       if (next.has(id)) {
         next.delete(id);
@@ -24,7 +24,10 @@ export default function PlanEditSheet({ plan, exercises, onSave, onClose }) {
   }
 
   async function handleSave() {
-    await updatePlan(plan.id, { name: planName.trim() || plan.name, exerciseIds: [...selectedIds] });
+    await updatePlan(plan.id, {
+      name: planName.trim() || plan.name,
+      exerciseIds: [...selectedIds],
+    });
     await onSave();
   }
 
@@ -37,22 +40,24 @@ export default function PlanEditSheet({ plan, exercises, onSave, onClose }) {
   return (
     <>
       <div className="sheet-overlay" onClick={onClose}>
-        <div className="sheet" onClick={e => e.stopPropagation()}>
+        <div className="sheet" onClick={(e) => e.stopPropagation()}>
           <div className="sheet-header">
             <input
               className="plan-name-input"
               value={planName}
-              onChange={e => setPlanName(e.target.value)}
+              onChange={(e) => setPlanName(e.target.value)}
               aria-label="Plan name"
             />
-            <button className="sheet-close" onClick={onClose}>✕</button>
+            <button className="sheet-close" onClick={onClose}>
+              ✕
+            </button>
           </div>
 
           <div className="sheet-body">
             {groups.map(({ label, exercises: group }) => (
               <div key={label} className="exercise-group">
                 <div className="exercise-group-header">{label}</div>
-                {group.map(ex => (
+                {group.map((ex) => (
                   <label key={ex.id} className="plan-exercise-row">
                     <input
                       type="checkbox"
@@ -68,18 +73,10 @@ export default function PlanEditSheet({ plan, exercises, onSave, onClose }) {
 
           <div className="sheet-footer">
             <div className="sheet-footer-row">
-              <button
-                type="button"
-                className="btn-danger"
-                onClick={() => setConfirmDelete(true)}
-              >
+              <button type="button" className="btn-danger" onClick={() => setConfirmDelete(true)}>
                 Delete Plan
               </button>
-              <button
-                type="button"
-                className="btn-primary"
-                onClick={handleSave}
-              >
+              <button type="button" className="btn-primary" onClick={handleSave}>
                 Save
               </button>
             </div>

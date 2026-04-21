@@ -12,7 +12,9 @@ function clampOffset(dx, rowWidth) {
   return Math.max(-rowWidth, Math.min(0, dx));
 }
 
-function getRowWidth(ref) { return ref.current?.offsetWidth ?? 300; }
+function getRowWidth(ref) {
+  return ref.current?.offsetWidth ?? 300;
+}
 
 function resolveSnapOffset(cur, rowWidth) {
   if (cur > -60) return 0;
@@ -37,7 +39,9 @@ export default function SwipeableRow({ children, onDelete }) {
   const lockedAxisRef = useRef(null);
 
   const onDeleteRef = useRef(onDelete);
-  useEffect(() => { onDeleteRef.current = onDelete; }, [onDelete]);
+  useEffect(() => {
+    onDeleteRef.current = onDelete;
+  }, [onDelete]);
 
   useEffect(() => {
     const el = wrapRef.current;
@@ -80,9 +84,16 @@ export default function SwipeableRow({ children, onDelete }) {
       setIsSnapping(true);
       applyOffset(snapOffset);
       if (snapOffset === -rowWidth) {
-        setTimeout(() => onDeleteRef.current({
-          snapBack: () => { setIsSnapping(true); applyOffset(0); }
-        }), 250);
+        setTimeout(
+          () =>
+            onDeleteRef.current({
+              snapBack: () => {
+                setIsSnapping(true);
+                applyOffset(0);
+              },
+            }),
+          250
+        );
       }
     }
 
@@ -101,15 +112,24 @@ export default function SwipeableRow({ children, onDelete }) {
     const rowWidth = getRowWidth(wrapRef);
     setIsSnapping(true);
     applyOffset(-rowWidth);
-    setTimeout(() => onDeleteRef.current({
-      snapBack: () => { setIsSnapping(true); applyOffset(0); }
-    }), 250);
+    setTimeout(
+      () =>
+        onDeleteRef.current({
+          snapBack: () => {
+            setIsSnapping(true);
+            applyOffset(0);
+          },
+        }),
+      250
+    );
   }
 
   return (
     <div className="swipe-wrap" ref={wrapRef}>
       <div className="swipe-delete-bg">
-        <button onClick={handleDeleteTap} aria-label="Delete">Delete</button>
+        <button onClick={handleDeleteTap} aria-label="Delete">
+          Delete
+        </button>
       </div>
       <div
         className="swipe-inner"

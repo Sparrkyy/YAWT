@@ -21,7 +21,7 @@ describe('groupExercises', () => {
       { name: 'Lunge', muscles: { quads: 1 } },
     ];
     const groups = groupExercises(exercises);
-    const names = groups[0].exercises.map(e => e.name);
+    const names = groups[0].exercises.map((e) => e.name);
     expect(names).toEqual(['Leg Press', 'Lunge', 'Squat']);
   });
 
@@ -47,7 +47,7 @@ describe('groupExercises', () => {
   it('omits sections that have no exercises', () => {
     const exercises = [{ name: 'Curl', muscles: { biceps: 1 } }];
     const groups = groupExercises(exercises);
-    const labels = groups.map(g => g.label);
+    const labels = groups.map((g) => g.label);
     expect(labels).toEqual(['Arms']);
     expect(labels).not.toContain('Chest');
     expect(labels).not.toContain('Legs');

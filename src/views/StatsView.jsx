@@ -1,16 +1,32 @@
 import { useState, useMemo, useEffect } from 'react';
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
+import {
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+} from 'recharts';
 import BodyDiagram from './BodyDiagram';
 import { getDateRange, getExerciseProgress, getLastMuscleHitDates } from '../data/statsUtils';
 import { groupExercises } from '../data/grouping';
 import ExerciseSelector from '../components/ExerciseSelector';
 
 const MUSCLE_LABELS = {
-  chest: 'Chest', back: 'Back',
-  frontDelts: 'Front Delts', sideDelts: 'Side Delts', rearDelts: 'Rear Delts',
-  biceps: 'Biceps', triceps: 'Triceps',
-  quads: 'Quads', hamstrings: 'Hamstrings', glutes: 'Glutes',
-  calves: 'Calves', abs: 'Abs', lowBack: 'Low Back',
+  chest: 'Chest',
+  back: 'Back',
+  frontDelts: 'Front Delts',
+  sideDelts: 'Side Delts',
+  rearDelts: 'Rear Delts',
+  biceps: 'Biceps',
+  triceps: 'Triceps',
+  quads: 'Quads',
+  hamstrings: 'Hamstrings',
+  glutes: 'Glutes',
+  calves: 'Calves',
+  abs: 'Abs',
+  lowBack: 'Low Back',
 };
 
 function formatDate(dateStr) {
@@ -18,7 +34,7 @@ function formatDate(dateStr) {
   return `${month}/${day}`;
 }
 
-const MONTHS = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+const MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 function formatShortDate(dateStr) {
   const [, m, d] = dateStr.split('-').map(Number);
   return `${MONTHS[m - 1]} ${d}`;
@@ -31,7 +47,8 @@ function hasData(active, payload) {
 function CustomTooltip({ active, payload, label }) {
   if (!hasData(active, payload)) return null;
   const { e1rm, reps, weight } = payload[0].payload;
-  const breakdown = reps != null ? `${weight} lbs × ${reps} reps` : `${weight} lbs (bodyweight/hold)`;
+  const breakdown =
+    reps != null ? `${weight} lbs × ${reps} reps` : `${weight} lbs (bodyweight/hold)`;
   return (
     <div className="chart-tooltip">
       <p className="chart-tooltip-date">{label}</p>
@@ -42,7 +59,7 @@ function CustomTooltip({ active, payload, label }) {
 }
 
 function mostRecentExercise(sets, user) {
-  const userSets = sets.filter(s => s.user === user);
+  const userSets = sets.filter((s) => s.user === user);
   if (userSets.length > 0) {
     const mostRecent = [...userSets].sort((a, b) => b.date.localeCompare(a.date))[0];
     return mostRecent.exercise;
@@ -50,16 +67,25 @@ function mostRecentExercise(sets, user) {
   return '';
 }
 
-function userBtnClass(activeUser, u) { return `user-btn${activeUser === u ? ' active' : ''}`; }
-function periodBtnClass(period, p) { return `period-btn${period === p ? ' active' : ''}`; }
+function userBtnClass(activeUser, u) {
+  return `user-btn${activeUser === u ? ' active' : ''}`;
+}
+function periodBtnClass(period, p) {
+  return `period-btn${period === p ? ' active' : ''}`;
+}
 
-const periodLabels = { week: 'This Week', month: 'This Month', lastMonth: 'Last Month', year: 'This Year' };
+const periodLabels = {
+  week: 'This Week',
+  month: 'This Month',
+  lastMonth: 'Last Month',
+  year: 'This Year',
+};
 
 function computeEffectiveSets(sets, exercises, period, activeUser) {
   const { start, end } = getDateRange(period);
   const startStr = start.toLocaleDateString('en-CA');
   const endStr = end.toLocaleDateString('en-CA');
-  const exMap = Object.fromEntries(exercises.map(ex => [ex.name, ex]));
+  const exMap = Object.fromEntries(exercises.map((ex) => [ex.name, ex]));
   const totals = {};
   for (const s of sets) {
     if (s.date < startStr || s.date > endStr) continue;
@@ -76,7 +102,7 @@ function computeEffectiveSets(sets, exercises, period, activeUser) {
 function UserToggle({ users, activeUser, onUserChange }) {
   return (
     <div className="user-toggle">
-      {users.map(u => (
+      {users.map((u) => (
         <button key={u} className={userBtnClass(activeUser, u)} onClick={() => onUserChange(u)}>
           {u}
         </button>
@@ -88,7 +114,7 @@ function UserToggle({ users, activeUser, onUserChange }) {
 function PeriodSelector({ period, onPeriodChange }) {
   return (
     <div className="period-selector">
-      {['week', 'month', 'lastMonth', 'year'].map(p => (
+      {['week', 'month', 'lastMonth', 'year'].map((p) => (
         <button key={p} className={periodBtnClass(period, p)} onClick={() => onPeriodChange(p)}>
           {periodLabels[p]}
         </button>
@@ -112,7 +138,9 @@ function MuscleTotals({ rankedMuscles, weeksInPeriod, period, lastMuscleHit }) {
               <span className="muscle-avg">~{(value / weeksInPeriod).toFixed(2)}/wk</span>
             )}
             {lastMuscleHit[muscle] && (
-              <span className="muscle-last">last performed {formatShortDate(lastMuscleHit[muscle])}</span>
+              <span className="muscle-last">
+                last performed {formatShortDate(lastMuscleHit[muscle])}
+              </span>
             )}
           </div>
         </div>
@@ -128,7 +156,7 @@ function ExerciseProgress({ progressData, selectedExercise, exercises, onExercis
       <ExerciseSelector
         exercises={exercises}
         value={selectedExercise}
-        onChange={e => onExerciseChange(e.target.value)}
+        onChange={(e) => onExerciseChange(e.target.value)}
         includeArchived
         aria-label="Select exercise"
       />
@@ -165,7 +193,9 @@ export default function StatsView({ sets, exercises, activeUser, onUserChange, u
 
   const [selectedExercise, setSelectedExercise] = useState(defaultExercise);
 
-  useEffect(() => { setSelectedExercise(defaultExercise); }, [activeUser]);
+  useEffect(() => {
+    setSelectedExercise(defaultExercise);
+  }, [activeUser]);
 
   const effectiveSets = useMemo(
     () => computeEffectiveSets(sets, exercises, period, activeUser),
@@ -202,9 +232,19 @@ export default function StatsView({ sets, exercises, activeUser, onUserChange, u
 
       <BodyDiagram effectiveSets={effectiveSets} side={side} onSideChange={setSide} />
 
-      <MuscleTotals rankedMuscles={rankedMuscles} weeksInPeriod={weeksInPeriod} period={period} lastMuscleHit={lastMuscleHit} />
+      <MuscleTotals
+        rankedMuscles={rankedMuscles}
+        weeksInPeriod={weeksInPeriod}
+        period={period}
+        lastMuscleHit={lastMuscleHit}
+      />
 
-      <ExerciseProgress progressData={progressData} selectedExercise={selectedExercise} exercises={exercises} onExerciseChange={setSelectedExercise} />
+      <ExerciseProgress
+        progressData={progressData}
+        selectedExercise={selectedExercise}
+        exercises={exercises}
+        onExerciseChange={setSelectedExercise}
+      />
     </div>
   );
 }

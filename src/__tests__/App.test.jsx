@@ -14,10 +14,10 @@ vi.mock('../data/auth', () => ({
 
 vi.mock('../data/api', () => ({
   DEV_MODE: false,
-  getSets: vi.fn(() => new Promise(() => {})),          // never resolves
-  getExercises: vi.fn(() => new Promise(() => {})),     // never resolves
-  getPlans: vi.fn(() => new Promise(() => {})),         // never resolves
-  getMeasurements: vi.fn(() => new Promise(() => {})),  // never resolves
+  getSets: vi.fn(() => new Promise(() => {})), // never resolves
+  getExercises: vi.fn(() => new Promise(() => {})), // never resolves
+  getPlans: vi.fn(() => new Promise(() => {})), // never resolves
+  getMeasurements: vi.fn(() => new Promise(() => {})), // never resolves
   setSheetId: vi.fn(),
   setApiErrorHandler: vi.fn(),
 }));
@@ -31,7 +31,9 @@ vi.mock('../views/HistoryView', () => ({ default: () => <div data-testid="histor
 vi.mock('../views/ExercisesView', () => ({ default: () => <div data-testid="exercises-view" /> }));
 vi.mock('../views/PlansView', () => ({ default: () => <div data-testid="plans-view" /> }));
 vi.mock('../views/StatsView', () => ({ default: () => <div data-testid="stats-view" /> }));
-vi.mock('../views/MeasurementsView', () => ({ default: () => <div data-testid="measurements-view" /> }));
+vi.mock('../views/MeasurementsView', () => ({
+  default: () => <div data-testid="measurements-view" />,
+}));
 vi.mock('../views/SettingsView', () => ({ default: () => <div data-testid="settings-view" /> }));
 
 import { initAuth, signIn } from '../data/auth';
@@ -43,7 +45,9 @@ beforeEach(() => {
   global.google = { accounts: { oauth2: {} } };
   localStorage.clear();
   vi.resetAllMocks();
-  initAuth.mockImplementation((cb) => { capturedOnSignIn = cb; });
+  initAuth.mockImplementation((cb) => {
+    capturedOnSignIn = cb;
+  });
   getSets.mockImplementation(() => new Promise(() => {}));
   getExercises.mockImplementation(() => new Promise(() => {}));
   getPlans.mockImplementation(() => new Promise(() => {}));
@@ -66,7 +70,9 @@ describe('App — loadApp resilience', () => {
     getPlans.mockResolvedValue([]);
     getMeasurements.mockResolvedValue([]);
     render(<App />);
-    await act(async () => { capturedOnSignIn(); });
+    await act(async () => {
+      capturedOnSignIn();
+    });
     expect(screen.getByTestId('log-view')).toBeInTheDocument();
   });
 
@@ -76,7 +82,9 @@ describe('App — loadApp resilience', () => {
     getPlans.mockResolvedValue([]);
     getMeasurements.mockRejectedValue(new Error('Sheets GET failed: HTTP status 400'));
     render(<App />);
-    await act(async () => { capturedOnSignIn(); });
+    await act(async () => {
+      capturedOnSignIn();
+    });
     expect(screen.getByTestId('log-view')).toBeInTheDocument();
   });
 
@@ -86,7 +94,9 @@ describe('App — loadApp resilience', () => {
     getPlans.mockResolvedValue([]);
     getMeasurements.mockResolvedValue([]);
     render(<App />);
-    await act(async () => { capturedOnSignIn(); });
+    await act(async () => {
+      capturedOnSignIn();
+    });
     expect(screen.getByTestId('log-view')).toBeInTheDocument();
   });
 
@@ -96,7 +106,9 @@ describe('App — loadApp resilience', () => {
     getPlans.mockRejectedValue(new Error('400'));
     getMeasurements.mockRejectedValue(new Error('400'));
     render(<App />);
-    await act(async () => { capturedOnSignIn(); });
+    await act(async () => {
+      capturedOnSignIn();
+    });
     expect(screen.getByTestId('log-view')).toBeInTheDocument();
   });
 });
@@ -104,9 +116,7 @@ describe('App — loadApp resilience', () => {
 describe('App — conditional rendering state machine', () => {
   it('shows sign-in screen after auth loads', () => {
     render(<App />);
-    expect(
-      screen.getByRole('button', { name: 'Sign in with Google' })
-    ).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Sign in with Google' })).toBeInTheDocument();
   });
 
   it('sign-in button calls signIn()', () => {
@@ -117,14 +127,18 @@ describe('App — conditional rendering state machine', () => {
 
   it('no localStorage → sheet phase after onSignIn', async () => {
     render(<App />);
-    await act(async () => { capturedOnSignIn(); });
+    await act(async () => {
+      capturedOnSignIn();
+    });
     expect(screen.getByTestId('setup-view')).toHaveTextContent('sheet');
   });
 
   it('sheet in localStorage but no users → users phase after onSignIn', async () => {
     localStorage.setItem('yawt_sheet_test-user', 'some-id');
     render(<App />);
-    await act(async () => { capturedOnSignIn(); });
+    await act(async () => {
+      capturedOnSignIn();
+    });
     expect(screen.getByTestId('setup-view')).toHaveTextContent('users');
   });
 
@@ -132,7 +146,9 @@ describe('App — conditional rendering state machine', () => {
     localStorage.setItem('yawt_sheet_test-user', 'some-id');
     localStorage.setItem('yawt_users_test-user', JSON.stringify(['Ethan']));
     render(<App />);
-    await act(async () => { capturedOnSignIn(); });
+    await act(async () => {
+      capturedOnSignIn();
+    });
     expect(screen.getByText('Loading…')).toBeInTheDocument();
   });
 });

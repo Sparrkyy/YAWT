@@ -31,7 +31,10 @@ function fireStop() {
 function scheduleStop() {
   const remaining = minEndTime - Date.now();
   if (remaining > 0) {
-    pendingTimer = setTimeout(() => { pendingTimer = null; fireStop(); }, remaining);
+    pendingTimer = setTimeout(() => {
+      pendingTimer = null;
+      fireStop();
+    }, remaining);
   } else {
     fireStop();
   }

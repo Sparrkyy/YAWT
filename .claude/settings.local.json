@@ -39,7 +39,10 @@
       "Bash(kill 73254)",
       "Bash(lsof -ti:5200)",
       "Bash(gh run *)",
-      "Bash(npx --yes typhonjs-escomplex-runner analyze --output complexity_report.json src/App.jsx src/views/LogView.jsx src/views/StatsView.jsx src/views/HistoryView.jsx src/data/sheetsApi.js src/data/statsUtils.js src/data/logUtils.js)"
+      "Bash(npx --yes typhonjs-escomplex-runner analyze --output complexity_report.json src/App.jsx src/views/LogView.jsx src/views/StatsView.jsx src/views/HistoryView.jsx src/data/sheetsApi.js src/data/statsUtils.js src/data/logUtils.js)",
+      "Bash(git pull *)",
+      "Skill(update-config)",
+      "Bash(npx eslint *)"
     ]
   }
 }

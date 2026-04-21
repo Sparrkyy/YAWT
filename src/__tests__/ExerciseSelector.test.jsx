@@ -10,24 +10,18 @@ const exercises = [
 
 describe('ExerciseSelector', () => {
   it('renders grouped options from exercises array', () => {
-    render(
-      <ExerciseSelector exercises={exercises} value="" onChange={() => {}} />
-    );
+    render(<ExerciseSelector exercises={exercises} value="" onChange={() => {}} />);
     expect(screen.getByRole('option', { name: 'Bench Press' })).toBeInTheDocument();
     expect(screen.getByRole('option', { name: 'Squat' })).toBeInTheDocument();
   });
 
   it('filters out archived exercises by default', () => {
-    render(
-      <ExerciseSelector exercises={exercises} value="" onChange={() => {}} />
-    );
+    render(<ExerciseSelector exercises={exercises} value="" onChange={() => {}} />);
     expect(screen.queryByRole('option', { name: 'Old Exercise' })).not.toBeInTheDocument();
   });
 
   it('shows archived exercises when includeArchived is passed', () => {
-    render(
-      <ExerciseSelector exercises={exercises} value="" onChange={() => {}} includeArchived />
-    );
+    render(<ExerciseSelector exercises={exercises} value="" onChange={() => {}} includeArchived />);
     expect(screen.getByRole('option', { name: 'Old Exercise' })).toBeInTheDocument();
   });
 

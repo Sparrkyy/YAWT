@@ -26,7 +26,14 @@ describe('ConfirmDialog', () => {
   });
 
   it('applies custom confirmStyle class', () => {
-    render(<ConfirmDialog confirmLabel="Create" confirmStyle="btn-primary" onConfirm={vi.fn()} onCancel={vi.fn()} />);
+    render(
+      <ConfirmDialog
+        confirmLabel="Create"
+        confirmStyle="btn-primary"
+        onConfirm={vi.fn()}
+        onCancel={vi.fn()}
+      />
+    );
     expect(screen.getByRole('button', { name: 'Create' })).toHaveClass('btn-primary');
   });
 

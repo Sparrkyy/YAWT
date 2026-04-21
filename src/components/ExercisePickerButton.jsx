@@ -1,7 +1,9 @@
 import { useState } from 'react';
 import ExerciseAccordionSheet from './ExerciseAccordionSheet';
 
-function pickerClass(value) { return `picker-button${value ? '' : ' placeholder'}`; }
+function pickerClass(value) {
+  return `picker-button${value ? '' : ' placeholder'}`;
+}
 
 export default function ExercisePickerButton({ exercises, value, onChange, ...rest }) {
   const [open, setOpen] = useState(false);
@@ -12,12 +14,7 @@ export default function ExercisePickerButton({ exercises, value, onChange, ...re
 
   return (
     <>
-      <button
-        type="button"
-        className={pickerClass(value)}
-        onClick={() => setOpen(true)}
-        {...rest}
-      >
+      <button type="button" className={pickerClass(value)} onClick={() => setOpen(true)} {...rest}>
         {value || '— select —'}
       </button>
       {open && (

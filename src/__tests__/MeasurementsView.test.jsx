@@ -119,7 +119,7 @@ describe('MeasurementsView', () => {
     // Weight is allInputs[0] (Body group), Waist is allInputs[4] (Upper: neck/shoulders/chest/waist)
     const allInputs = screen.getAllByPlaceholderText('—');
     fireEvent.change(allInputs[0], { target: { value: '185' } }); // weight
-    fireEvent.change(allInputs[4], { target: { value: '32' } });  // waist
+    fireEvent.change(allInputs[4], { target: { value: '32' } }); // waist
 
     const submitBtn = screen.getByRole('button', { name: /Log Measurements/i });
     fireEvent.click(submitBtn);
@@ -149,7 +149,9 @@ describe('MeasurementsView', () => {
 
   it('renders user toggle and calls onUserChange when clicked', () => {
     const onUserChange = vi.fn();
-    render(<MeasurementsView {...defaultProps({ onUserChange })} measurements={[makeMeasurement()]} />);
+    render(
+      <MeasurementsView {...defaultProps({ onUserChange })} measurements={[makeMeasurement()]} />
+    );
     fireEvent.click(screen.getByRole('button', { name: 'Ava' }));
     expect(onUserChange).toHaveBeenCalledWith('Ava');
   });

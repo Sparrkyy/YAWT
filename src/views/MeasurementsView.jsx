@@ -6,16 +6,25 @@ import ConfirmDialog from '../components/ConfirmDialog';
 
 function InfoIcon() {
   return (
-    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <circle cx="12" cy="12" r="10"/>
-      <line x1="12" y1="16" x2="12" y2="12"/>
-      <line x1="12" y1="8" x2="12.01" y2="8"/>
+    <svg
+      width="14"
+      height="14"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      <circle cx="12" cy="12" r="10" />
+      <line x1="12" y1="16" x2="12" y2="12" />
+      <line x1="12" y1="8" x2="12.01" y2="8" />
     </svg>
   );
 }
 
 function filterByUser(measurements, user) {
-  return user ? measurements.filter(m => m.user === user) : measurements;
+  return user ? measurements.filter((m) => m.user === user) : measurements;
 }
 
 function groupByDate(measurements) {
@@ -27,7 +36,7 @@ function groupByDate(measurements) {
 }
 
 function labelForType(key) {
-  return MEASUREMENT_TYPES.find(t => t.key === key)?.label ?? key;
+  return MEASUREMENT_TYPES.find((t) => t.key === key)?.label ?? key;
 }
 
 function toggleHint(expanded, key) {
@@ -55,18 +64,22 @@ function renderHistorySection(sortedDates, byDate, handleRequestDelete) {
   if (sortedDates.length === 0) {
     return <div className="empty-state">No measurements logged yet.</div>;
   }
-  return sortedDates.map(d => (
+  return sortedDates.map((d) => (
     <div key={d} className="history-day">
       <h3 className="history-date">
         {new Date(d + 'T12:00:00').toLocaleDateString('en-US', {
-          weekday: 'short', month: 'short', day: 'numeric'
+          weekday: 'short',
+          month: 'short',
+          day: 'numeric',
         })}
       </h3>
-      {byDate[d].map(m => (
+      {byDate[d].map((m) => (
         <SwipeableRow key={m.id} onDelete={({ snapBack }) => handleRequestDelete(m.id, snapBack)}>
           <div className="set-row">
             <span className="set-exercise">{labelForType(m.type)}</span>
-            <span className="set-stats">{m.value} {m.unit}</span>
+            <span className="set-stats">
+              {m.value} {m.unit}
+            </span>
             {m.notes && <span className="set-notes">{m.notes}</span>}
           </div>
         </SwipeableRow>
@@ -75,9 +88,17 @@ function renderHistorySection(sortedDates, byDate, handleRequestDelete) {
   ));
 }
 
-function userBtnClass(activeUser, u) { return `user-btn${activeUser === u ? ' active' : ''}`; }
+function userBtnClass(activeUser, u) {
+  return `user-btn${activeUser === u ? ' active' : ''}`;
+}
 
-export default function MeasurementsView({ measurements, onMeasurementsChange, activeUser, onUserChange, users = [] }) {
+export default function MeasurementsView({
+  measurements,
+  onMeasurementsChange,
+  activeUser,
+  onUserChange,
+  users = [],
+}) {
   const today = new Date().toLocaleDateString('en-CA');
   const [date, setDate] = useState(today);
   const [values, setValues] = useState({});
@@ -86,31 +107,37 @@ export default function MeasurementsView({ measurements, onMeasurementsChange, a
   const [expandedHint, setExpandedHint] = useState(null);
 
   function handleValueChange(key, val) {
-    setValues(prev => ({ ...prev, [key]: val }));
+    setValues((prev) => ({ ...prev, [key]: val }));
   }
 
   async function handleSubmit(e) {
     e.preventDefault();
-    const entries = MEASUREMENT_TYPES.filter(t => values[t.key] !== undefined && values[t.key] !== '');
+    const entries = MEASUREMENT_TYPES.filter(
+      (t) => values[t.key] !== undefined && values[t.key] !== ''
+    );
     if (entries.length === 0) return;
 
     setSubmitting(true);
     try {
-      await Promise.all(entries.map(t =>
-        addMeasurement({
-          id: crypto.randomUUID(),
-          date,
-          user: activeUser,
-          type: t.key,
-          value: Number(values[t.key]),
-          unit: t.unit,
-          notes: '',
-          createdAt: new Date().toISOString(),
-        })
-      ));
+      await Promise.all(
+        entries.map((t) =>
+          addMeasurement({
+            id: crypto.randomUUID(),
+            date,
+            user: activeUser,
+            type: t.key,
+            value: Number(values[t.key]),
+            unit: t.unit,
+            notes: '',
+            createdAt: new Date().toISOString(),
+          })
+        )
+      );
       setValues({});
       await onMeasurementsChange();
-    } catch { /* error dialog shown by transport layer */ } finally {
+    } catch {
+      /* error dialog shown by transport layer */
+    } finally {
       setSubmitting(false);
     }
   }
@@ -125,7 +152,9 @@ export default function MeasurementsView({ measurements, onMeasurementsChange, a
     try {
       await deleteMeasurement(id);
       onMeasurementsChange();
-    } catch { /* error dialog shown by transport layer */ }
+    } catch {
+      /* error dialog shown by transport layer */
+    }
   }
 
   function handleCancelDelete() {
@@ -141,7 +170,7 @@ export default function MeasurementsView({ measurements, onMeasurementsChange, a
     <div className="view">
       {users.length > 0 && (
         <div className="user-toggle">
-          {users.map(u => (
+          {users.map((u) => (
             <button key={u} className={userBtnClass(activeUser, u)} onClick={() => onUserChange(u)}>
               {u}
             </button>
@@ -156,14 +185,14 @@ export default function MeasurementsView({ measurements, onMeasurementsChange, a
             type="date"
             className="setup-input"
             value={date}
-            onChange={e => setDate(e.target.value)}
+            onChange={(e) => setDate(e.target.value)}
           />
         </div>
 
-        {MEASUREMENT_GROUPS.map(group => (
+        {MEASUREMENT_GROUPS.map((group) => (
           <div key={group} className="measurement-group">
             <div className="exercise-group-header">{group}</div>
-            {MEASUREMENT_TYPES.filter(t => t.group === group).map(t => (
+            {MEASUREMENT_TYPES.filter((t) => t.group === group).map((t) => (
               <div key={t.key}>
                 <div className="muscle-row">
                   <div className="measurement-label-row">
@@ -186,7 +215,7 @@ export default function MeasurementsView({ measurements, onMeasurementsChange, a
                       className="measurement-number-input"
                       placeholder="—"
                       value={values[t.key] ?? ''}
-                      onChange={e => handleValueChange(t.key, e.target.value)}
+                      onChange={(e) => handleValueChange(t.key, e.target.value)}
                     />
                     <span className="measurement-unit-label">{t.unit}</span>
                   </div>
@@ -203,7 +232,9 @@ export default function MeasurementsView({ measurements, onMeasurementsChange, a
       </form>
 
       <div className="measurements-history">
-        <div className="exercise-group-header" style={{ paddingTop: 4 }}>History</div>
+        <div className="exercise-group-header" style={{ paddingTop: 4 }}>
+          History
+        </div>
         {renderHistorySection(sortedDates, byDate, handleRequestDelete)}
       </div>
 
