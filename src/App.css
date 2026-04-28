@@ -263,6 +263,18 @@
   font-style: italic;
 }
 
+.exercise-field-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.exercise-field-row select,
+.exercise-field-row > *:first-child {
+  flex: 1;
+  min-width: 0;
+}
+
 .field-row {
   display: grid;
   grid-template-columns: 1fr 1fr;

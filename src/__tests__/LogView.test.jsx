@@ -323,6 +323,102 @@ describe('LogView', () => {
     expect(setLogDraft).toHaveBeenCalled();
   });
 
+  it('does not show toggle button when only one exercise has been selected', () => {
+    render(
+      <LogView
+        {...defaultProps}
+        logDraft={{ exercise: 'Bench Press', reps: '', weight: '', notes: '' }}
+      />
+    );
+    expect(screen.queryByRole('button', { name: /Switch to/i })).not.toBeInTheDocument();
+  });
+
+  it('shows toggle button after selecting a second exercise', () => {
+    const setLogDraft = vi.fn((fn) => fn({ exercise: 'Bench Press', reps: '', weight: '', notes: '' }));
+    const { rerender } = render(
+      <LogView
+        {...defaultProps}
+        logDraft={{ exercise: 'Bench Press', reps: '', weight: '', notes: '' }}
+        setLogDraft={setLogDraft}
+      />
+    );
+    fireEvent.change(screen.getByRole('combobox'), { target: { value: 'Squat' } });
+    rerender(
+      <LogView
+        {...defaultProps}
+        logDraft={{ exercise: 'Squat', reps: '', weight: '', notes: '' }}
+        setLogDraft={setLogDraft}
+      />
+    );
+    expect(screen.getByRole('button', { name: 'Switch to Bench Press' })).toBeInTheDocument();
+  });
+
+  it('toggle button swaps back to previous exercise', () => {
+    const sets = [
+      {
+        id: '1',
+        date: '2026-02-01',
+        user: 'Ethan',
+        exercise: 'Bench Press',
+        reps: 5,
+        weight: 135,
+        notes: '',
+        createdAt: '2026-02-01T10:00:00.000Z',
+      },
+    ];
+    const setLogDraft = vi.fn((fn) => fn({ exercise: 'Bench Press', reps: '', weight: '', notes: '' }));
+    const { rerender } = render(
+      <LogView
+        {...defaultProps}
+        sets={sets}
+        logDraft={{ exercise: 'Bench Press', reps: '', weight: '', notes: '' }}
+        setLogDraft={setLogDraft}
+      />
+    );
+    fireEvent.change(screen.getByRole('combobox'), { target: { value: 'Squat' } });
+    rerender(
+      <LogView
+        {...defaultProps}
+        sets={sets}
+        logDraft={{ exercise: 'Squat', reps: '', weight: '', notes: '' }}
+        setLogDraft={setLogDraft}
+      />
+    );
+    fireEvent.click(screen.getByRole('button', { name: 'Switch to Bench Press' }));
+    const lastCall = setLogDraft.mock.calls[setLogDraft.mock.calls.length - 1][0];
+    const result = lastCall({ exercise: 'Squat', reps: '', weight: '', notes: '' });
+    expect(result.exercise).toBe('Bench Press');
+    expect(result.weight).toBe('135');
+  });
+
+  it('toggle button is re-pressable to swap forward again', () => {
+    const setLogDraft = vi.fn((fn) => fn({ exercise: 'Bench Press', reps: '', weight: '', notes: '' }));
+    const { rerender } = render(
+      <LogView
+        {...defaultProps}
+        logDraft={{ exercise: 'Bench Press', reps: '', weight: '', notes: '' }}
+        setLogDraft={setLogDraft}
+      />
+    );
+    fireEvent.change(screen.getByRole('combobox'), { target: { value: 'Squat' } });
+    rerender(
+      <LogView
+        {...defaultProps}
+        logDraft={{ exercise: 'Squat', reps: '', weight: '', notes: '' }}
+        setLogDraft={setLogDraft}
+      />
+    );
+    fireEvent.click(screen.getByRole('button', { name: 'Switch to Bench Press' }));
+    rerender(
+      <LogView
+        {...defaultProps}
+        logDraft={{ exercise: 'Bench Press', reps: '', weight: '', notes: '' }}
+        setLogDraft={setLogDraft}
+      />
+    );
+    expect(screen.getByRole('button', { name: 'Switch to Squat' })).toBeInTheDocument();
+  });
+
   it('shows last set with null reps as weight-only', () => {
     const sets = [
       {

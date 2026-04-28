@@ -72,11 +72,23 @@ async function fireCelebration(
   return label;
 }
 
-function handleExerciseChange(sets, activeUser, setLogDraft) {
+function captureIfChanged(currentExercise, newExercise, setPrevExercise) {
+  if (currentExercise && currentExercise !== newExercise) setPrevExercise(currentExercise);
+}
+
+function handleExerciseChange(sets, activeUser, setLogDraft, currentExercise, setPrevExercise) {
   return (newExercise) => {
+    captureIfChanged(currentExercise, newExercise, setPrevExercise);
     const last = getLastSet(sets, newExercise, activeUser);
     setLogDraft((d) => ({ ...d, exercise: newExercise, weight: last ? String(last.weight) : '' }));
   };
+}
+
+function handleToggleExercise(exercise, prevExercise, sets, activeUser, setLogDraft, setPrevExercise) {
+  if (!prevExercise) return;
+  setPrevExercise(exercise);
+  const last = getLastSet(sets, prevExercise, activeUser);
+  setLogDraft((d) => ({ ...d, exercise: prevExercise, weight: last ? String(last.weight) : '' }));
 }
 
 function planChipClass(activePlanId, p) {
@@ -175,6 +187,9 @@ function LogForm({
   setLogDraft,
   onSubmit,
   isExerciseReady,
+  onExerciseChange,
+  prevExercise,
+  onToggleExercise,
 }) {
   const weightId = 'weight-input';
   const repsId = 'reps-input';
@@ -183,22 +198,35 @@ function LogForm({
     <form className="log-form" onSubmit={onSubmit}>
       <div className="field">
         <label htmlFor="exercise-select">Exercise</label>
-        {useAccordionPicker ? (
-          <ExercisePickerButton
-            id="exercise-select"
-            exercises={visibleExercises}
-            value={exercise}
-            onChange={(e) => handleExerciseChange(sets, activeUser, setLogDraft)(e.target.value)}
-          />
-        ) : (
-          <ExerciseSelector
-            id="exercise-select"
-            exercises={visibleExercises}
-            value={exercise}
-            onChange={(e) => handleExerciseChange(sets, activeUser, setLogDraft)(e.target.value)}
-            required
-          />
-        )}
+        <div className="exercise-field-row">
+          {useAccordionPicker ? (
+            <ExercisePickerButton
+              id="exercise-select"
+              exercises={visibleExercises}
+              value={exercise}
+              onChange={(e) => onExerciseChange(e.target.value)}
+            />
+          ) : (
+            <ExerciseSelector
+              id="exercise-select"
+              exercises={visibleExercises}
+              value={exercise}
+              onChange={(e) => onExerciseChange(e.target.value)}
+              required
+            />
+          )}
+          {prevExercise && (
+            <button
+              type="button"
+              className="btn-small"
+              onClick={onToggleExercise}
+              title={`Switch to ${prevExercise}`}
+              aria-label={`Switch to ${prevExercise}`}
+            >
+              ⇄ {prevExercise}
+            </button>
+          )}
+        </div>
       </div>
 
       <ExerciseStats sets={sets} exercise={exercise} activeUser={activeUser} weight={weight} />
@@ -329,6 +357,7 @@ export default function LogView({
   const [pendingDelete, setPendingDelete] = useState(null);
   const [fireworksLabel, setFireworksLabel] = useState(null);
   const [activePlanId, setActivePlanId] = useState(null);
+  const [prevExercise, setPrevExercise] = useState(null);
   const { exercise, reps, weight, notes } = logDraft;
 
   const activePlan = getActivePlan(plans, activePlanId);
@@ -407,6 +436,9 @@ export default function LogView({
         setLogDraft={setLogDraft}
         onSubmit={handleSubmit}
         isExerciseReady={exercise}
+        onExerciseChange={handleExerciseChange(sets, activeUser, setLogDraft, exercise, setPrevExercise)}
+        prevExercise={prevExercise}
+        onToggleExercise={() => handleToggleExercise(exercise, prevExercise, sets, activeUser, setLogDraft, setPrevExercise)}
       />
 
       <TodaysSets
