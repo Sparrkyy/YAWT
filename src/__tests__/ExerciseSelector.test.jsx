@@ -38,4 +38,35 @@ describe('ExerciseSelector', () => {
     const select = screen.getByRole('combobox', { name: /pick exercise/i });
     expect(select).toBeRequired();
   });
+
+  it('renders flat list (no optgroup) when 15 or fewer exercises', () => {
+    const few = Array.from({ length: 15 }, (_, i) => ({
+      name: `Exercise ${i + 1}`,
+      muscles: { chest: 1 },
+      archived: false,
+    }));
+    const { container } = render(<ExerciseSelector exercises={few} value="" onChange={() => {}} />);
+    expect(container.querySelector('optgroup')).toBeNull();
+    expect(screen.getAllByRole('option').length).toBe(16); // 15 + "— select —"
+  });
+
+  it('renders grouped optgroups when more than 15 exercises', () => {
+    const many = Array.from({ length: 16 }, (_, i) => ({
+      name: `Exercise ${i + 1}`,
+      muscles: { chest: 1 },
+      archived: false,
+    }));
+    const { container } = render(<ExerciseSelector exercises={many} value="" onChange={() => {}} />);
+    expect(container.querySelector('optgroup')).not.toBeNull();
+  });
+
+  it('flat list is sorted alphabetically', () => {
+    const few = [
+      { name: 'Squat', muscles: { quads: 1 }, archived: false },
+      { name: 'Bench Press', muscles: { chest: 1 }, archived: false },
+    ];
+    render(<ExerciseSelector exercises={few} value="" onChange={() => {}} />);
+    const options = screen.getAllByRole('option').map((o) => o.textContent);
+    expect(options.indexOf('Bench Press')).toBeLessThan(options.indexOf('Squat'));
+  });
 });

@@ -51,6 +51,7 @@ const defaultProps = {
   logDraft: { exercise: 'Bench Press', reps: '10', weight: '135', notes: '' },
   setLogDraft: vi.fn(),
   users: ['Ethan', 'Ava'],
+  onPlanSelect: vi.fn(),
 };
 
 describe('LogView', () => {
@@ -203,30 +204,36 @@ describe('LogView', () => {
     expect(screen.queryByRole('button', { name: 'All' })).not.toBeInTheDocument();
   });
 
-  it('clicking a plan chip filters exercises to that plan', () => {
+  it('clicking a plan chip calls onPlanSelect with the plan id', () => {
+    const onPlanSelect = vi.fn();
+    const plans = [{ id: 'p1', name: 'Push Day', exerciseIds: ['ex-1'] }];
+    render(<LogView {...defaultProps} plans={plans} onPlanSelect={onPlanSelect} />);
+    fireEvent.click(screen.getByRole('button', { name: 'Push Day' }));
+    expect(onPlanSelect).toHaveBeenCalledWith('p1');
+  });
+
+  it('filters exercises when activePlanId prop is set', () => {
     const plans = [{ id: 'p1', name: 'Push Day', exerciseIds: ['ex-1'] }];
     const exercises = [
       { id: 'ex-1', name: 'Bench Press', muscles: {} },
       { id: 'ex-2', name: 'Squat', muscles: {} },
     ];
-    render(<LogView {...defaultProps} plans={plans} exercises={exercises} />);
-    fireEvent.click(screen.getByRole('button', { name: 'Push Day' }));
+    render(
+      <LogView {...defaultProps} plans={plans} exercises={exercises} activePlanId="p1" />
+    );
     const options = screen.getAllByRole('option');
     expect(options.map((o) => o.textContent)).toContain('Bench Press');
     expect(options.map((o) => o.textContent)).not.toContain('Squat');
   });
 
-  it('clicking All chip restores all exercises', () => {
+  it('clicking All chip calls onPlanSelect with null', () => {
+    const onPlanSelect = vi.fn();
     const plans = [{ id: 'p1', name: 'Push Day', exerciseIds: ['ex-1'] }];
-    const exercises = [
-      { id: 'ex-1', name: 'Bench Press', muscles: {} },
-      { id: 'ex-2', name: 'Squat', muscles: {} },
-    ];
-    render(<LogView {...defaultProps} plans={plans} exercises={exercises} />);
-    fireEvent.click(screen.getByRole('button', { name: 'Push Day' }));
+    render(
+      <LogView {...defaultProps} plans={plans} activePlanId="p1" onPlanSelect={onPlanSelect} />
+    );
     fireEvent.click(screen.getByRole('button', { name: 'All' }));
-    const options = screen.getAllByRole('option');
-    expect(options.map((o) => o.textContent)).toContain('Squat');
+    expect(onPlanSelect).toHaveBeenCalledWith(null);
   });
 
   it('shows confirm dialog and cancels delete without calling API', async () => {

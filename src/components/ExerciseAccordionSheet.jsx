@@ -1,6 +1,8 @@
 import { useState } from 'react';
 import { MUSCLE_GROUPS } from '../data/exercises';
 
+const FLAT_LIST_THRESHOLD = 15;
+
 const MUSCLE_LABELS = {
   chest: 'Chest',
   back: 'Back',
@@ -47,7 +49,9 @@ function groupByMuscle(exercises) {
 export default function ExerciseAccordionSheet({ exercises, value, onSelect, onClose }) {
   const [expandedSection, setExpandedSection] = useState(null);
   const visible = exercises.filter((ex) => !ex.archived);
-  const groups = groupByMuscle(visible);
+  const flat = visible.length <= FLAT_LIST_THRESHOLD;
+  const flatList = flat ? [...visible].sort((a, b) => a.name.localeCompare(b.name)) : null;
+  const groups = flat ? null : groupByMuscle(visible);
 
   function handleSectionToggle(key) {
     setExpandedSection((prev) => (prev === key ? null : key));
@@ -68,33 +72,44 @@ export default function ExerciseAccordionSheet({ exercises, value, onSelect, onC
           </button>
         </div>
         <div className="sheet-body">
-          {groups.map(({ key, label, exercises: group }) => (
-            <div key={key} className="accordion-section">
-              <button
-                type="button"
-                className="accordion-header"
-                onClick={() => handleSectionToggle(key)}
-              >
-                <span className="accordion-chevron">{expandedSection === key ? '▾' : '▸'}</span>
-                <span className="accordion-label">{label}</span>
-                <span className="accordion-count">{group.length}</span>
-              </button>
-              {expandedSection === key && (
-                <div className="accordion-items">
-                  {group.map((ex) => (
-                    <button
-                      type="button"
-                      key={ex.name}
-                      className={`accordion-item${ex.name === value ? ' selected' : ''}`}
-                      onClick={() => handleSelect(ex.name)}
-                    >
-                      {ex.name}
-                    </button>
-                  ))}
+          {flat
+            ? flatList.map((ex) => (
+                <button
+                  type="button"
+                  key={ex.name}
+                  className={`accordion-item${ex.name === value ? ' selected' : ''}`}
+                  onClick={() => handleSelect(ex.name)}
+                >
+                  {ex.name}
+                </button>
+              ))
+            : groups.map(({ key, label, exercises: group }) => (
+                <div key={key} className="accordion-section">
+                  <button
+                    type="button"
+                    className="accordion-header"
+                    onClick={() => handleSectionToggle(key)}
+                  >
+                    <span className="accordion-chevron">{expandedSection === key ? '▾' : '▸'}</span>
+                    <span className="accordion-label">{label}</span>
+                    <span className="accordion-count">{group.length}</span>
+                  </button>
+                  {expandedSection === key && (
+                    <div className="accordion-items">
+                      {group.map((ex) => (
+                        <button
+                          type="button"
+                          key={ex.name}
+                          className={`accordion-item${ex.name === value ? ' selected' : ''}`}
+                          onClick={() => handleSelect(ex.name)}
+                        >
+                          {ex.name}
+                        </button>
+                      ))}
+                    </div>
+                  )}
                 </div>
-              )}
-            </div>
-          ))}
+              ))}
         </div>
       </div>
     </div>

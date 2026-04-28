@@ -353,10 +353,11 @@ export default function LogView({
   setLogDraft,
   users = [],
   useAccordionPicker = false,
+  activePlanId = null,
+  onPlanSelect,
 }) {
   const [pendingDelete, setPendingDelete] = useState(null);
   const [fireworksLabel, setFireworksLabel] = useState(null);
-  const [activePlanId, setActivePlanId] = useState(null);
   const [prevExercise, setPrevExercise] = useState(null);
   const { exercise, reps, weight, notes } = logDraft;
 
@@ -366,7 +367,7 @@ export default function LogView({
   const todaysSets = getTodaysSets(sets, today);
 
   function handlePlanSelect(planId) {
-    setActivePlanId(planId);
+    onPlanSelect(planId);
     if (planId !== null) {
       selectPlan(plans, planId, exercises, exercise, setLogDraft);
     }

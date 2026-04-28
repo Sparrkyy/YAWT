@@ -14,19 +14,16 @@ describe('Accordion picker does not submit form', () => {
     });
   }
 
-  it('expanding an accordion section does not log a set', async () => {
+  it('selecting an exercise via the picker does not log a set', async () => {
     const user = userEvent.setup();
     render(<App />);
     await waitForAppLoad();
 
-    // Open picker, select an exercise to fill the form
+    // Open picker and select Bench Press (flat list — no sections to expand)
     const pickerBtn = document.querySelector('.picker-button');
     await user.click(pickerBtn);
 
-    // Expand Chest section and select Bench Press
-    const chestHeader = screen.getByText('Chest');
-    await user.click(chestHeader);
-    const benchItem = document.querySelector('.accordion-item');
+    const benchItem = screen.getByRole('button', { name: 'Bench Press' });
     await user.click(benchItem);
 
     // Fill in weight so the form would succeed if submitted
@@ -34,21 +31,15 @@ describe('Accordion picker does not submit form', () => {
     await user.clear(weightInput);
     await user.type(weightInput, '200');
 
-    // Count today's sets before interacting with the accordion
     const setsBefore = document.querySelectorAll('.set-row').length;
 
-    // Open picker again and expand a different section — this must NOT submit the form
+    // Open picker again and close it — must NOT submit the form
     const pickerBtnAgain = document.querySelector('.picker-button');
     await user.click(pickerBtnAgain);
 
-    const backHeader = screen.getByText('Back');
-    await user.click(backHeader);
-
-    // Close the picker via the close button
     const closeBtn = screen.getByText('✕');
     await user.click(closeBtn);
 
-    // Verify no new set was added
     const setsAfter = document.querySelectorAll('.set-row').length;
     expect(setsAfter).toBe(setsBefore);
   });

@@ -202,6 +202,7 @@ export default function App() {
   const [apiError, setApiError] = useState(null);
   const [apiLoading, setApiLoading] = useState(false);
   const [useAccordionPicker, setUseAccordionPicker] = useState(false);
+  const [activePlanId, setActivePlanId] = useState(null);
   const [darkMode, setDarkMode] = useState(() => localStorage.getItem('yawt_darkMode') === 'true');
   const pendingSheetIdRef = useRef(null); // carries sheet ID from step 1 → step 2 of setup
 
@@ -487,6 +488,8 @@ tryInit();
             setLogDraft={setLogDraft}
             users={users}
             useAccordionPicker={useAccordionPicker}
+            activePlanId={activePlanId}
+            onPlanSelect={setActivePlanId}
           />
         )}
         {tab === 'History' && (
