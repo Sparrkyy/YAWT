@@ -202,7 +202,7 @@ describe('App — syncPendingIfNeeded', () => {
     getMeasurements.mockResolvedValue([]);
   });
 
-  it('calls addSet for each pending set before loadApp', async () => {
+  it('calls addSet for each pending set during loadApp', async () => {
     const setA = { exercise: 'Bench Press', exerciseId: 'ex-1', weight: 135, reps: 8 };
     const setB = { exercise: 'Squat', exerciseId: 'ex-2', weight: 225, reps: 5 };
     enqueuePendingSet(setA);

@@ -310,7 +310,6 @@ tryInit();
 
   async function onSignIn() {
     setSignedIn(true);
-    await syncPendingIfNeeded();
 
     const storedSheetId = localStorage.getItem(storageKey('sheet'));
 
@@ -338,6 +337,7 @@ tryInit();
     setUseAccordionPicker(localStorage.getItem(storageKey('exercisePicker')) === 'true');
     setLoading(true);
     try {
+      await syncPendingIfNeeded();
       const [setsResult, exercisesResult, plansResult, measurementsResult] =
         await Promise.allSettled([getSets(), getExercises(), getPlans(), getMeasurements()]);
       const fetchedSets = fromSettled(setsResult, []);
