@@ -2,8 +2,9 @@ import { render, screen, fireEvent, act } from '@testing-library/react';
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import App from '../App';
 
-import { getSets, getExercises, getPlans, getMeasurements } from '../data/api';
+import { getSets, getExercises, getPlans, getMeasurements, addSet } from '../data/api';
 import { initAuth, signIn } from '../data/auth';
+import { saveOfflineCache, getPendingQueue, enqueuePendingSet } from '../data/offlineStorage';
 
 vi.mock('../data/auth', () => ({
   initAuth: vi.fn(),
@@ -21,6 +22,7 @@ vi.mock('../data/api', () => ({
   getExercises: vi.fn(() => new Promise(() => {})), // never resolves
   getPlans: vi.fn(() => new Promise(() => {})), // never resolves
   getMeasurements: vi.fn(() => new Promise(() => {})), // never resolves
+  addSet: vi.fn(() => Promise.resolve()),
   setSheetId: vi.fn(),
   setApiErrorHandler: vi.fn(),
 }));
@@ -28,6 +30,13 @@ vi.mock('../data/api', () => ({
 // Mock child views that aren't under test here to keep rendering lightweight
 vi.mock('../views/SetupView', () => ({
   default: ({ setupPhase }) => <div data-testid="setup-view">{setupPhase}</div>,
+}));
+vi.mock('../views/OfflineView', () => ({
+  default: ({ onSignIn }) => (
+    <div data-testid="offline-view">
+      <button onClick={onSignIn}>Back to sign-in</button>
+    </div>
+  ),
 }));
 vi.mock('../views/LogView', () => ({ default: () => <div data-testid="log-view" /> }));
 vi.mock('../views/HistoryView', () => ({ default: () => <div data-testid="history-view" /> }));
@@ -150,5 +159,87 @@ describe('App — conditional rendering state machine', () => {
       capturedOnSignIn();
     });
     expect(screen.getByText('Loading…')).toBeInTheDocument();
+  });
+});
+
+describe('App — offline mode', () => {
+  const EXERCISES = [{ id: 'ex-1', name: 'Bench Press', muscles: {}, archived: false }];
+
+  it('"Use Offline" button is absent when no cache exists', () => {
+    render(<App />);
+    expect(screen.queryByRole('button', { name: 'Use Offline' })).not.toBeInTheDocument();
+  });
+
+  it('"Use Offline" button is present when cache exists', () => {
+    saveOfflineCache('sub1', EXERCISES, ['Ethan']);
+    render(<App />);
+    expect(screen.getByRole('button', { name: 'Use Offline' })).toBeInTheDocument();
+  });
+
+  it('clicking "Use Offline" renders OfflineView', () => {
+    saveOfflineCache('sub1', EXERCISES, ['Ethan']);
+    render(<App />);
+    fireEvent.click(screen.getByRole('button', { name: 'Use Offline' }));
+    expect(screen.getByTestId('offline-view')).toBeInTheDocument();
+  });
+
+  it('OfflineView onSignIn callback returns to sign-in screen', () => {
+    saveOfflineCache('sub1', EXERCISES, ['Ethan']);
+    render(<App />);
+    fireEvent.click(screen.getByRole('button', { name: 'Use Offline' }));
+    fireEvent.click(screen.getByRole('button', { name: 'Back to sign-in' }));
+    expect(screen.getByRole('button', { name: 'Sign in with Google' })).toBeInTheDocument();
+  });
+});
+
+describe('App — syncPendingIfNeeded', () => {
+  beforeEach(() => {
+    localStorage.setItem('yawt_sheet_test-user', 'some-id');
+    localStorage.setItem('yawt_users_test-user', JSON.stringify(['Ethan']));
+    getSets.mockResolvedValue([]);
+    getExercises.mockResolvedValue([]);
+    getPlans.mockResolvedValue([]);
+    getMeasurements.mockResolvedValue([]);
+  });
+
+  it('calls addSet for each pending set before loadApp', async () => {
+    const setA = { exercise: 'Bench Press', exerciseId: 'ex-1', weight: 135, reps: 8 };
+    const setB = { exercise: 'Squat', exerciseId: 'ex-2', weight: 225, reps: 5 };
+    enqueuePendingSet(setA);
+    enqueuePendingSet(setB);
+    render(<App />);
+    await act(async () => {
+      await capturedOnSignIn();
+    });
+    expect(addSet).toHaveBeenCalledTimes(2);
+    expect(addSet).toHaveBeenCalledWith(setA);
+    expect(addSet).toHaveBeenCalledWith(setB);
+  });
+
+  it('clears the pending queue after sync', async () => {
+    enqueuePendingSet({ exercise: 'Squat', weight: 225 });
+    render(<App />);
+    await act(async () => {
+      await capturedOnSignIn();
+    });
+    expect(getPendingQueue()).toEqual([]);
+  });
+
+  it('does not call addSet when the queue is empty', async () => {
+    render(<App />);
+    await act(async () => {
+      await capturedOnSignIn();
+    });
+    expect(addSet).not.toHaveBeenCalled();
+  });
+
+  it('clears the queue even if one addSet call rejects', async () => {
+    addSet.mockRejectedValueOnce(new Error('network'));
+    enqueuePendingSet({ exercise: 'Bench Press', weight: 135 });
+    render(<App />);
+    await act(async () => {
+      await capturedOnSignIn();
+    });
+    expect(getPendingQueue()).toEqual([]);
   });
 });

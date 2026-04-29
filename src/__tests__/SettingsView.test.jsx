@@ -242,4 +242,27 @@ describe('SettingsView', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Sign out' }));
     expect(onSignOut).toHaveBeenCalled();
   });
+
+  // --- Offline use ---
+  it('renders "Sync exercises for offline use" button', () => {
+    renderSettings();
+    expect(screen.getByRole('button', { name: 'Sync exercises for offline use' })).toBeInTheDocument();
+  });
+
+  it('calls onSyncOffline when sync button is clicked', () => {
+    const onSyncOffline = vi.fn();
+    renderSettings({ onSyncOffline });
+    fireEvent.click(screen.getByRole('button', { name: 'Sync exercises for offline use' }));
+    expect(onSyncOffline).toHaveBeenCalledTimes(1);
+  });
+
+  it('shows synced exercise count when offlineSynced is true', () => {
+    renderSettings({ offlineSynced: true, offlineSyncCount: 42 });
+    expect(screen.getByText('42 exercises synced')).toBeInTheDocument();
+  });
+
+  it('does not show sync count when offlineSynced is false', () => {
+    renderSettings({ offlineSynced: false, offlineSyncCount: 42 });
+    expect(screen.queryByText('42 exercises synced')).not.toBeInTheDocument();
+  });
 });

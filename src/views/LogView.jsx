@@ -5,6 +5,7 @@ import ExerciseSelector from '../components/ExerciseSelector';
 import Fireworks from '../components/Fireworks';
 import SwipeableRow from '../components/SwipeableRow';
 import { addSet, deleteSet } from '../data/api';
+import UserToggle from '../components/UserToggle';
 import {
   getBestSet,
   getLastSet,
@@ -93,9 +94,6 @@ function handleToggleExercise(exercise, prevExercise, sets, activeUser, setLogDr
 
 function planChipClass(activePlanId, p) {
   return `plan-chip${activePlanId === p.id ? ' active' : ''}`;
-}
-function userBtnClass(activeUser, u) {
-  return `user-btn${activeUser === u ? ' active' : ''}`;
 }
 
 function selectPlan(plans, planId, exercises, currentExercise, setLogDraft) {
@@ -330,17 +328,6 @@ function FireworksCelebration({ label, onDismiss }) {
   return <Fireworks label={label} onDismiss={onDismiss} />;
 }
 
-function UserToggle({ users, activeUser, onUserChange }) {
-  return (
-    <div className="user-toggle">
-      {users.map((u) => (
-        <button key={u} className={userBtnClass(activeUser, u)} onClick={() => onUserChange(u)}>
-          {u}
-        </button>
-      ))}
-    </div>
-  );
-}
 
 function ExerciseStats({ sets, exercise, activeUser, weight }) {
   if (!exercise) return null;

@@ -125,6 +125,13 @@
   margin-top: 8px;
 }
 
+.offline-pending-badge {
+  font-size: 0.8rem;
+  color: var(--text-secondary);
+  text-align: center;
+  margin: 0;
+}
+
 /* Loading spinner */
 .loading-spinner {
   display: block;

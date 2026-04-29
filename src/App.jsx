@@ -6,10 +6,19 @@ import {
   getExercises,
   getPlans,
   getMeasurements,
+  addSet,
   setSheetId,
   setApiErrorHandler,
   DEV_MODE,
 } from './data/api';
+import {
+  isOfflineEnabled,
+  setOfflineEnabled,
+  saveOfflineCache,
+  hasOfflineCache,
+  getPendingQueue,
+  clearPendingQueue,
+} from './data/offlineStorage';
 import {
   initAuth,
   signIn,
@@ -26,6 +35,7 @@ import HistoryView from './views/HistoryView';
 import LogView from './views/LogView';
 import MeasurementsView from './views/MeasurementsView';
 import PlansView from './views/PlansView';
+import OfflineView from './views/OfflineView';
 import SettingsView from './views/SettingsView';
 import SetupView from './views/SetupView';
 import StatsView from './views/StatsView';
@@ -204,6 +214,7 @@ export default function App() {
   const [useAccordionPicker, setUseAccordionPicker] = useState(false);
   const [activePlanId, setActivePlanId] = useState(null);
   const [darkMode, setDarkMode] = useState(() => localStorage.getItem('yawt_darkMode') === 'true');
+  const [offlineMode, setOfflineMode] = useState(false);
   const pendingSheetIdRef = useRef(null); // carries sheet ID from step 1 → step 2 of setup
 
   // Sync dark mode to DOM and localStorage
@@ -278,8 +289,28 @@ useEffect(() => {
 tryInit();
   }, []);
 
+  async function syncPendingIfNeeded() {
+    const queue = getPendingQueue();
+    if (queue.length === 0) return;
+    await Promise.allSettled(queue.map((set) => addSet(set)));
+    clearPendingQueue();
+  }
+
+  function maybeSaveOfflineCache(fetchedExercises, userList) {
+    if (!isOfflineEnabled(getUserSub())) return;
+    if (fetchedExercises.length === 0) return;
+    saveOfflineCache(getUserSub(), fetchedExercises, userList);
+  }
+
+  function handleSyncOffline() {
+    if (exercises.length === 0) return;
+    saveOfflineCache(getUserSub(), exercises, users);
+    setOfflineEnabled(getUserSub(), true);
+  }
+
   async function onSignIn() {
     setSignedIn(true);
+    await syncPendingIfNeeded();
 
     const storedSheetId = localStorage.getItem(storageKey('sheet'));
 
@@ -316,6 +347,7 @@ tryInit();
       setExercises(fetchedExercises);
       setPlans(fetchedPlans);
       setMeasurements(fromSettled(measurementsResult, []));
+      maybeSaveOfflineCache(fetchedExercises, userList);
       const defaultExercise = getLastExerciseToday(fetchedSets, userList[0]);
       if (defaultExercise) {
         const lastSet = getLastSet(fetchedSets, defaultExercise, userList[0]);
@@ -405,6 +437,10 @@ tryInit();
     setSharedExercise('');
   }
 
+  if (offlineMode) {
+    return <OfflineView onSignIn={() => setOfflineMode(false)} />;
+  }
+
   if (!signedIn) {
     return (
       <div className="app sign-in-screen">
@@ -417,6 +453,11 @@ tryInit();
           <button className="btn-primary sign-in-btn" onClick={signIn} disabled={!authReady}>
             {authReady ? 'Sign in with Google' : 'Loading…'}
           </button>
+          {hasOfflineCache() && (
+            <button className="btn-secondary sign-in-btn" onClick={() => setOfflineMode(true)}>
+              Use Offline
+            </button>
+          )}
         </div>
         <LoadingOverlay visible={apiLoading} />
         <ErrorDialog
@@ -555,6 +596,9 @@ tryInit();
             }}
             darkMode={darkMode}
             onDarkModeChange={setDarkMode}
+            offlineSynced={isOfflineEnabled(getUserSub())}
+            offlineSyncCount={exercises.length}
+            onSyncOffline={handleSyncOffline}
           />
         )}
       </main>

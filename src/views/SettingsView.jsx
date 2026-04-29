@@ -129,6 +129,20 @@ function PreferencesSection({
   );
 }
 
+function OfflineSection({ offlineSynced, offlineSyncCount, onSyncOffline }) {
+  return (
+    <section className="settings-section">
+      <h2 className="settings-heading">Offline use</h2>
+      {offlineSynced && (
+        <p className="settings-offline-status">{offlineSyncCount} exercises synced</p>
+      )}
+      <button className="settings-text-btn" onClick={onSyncOffline}>
+        Sync exercises for offline use
+      </button>
+    </section>
+  );
+}
+
 function DataSection({ migrateStatus, migrateLoading, onMigrate }) {
   return (
     <section className="settings-section">
@@ -211,6 +225,9 @@ export default function SettingsView({
   onAccordionPickerChange,
   darkMode = false,
   onDarkModeChange,
+  offlineSynced = false,
+  offlineSyncCount = 0,
+  onSyncOffline,
 }) {
   const [sheetInput, setSheetInput] = useState('');
   const [sheetLoading, setSheetLoading] = useState(false);
@@ -287,6 +304,12 @@ export default function SettingsView({
         useAccordionPicker={useAccordionPicker}
         onDarkModeChange={onDarkModeChange}
         onAccordionPickerChange={onAccordionPickerChange}
+      />
+
+      <OfflineSection
+        offlineSynced={offlineSynced}
+        offlineSyncCount={offlineSyncCount}
+        onSyncOffline={onSyncOffline}
       />
 
       <DataSection
