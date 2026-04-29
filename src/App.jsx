@@ -409,6 +409,9 @@ tryInit();
     return (
       <div className="app sign-in-screen">
         <div className="sign-in-card">
+          <div className="sign-in-logo">
+            <img src="yawt-icon.svg" alt="YAWT" />
+          </div>
           <h1 className="app-title">YAWT</h1>
           <p className="sign-in-subtitle">Yet Another Workout Tracker</p>
           <button className="btn-primary sign-in-btn" onClick={signIn} disabled={!authReady}>
@@ -469,10 +472,23 @@ tryInit();
     );
   }
 
+  function cycleUser() {
+    const idx = users.indexOf(activeUser);
+    handleUserChange(users[(idx + 1) % users.length]);
+  }
+
   return (
     <div className={`app${tab === 'Log' ? ` user-${activeUser.toLowerCase()}` : ''}`}>
       <header className="app-header">
-        <img src="yawt-icon.svg" className="app-logo-icon" alt="YAWT" />
+        <h1 className="app-title">{tab}</h1>
+        {users.length > 1 && (
+          <button className="header-user-pill" onClick={cycleUser}>
+            {activeUser}
+            <svg width="9" height="6" viewBox="0 0 9 6" fill="currentColor" aria-hidden="true">
+              <path d="M0 0l4.5 6L9 0z" />
+            </svg>
+          </button>
+        )}
       </header>
 
       <main className="app-main">

@@ -38,7 +38,7 @@ describe('HistoryView', () => {
   it('shows sets grouped under a formatted date heading', () => {
     const sets = [makeSet({ date: '2026-02-16' })];
     render(<HistoryView sets={sets} onSetsChange={() => {}} />);
-    expect(screen.getByText(/Feb 16/)).toBeInTheDocument();
+    expect(screen.getByText(/FEB 16/i)).toBeInTheDocument();
     expect(screen.getByText('Bench Press')).toBeInTheDocument();
   });
 
@@ -48,9 +48,9 @@ describe('HistoryView', () => {
       makeSet({ date: '2026-02-19', exercise: 'Bench Press' }),
     ];
     render(<HistoryView sets={sets} onSetsChange={() => {}} />);
-    const headings = screen.getAllByRole('heading', { level: 3 });
-    expect(headings[0].textContent).toMatch(/Feb 19/);
-    expect(headings[1].textContent).toMatch(/Feb 10/);
+    const dateHeaders = document.querySelectorAll('.history-date');
+    expect(dateHeaders[0].textContent).toMatch(/FEB 19/i);
+    expect(dateHeaders[1].textContent).toMatch(/FEB 10/i);
   });
 
   it('does not render the user toggle when users array is empty', () => {
@@ -98,14 +98,14 @@ describe('HistoryView', () => {
     expect(screen.getByText('No sets for Ava.')).toBeInTheDocument();
   });
 
-  it('formats stats as "reps @ weight lbs" when both are present', () => {
+  it('formats stats as "weight lbs × reps reps" when both are present', () => {
     render(<HistoryView sets={[makeSet({ reps: 8, weight: 135 })]} onSetsChange={() => {}} />);
-    expect(screen.getByText('8 reps @ 135 lbs')).toBeInTheDocument();
+    expect(screen.getByText('135 lbs × 8 reps')).toBeInTheDocument();
   });
 
-  it('formats stats as "— @ weight lbs" when reps is null', () => {
+  it('formats stats as "weight lbs" when reps is null', () => {
     render(<HistoryView sets={[makeSet({ reps: null, weight: 135 })]} onSetsChange={() => {}} />);
-    expect(screen.getByText('— @ 135 lbs')).toBeInTheDocument();
+    expect(screen.getByText('135 lbs')).toBeInTheDocument();
   });
 
   it('shows only reps when weight is 0', () => {

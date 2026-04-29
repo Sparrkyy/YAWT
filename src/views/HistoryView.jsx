@@ -3,10 +3,19 @@ import ConfirmDialog from '../components/ConfirmDialog';
 import SwipeableRow from '../components/SwipeableRow';
 import { deleteSet } from '../data/api';
 
+function BarbellIcon() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <path d="M6 4v16M18 4v16M6 9h12M6 15h12M2 9v6M22 9v6" />
+    </svg>
+  );
+}
+
 function formatStats(s) {
-  const reps = s.reps != null ? `${s.reps} reps` : '—';
-  if (!s.weight) return reps;
-  return `${reps} @ ${s.weight} lbs`;
+  const parts = [];
+  if (s.weight) parts.push(`${s.weight} lbs`);
+  if (s.reps != null) parts.push(`${s.reps} reps`);
+  return parts.join(' × ') || '—';
 }
 
 function groupByDate(sets) {
@@ -75,20 +84,26 @@ export default function HistoryView({ sets, onSetsChange, activeUser, onUserChan
     }
     return sortedDates.map((date) => (
       <div key={date} className="history-day">
-        <h3 className="history-date">
+        <div className="history-date">
           {new Date(date + 'T12:00:00').toLocaleDateString('en-US', {
-            weekday: 'short',
             month: 'short',
             day: 'numeric',
-          })}
-        </h3>
+            year: 'numeric',
+          }).toUpperCase()}
+        </div>
         {byDate[date].map((s) => (
           <SwipeableRow key={s.id} onDelete={({ snapBack }) => handleRequestDelete(s.id, snapBack)}>
             <div className={`set-row ${s.user?.toLowerCase()}`}>
               <span className="set-user">{s.user}</span>
-              <span className="set-exercise">{s.exercise}</span>
-              <span className="set-stats">{formatStats(s)}</span>
-              {s.notes && <span className="set-notes">{s.notes}</span>}
+              <div className="set-icon"><BarbellIcon /></div>
+              <div className="set-content">
+                <span className="set-exercise">{s.exercise}</span>
+                <span className="set-stats">{formatStats(s)}</span>
+                {s.notes && <span className="set-notes">{s.notes}</span>}
+              </div>
+              <div className="set-right">
+                <span className="set-chevron">›</span>
+              </div>
             </div>
           </SwipeableRow>
         ))}

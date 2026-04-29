@@ -5,6 +5,14 @@ import { addExercise, updateExercise } from '../data/api';
 import { groupExercises } from '../data/grouping';
 import ExerciseEditSheet from './ExerciseEditSheet';
 
+function BarbellIcon() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <path d="M6 4v16M18 4v16M6 9h12M6 15h12M2 9v6M22 9v6" />
+    </svg>
+  );
+}
+
 const MUSCLE_LABELS = {
   chest: 'Chest',
   back: 'Back',
@@ -102,10 +110,13 @@ export default function ExercisesView({ exercises, onExercisesChange }) {
                 onDelete={({ snapBack }) => handleArchiveRequest(ex, snapBack)}
               >
                 <div className="exercise-item tappable" onClick={() => setEditingExercise(ex)}>
-                  <span className="exercise-name">{ex.name}</span>
-                  {Object.keys(ex.muscles).length > 0 && (
-                    <span className="exercise-muscles">{primaryMuscles(ex.muscles)}</span>
-                  )}
+                  <div className="exercise-item-icon"><BarbellIcon /></div>
+                  <div className="exercise-item-content">
+                    <span className="exercise-name">{ex.name}</span>
+                    {Object.keys(ex.muscles).length > 0 && (
+                      <span className="exercise-muscles">{primaryMuscles(ex.muscles)}</span>
+                    )}
+                  </div>
                 </div>
               </SwipeableRow>
             ))}

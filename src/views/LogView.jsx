@@ -134,42 +134,66 @@ function RecentNotes({ sets, exercise, activeUser }) {
 function PlanChips({ plans, activePlanId, onSelect }) {
   if (plans.length === 0) return null;
   return (
-    <div className="plan-chips">
-      <button
-        type="button"
-        className={`plan-chip${activePlanId === null ? ' active' : ''}`}
-        onClick={() => onSelect(null)}
-      >
-        All
-      </button>
-      {plans.map((p) => (
+    <div className="plan-chips-wrap">
+      <div className="plan-chips-label">Plan Filter</div>
+      <div className="plan-chips">
         <button
-          key={p.id}
           type="button"
-          className={planChipClass(activePlanId, p)}
-          onClick={() => onSelect(p.id)}
+          className={`plan-chip${activePlanId === null ? ' active' : ''}`}
+          onClick={() => onSelect(null)}
         >
-          {p.name}
+          All
         </button>
-      ))}
+        {plans.map((p) => (
+          <button
+            key={p.id}
+            type="button"
+            className={planChipClass(activePlanId, p)}
+            onClick={() => onSelect(p.id)}
+          >
+            {p.name}
+          </button>
+        ))}
+      </div>
     </div>
   );
 }
 
-function SetRow({ set, onDelete }) {
+function BarbellIcon() {
+  return (
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+      <path d="M6 4v16M18 4v16M6 9h12M6 15h12M2 9v6M22 9v6" />
+    </svg>
+  );
+}
+
+function formatSetStats(set) {
+  const parts = [];
+  if (set.weight) parts.push(`${set.weight} lbs`);
+  if (set.reps != null) parts.push(`${set.reps} reps`);
+  return parts.join(' × ') || '—';
+}
+
+function SetRow({ set, onDelete, showUser }) {
   function handleDelete({ snapBack }) {
     onDelete({ id: set.id, snapBack });
   }
+  const stats = showUser
+    ? `${set.user} · ${formatSetStats(set)}`
+    : formatSetStats(set);
   return (
     <SwipeableRow key={set.id} onDelete={handleDelete}>
       <div className={`set-row ${set.user.toLowerCase()}`}>
         <span className="set-user">{set.user}</span>
-        <span className="set-exercise">{set.exercise}</span>
-        <span className="set-stats">
-          {set.reps != null ? `${set.reps} reps` : '—'}
-          {set.weight ? ` @ ${set.weight} lbs` : ''}
-        </span>
-        {set.notes && <span className="set-notes">{set.notes}</span>}
+        <div className="set-icon"><BarbellIcon /></div>
+        <div className="set-content">
+          <span className="set-exercise">{set.exercise}</span>
+          <span className="set-stats">{stats}</span>
+          {set.notes && <span className="set-notes">{set.notes}</span>}
+        </div>
+        <div className="set-right">
+          <span className="set-chevron">›</span>
+        </div>
       </div>
     </SwipeableRow>
   );
@@ -273,19 +297,24 @@ function LogForm({
       </div>
 
       <button type="submit" className="btn-primary" disabled={!isExerciseReady}>
-        Add Set
+        Log Set
       </button>
     </form>
   );
 }
 
-function TodaysSets({ todaysSets, onSetDelete }) {
+function TodaysSets({ todaysSets, onSetDelete, multiUser }) {
   if (todaysSets.length === 0) return null;
+  const today = new Date().toLocaleDateString('en-US', {
+    month: 'short',
+    day: 'numeric',
+    year: 'numeric',
+  }).toUpperCase();
   return (
     <div className="todays-sets">
-      <h3>Today</h3>
+      <div className="todays-sets-header">TODAY · {today}</div>
       {todaysSets.map((s) => (
-        <SetRow key={s.id} set={s} onDelete={onSetDelete} />
+        <SetRow key={s.id} set={s} onDelete={onSetDelete} showUser={multiUser} />
       ))}
     </div>
   );
@@ -445,6 +474,7 @@ export default function LogView({
       <TodaysSets
         todaysSets={todaysSets}
         onSetDelete={({ id, snapBack }) => handleRequestDelete(id, snapBack)}
+        multiUser={users.length > 1}
       />
       <DeleteConfirm
         pendingDelete={pendingDelete}

@@ -81,7 +81,7 @@ describe('LogView', () => {
     vi.spyOn(logUtils, 'isNewPR').mockReturnValue(true);
     render(<LogView {...defaultProps} />);
 
-    fireEvent.submit(screen.getByRole('button', { name: 'Add Set' }).closest('form'));
+    fireEvent.submit(screen.getByRole('button', { name: 'Log Set' }).closest('form'));
 
     await waitFor(() => {
       expect(screen.getByTestId('fireworks')).toBeInTheDocument();
@@ -96,7 +96,7 @@ describe('LogView', () => {
     vi.spyOn(logUtils, 'isNewBestSetEver').mockReturnValue(false);
     render(<LogView {...defaultProps} />);
 
-    fireEvent.submit(screen.getByRole('button', { name: 'Add Set' }).closest('form'));
+    fireEvent.submit(screen.getByRole('button', { name: 'Log Set' }).closest('form'));
 
     await waitFor(() => {
       expect(defaultProps.onSetsChange).toHaveBeenCalled();
@@ -110,7 +110,7 @@ describe('LogView', () => {
     vi.spyOn(logUtils, 'isNewPR').mockReturnValue(false);
     render(<LogView {...defaultProps} />);
 
-    fireEvent.submit(screen.getByRole('button', { name: 'Add Set' }).closest('form'));
+    fireEvent.submit(screen.getByRole('button', { name: 'Log Set' }).closest('form'));
 
     await waitFor(() => {
       expect(screen.getByTestId('fireworks')).toBeInTheDocument();
@@ -124,7 +124,7 @@ describe('LogView', () => {
     vi.spyOn(logUtils, 'isNewPR').mockReturnValue(true);
     render(<LogView {...defaultProps} />);
 
-    fireEvent.submit(screen.getByRole('button', { name: 'Add Set' }).closest('form'));
+    fireEvent.submit(screen.getByRole('button', { name: 'Log Set' }).closest('form'));
 
     await waitFor(() => {
       expect(screen.getByTestId('fireworks')).toBeInTheDocument();
@@ -312,7 +312,7 @@ describe('LogView', () => {
         logDraft={{ exercise: 'Bench Press', reps: '10', weight: '', notes: '' }}
       />
     );
-    fireEvent.submit(screen.getByRole('button', { name: 'Add Set' }).closest('form'));
+    fireEvent.submit(screen.getByRole('button', { name: 'Log Set' }).closest('form'));
     expect(addSet).not.toHaveBeenCalled();
   });
 
@@ -443,7 +443,7 @@ describe('LogView', () => {
     expect(screen.getByText('100 lbs')).toBeInTheDocument();
   });
 
-  it('shows null-reps stat as "— @ weight" for today set', () => {
+  it('shows null-reps stat as "weight lbs" for today set', () => {
     const today = new Date().toLocaleDateString('en-CA');
     const todaySet = {
       id: 's2',
@@ -456,7 +456,7 @@ describe('LogView', () => {
       createdAt: new Date().toISOString(),
     };
     render(<LogView {...defaultProps} sets={[todaySet]} />);
-    expect(screen.getByText('— @ 100 lbs')).toBeInTheDocument();
+    expect(screen.getByText('100 lbs')).toBeInTheDocument();
   });
 
   it('shows notes for today sets', () => {
