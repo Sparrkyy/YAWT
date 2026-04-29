@@ -48,3 +48,4 @@ export function stopLoading() {
 export function setLoadingListener(fn) {
   listener = fn;
 }
+

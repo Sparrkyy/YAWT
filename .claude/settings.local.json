@@ -42,7 +42,17 @@
       "Bash(npx --yes typhonjs-escomplex-runner analyze --output complexity_report.json src/App.jsx src/views/LogView.jsx src/views/StatsView.jsx src/views/HistoryView.jsx src/data/sheetsApi.js src/data/statsUtils.js src/data/logUtils.js)",
       "Bash(git pull *)",
       "Skill(update-config)",
-      "Bash(npx eslint *)"
+      "Bash(npx eslint *)",
+      "Bash(xcode-select -p)",
+      "Read(//Applications/**)",
+      "Bash(brew --version)",
+      "Bash(xcode-select --print-path)",
+      "Bash(/Applications/Xcode.app/Contents/Developer/usr/bin/xcodebuild -version)",
+      "Bash(sudo xcode-select *)",
+      "Bash(brew install *)",
+      "Bash(xcodegen generate *)",
+      "Bash(open *)",
+      "Bash(lsof -ti:5173)"
     ]
   }
 }
