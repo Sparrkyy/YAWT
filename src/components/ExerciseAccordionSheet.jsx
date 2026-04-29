@@ -73,16 +73,20 @@ export default function ExerciseAccordionSheet({ exercises, value, onSelect, onC
         </div>
         <div className="sheet-body">
           {flat
-            ? flatList.map((ex) => (
-                <button
-                  type="button"
-                  key={ex.name}
-                  className={`accordion-item${ex.name === value ? ' selected' : ''}`}
-                  onClick={() => handleSelect(ex.name)}
-                >
-                  {ex.name}
-                </button>
-              ))
+            ? (
+                <div className="accordion-items">
+                  {flatList.map((ex) => (
+                    <button
+                      type="button"
+                      key={ex.name}
+                      className={`accordion-item${ex.name === value ? ' selected' : ''}`}
+                      onClick={() => handleSelect(ex.name)}
+                    >
+                      {ex.name}
+                    </button>
+                  ))}
+                </div>
+              )
             : groups.map(({ key, label, exercises: group }) => (
                 <div key={key} className="accordion-section">
                   <button
