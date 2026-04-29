@@ -47,5 +47,8 @@ export function stopLoading() {
 
 export function setLoadingListener(fn) {
   listener = fn;
+  if (counter > 0) {
+    listener?.(true);
+  }
 }
 

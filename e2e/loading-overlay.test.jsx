@@ -56,30 +56,28 @@ describe('Loading overlay', () => {
     }, { timeout: 3000 });
   });
 
-  it.skip('shows loading overlay during initial data load', async () => {
-    // Use a 4s delay so the overlay stays visible long enough for CI to catch it
-    // Delay both Sets and Exercises since they're fetched in parallel
+  it('shows loading overlay during initial data load', async () => {
+    worker.resetHandlers();
+
     worker.use(
       http.get('https://sheets.googleapis.com/v4/spreadsheets/:sheetId/values/Sets!A:I', async () => {
-        await delay(4000);
+        await delay(2000);
         return HttpResponse.json({ values: [] });
       }),
       http.get('https://sheets.googleapis.com/v4/spreadsheets/:sheetId/values/Exercises!A:D', async () => {
-        await delay(4000);
+        await delay(2000);
         return HttpResponse.json({ values: [] });
       }),
     );
 
     render(<App />);
 
-    // Overlay should appear during initial load (longer timeout for CI session-restore lag)
     await waitFor(() => {
       expect(document.querySelector('.loading-overlay')).toBeInTheDocument();
-    }, { timeout: 5000 });
+    }, { timeout: 3000 });
 
-    // Should eventually disappear
     await waitFor(() => {
       expect(document.querySelector('.loading-overlay')).not.toBeInTheDocument();
-    }, { timeout: 8000 });
+    }, { timeout: 5000 });
   });
 });
