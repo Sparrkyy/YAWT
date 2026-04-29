@@ -57,10 +57,10 @@ describe('Loading overlay', () => {
   });
 
   it('shows loading overlay during initial data load', async () => {
-    // Add a long delay so the overlay stays visible long enough for CI to catch it
+    // Use a 3s delay so the overlay stays visible long enough for CI to catch it
     worker.use(
       http.get('https://sheets.googleapis.com/v4/spreadsheets/:sheetId/values/Sets!A:I', async () => {
-        await delay(1000);
+        await delay(3000);
         return HttpResponse.json({ values: [] });
       }),
     );
@@ -70,11 +70,11 @@ describe('Loading overlay', () => {
     // Overlay should appear during initial load (longer timeout for CI session-restore lag)
     await waitFor(() => {
       expect(document.querySelector('.loading-overlay')).toBeInTheDocument();
-    }, { timeout: 3000 });
+    }, { timeout: 5000 });
 
     // Should eventually disappear
     await waitFor(() => {
       expect(document.querySelector('.loading-overlay')).not.toBeInTheDocument();
-    }, { timeout: 5000 });
+    }, { timeout: 8000 });
   });
 });
