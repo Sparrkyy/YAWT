@@ -8,7 +8,7 @@ describe('Stats view', () => {
     render(<App />);
 
     await waitFor(() => {
-      expect(screen.getByText('Add Set')).toBeInTheDocument();
+      expect(screen.getByText('Log Set')).toBeInTheDocument();
     });
 
     const navButtons = screen.getAllByRole('button');

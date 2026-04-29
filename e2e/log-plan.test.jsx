@@ -9,7 +9,7 @@ function getExerciseSelect() {
 describe('Sticky plan selection', () => {
   async function waitForAppLoad() {
     await waitFor(() => {
-      expect(screen.getByText('Add Set')).toBeInTheDocument();
+      expect(screen.getByText('Log Set')).toBeInTheDocument();
     });
   }
 
@@ -22,7 +22,7 @@ describe('Sticky plan selection', () => {
 
     // Navigate away to History tab
     await user.click(screen.getByRole('button', { name: /history/i }));
-    await waitFor(() => expect(screen.queryByText('Add Set')).not.toBeInTheDocument());
+    await waitFor(() => expect(screen.queryByText('Log Set')).not.toBeInTheDocument());
 
     // Navigate back to Log tab
     await user.click(screen.getByRole('button', { name: /log/i }));

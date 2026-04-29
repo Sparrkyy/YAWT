@@ -27,7 +27,7 @@ describe('API error dialog', () => {
 
     // Wait for app to load
     await waitFor(() => {
-      expect(screen.getByText('Add Set')).toBeInTheDocument();
+      expect(screen.getByText('Log Set')).toBeInTheDocument();
     });
 
     // Fill out the form
@@ -44,7 +44,7 @@ describe('API error dialog', () => {
       }),
     );
 
-    await user.click(screen.getByText('Add Set'));
+    await user.click(screen.getByText('Log Set'));
 
     await waitFor(() => {
       expect(screen.getByRole('alertdialog')).toBeInTheDocument();

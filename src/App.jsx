@@ -472,22 +472,22 @@ tryInit();
     );
   }
 
-  function cycleUser() {
-    const idx = users.indexOf(activeUser);
-    handleUserChange(users[(idx + 1) % users.length]);
-  }
-
   return (
     <div className={`app${tab === 'Log' ? ` user-${activeUser.toLowerCase()}` : ''}`}>
       <header className="app-header">
         <h1 className="app-title">{tab}</h1>
         {users.length > 1 && (
-          <button className="header-user-pill" onClick={cycleUser}>
-            {activeUser}
-            <svg width="9" height="6" viewBox="0 0 9 6" fill="currentColor" aria-hidden="true">
-              <path d="M0 0l4.5 6L9 0z" />
-            </svg>
-          </button>
+          <div className="header-user-toggle">
+            {users.map((u) => (
+              <button
+                key={u}
+                className={`header-user-btn${activeUser === u ? ' active' : ''}`}
+                onClick={() => handleUserChange(u)}
+              >
+                {u}
+              </button>
+            ))}
+          </div>
         )}
       </header>
 

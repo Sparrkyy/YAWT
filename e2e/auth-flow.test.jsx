@@ -25,7 +25,7 @@ describe('Auth flow', () => {
     render(<App />);
 
     await waitFor(() => {
-      expect(screen.getByText('Add Set')).toBeInTheDocument();
+      expect(screen.getByText('Log Set')).toBeInTheDocument();
     });
     expect(screen.getByRole('button', { name: 'Ethan' })).toBeInTheDocument();
     expect(screen.getByRole('button', { name: 'Ava' })).toBeInTheDocument();
@@ -36,7 +36,7 @@ describe('Auth flow', () => {
     render(<App />);
 
     await waitFor(() => {
-      expect(screen.getByText('Add Set')).toBeInTheDocument();
+      expect(screen.getByText('Log Set')).toBeInTheDocument();
     });
 
     // Navigate to History
@@ -72,7 +72,7 @@ describe('Auth flow', () => {
     // Navigate back to Log
     await user.click(getNavButton('Log'));
     await waitFor(() => {
-      expect(screen.getByText('Add Set')).toBeInTheDocument();
+      expect(screen.getByText('Log Set')).toBeInTheDocument();
     });
   });
 });

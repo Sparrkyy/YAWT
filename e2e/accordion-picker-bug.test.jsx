@@ -10,7 +10,7 @@ describe('Accordion picker does not submit form', () => {
 
   async function waitForAppLoad() {
     await waitFor(() => {
-      expect(screen.getByText('Add Set')).toBeInTheDocument();
+      expect(screen.getByText('Log Set')).toBeInTheDocument();
     });
   }
 

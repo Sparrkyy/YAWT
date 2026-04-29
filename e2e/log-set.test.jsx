@@ -17,7 +17,7 @@ function getRepsInput() {
 describe('Log set flow', () => {
   async function waitForAppLoad() {
     await waitFor(() => {
-      expect(screen.getByText('Add Set')).toBeInTheDocument();
+      expect(screen.getByText('Log Set')).toBeInTheDocument();
     });
   }
 
@@ -57,7 +57,7 @@ describe('Log set flow', () => {
     await user.type(weightInput, '135');
     await user.type(repsInput, '8');
 
-    await user.click(screen.getByText('Add Set'));
+    await user.click(screen.getByText('Log Set'));
 
     await waitFor(() => {
       const setRows = screen.getAllByText('Overhead Press');

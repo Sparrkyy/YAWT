@@ -36,23 +36,31 @@
   flex-shrink: 0;
 }
 
-.header-user-pill {
+.header-user-toggle {
   display: flex;
-  align-items: center;
-  gap: 5px;
-  padding: 6px 12px 6px 14px;
-  background: var(--surface2);
-  border: 1px solid var(--border);
-  border-radius: 999px;
-  font-size: 0.85rem;
-  font-weight: 600;
-  color: var(--text);
-  transition: opacity 0.15s;
+  gap: 6px;
   flex-shrink: 0;
 }
 
-.header-user-pill:active {
-  opacity: 0.7;
+.header-user-btn {
+  padding: 6px 12px;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 999px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  transition: background 0.15s, color 0.15s;
+}
+
+.header-user-btn.active {
+  background: var(--accent);
+  color: #1A1A1A;
+  border-color: var(--accent);
+}
+
+.header-user-btn:active {
+  opacity: 0.8;
 }
 
 .sign-out-btn {

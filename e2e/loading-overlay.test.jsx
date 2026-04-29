@@ -15,7 +15,7 @@ function getWeightInput() {
 describe('Loading overlay', () => {
   async function waitForAppLoad() {
     await waitFor(() => {
-      expect(screen.getByText('Add Set')).toBeInTheDocument();
+      expect(screen.getByText('Log Set')).toBeInTheDocument();
     });
   }
 
@@ -43,7 +43,7 @@ describe('Loading overlay', () => {
     await user.clear(weightInput);
     await user.type(weightInput, '135');
 
-    await user.click(screen.getByText('Add Set'));
+    await user.click(screen.getByText('Log Set'));
 
     // Overlay should appear
     await waitFor(() => {

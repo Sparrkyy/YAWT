@@ -13,7 +13,7 @@ function getWeightInput() {
 describe('Exercise toggle (superset back button)', () => {
   async function waitForAppLoad() {
     await waitFor(() => {
-      expect(screen.getByText('Add Set')).toBeInTheDocument();
+      expect(screen.getByText('Log Set')).toBeInTheDocument();
     });
   }
 
