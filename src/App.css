@@ -536,6 +536,26 @@
   font-weight: 600;
 }
 
+.exercise-toggle-btn {
+  width: 36px;
+  height: 36px;
+  flex-shrink: 0;
+  background: var(--surface2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  font-size: 1.1rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-secondary);
+  transition: background 0.15s, color 0.15s;
+}
+
+.exercise-toggle-btn:active {
+  background: var(--accent-dim);
+  color: var(--accent);
+}
+
 .add-exercise-form {
   display: flex;
   gap: 8px;

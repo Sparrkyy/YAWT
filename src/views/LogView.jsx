@@ -242,12 +242,12 @@ function LogForm({
           {prevExercise && (
             <button
               type="button"
-              className="btn-small"
+              className="exercise-toggle-btn"
               onClick={onToggleExercise}
               title={`Switch to ${prevExercise}`}
               aria-label={`Switch to ${prevExercise}`}
             >
-              ⇄ {prevExercise}
+              ⇄
             </button>
           )}
         </div>
